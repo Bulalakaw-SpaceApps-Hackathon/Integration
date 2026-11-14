@@ -18,18 +18,18 @@ script = ExtResource("2_a81h5")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.5
-source_name = "Based on Curiosity rover weather data (simplified)"
-why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
+why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
 
 [resource]
 script = ExtResource("3_5sd0w")
 title = "Welcome, Commander"
 theme = "Power"
-briefing_text = "The sun is setting, so the solar panels stop making power. Make the battery last until 06:00!"
-debrief_why = "At night there is no sunlight, so every light, heater and camera uses up stored battery."
+briefing_text = "The sun is setting in Gale Crater and temperatures will drop from -20 C to -80 C. Make the battery last until 06:00!"
+debrief_why = "At night there is no sunlight, and Mars's thin air loses heat fast. Every light, heater, and camera uses stored battery."
 debrief_tip = "Watch the forecast line. Switch off what you don't need before it's too late."
-did_you_know = "A day on Mars, called a sol, is about 24 hours and 39 minutes long."
-did_you_know_source = "NASA"
+did_you_know = "A day on Mars, called a sol, is 24 hours and 39 minutes long—and Curiosity's REMS station measures nights down to -80 C."
+did_you_know_source = "NASA Mars Science Laboratory (Curiosity REMS)"
 hazard_events = Array[ExtResource("2_a81h5")]([SubResource("Resource_x8fxu")])
 crew_ids = Array[String](["lani"])
 crew_schedule = Array[ExtResource("1_tr3h8")]([SubResource("Resource_c85hj"), SubResource("Resource_gc2xv")])

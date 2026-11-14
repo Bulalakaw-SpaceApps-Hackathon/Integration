@@ -6,7 +6,7 @@
 script = ExtResource("1_ovpgr")
 id = "radiation"
 title = "RADIATION"
-text = "Mars has a very thin atmosphere and no global magnetic field, so energetic particles from space can reach the ground. Curiosity's RAD instrument measures them."
-real_number = "2024-05-20: 8,100 microgray, about 30 chest X-rays"
-source = "NASA, Curiosity RAD (2024)"
+text = "Mars has thin air and no global magnetic field, so space radiation reaches the ground. NASA's Curiosity RAD and OSDR RadLab track how much dose astronauts and rovers absorb."
+real_number = "2024-05-20: 8,100 µGy (~30 chest X-rays)"
+source = "NASA Curiosity RAD & OSDR RadLab"
 order = 5
