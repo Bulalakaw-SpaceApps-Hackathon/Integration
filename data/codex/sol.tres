@@ -6,5 +6,6 @@
 script = ExtResource("1_fsdps")
 id = "sol"
 title = "A DAY ON MARS: THE SOL"
-text = "A day on Mars is called a sol. It lasts about 24 hours and 39 minutes."
-source = "NASA Mars Facts"
+text = "A day on Mars is called a sol, and it is slightly longer than an Earth day. Mission teams on Earth shift their clocks to live on Mars time."
+real_number = "24 hours, 39 minutes, 35 seconds"
+source = "NASA Mars Exploration / Curiosity REMS"
