@@ -1472,6 +1472,7 @@ class FeedView extends Control:
 	var cam: String = ""
 	var t := 0.0
 	var crew_rects: Array[Dictionary] = []    # {id, rect} where each crewmate was drawn (for taps)
+	var last_bg := ""
 
 	func _gui_input(event: InputEvent) -> void:
 		var mb := event as InputEventMouseButton
@@ -1523,7 +1524,12 @@ class FeedView extends Control:
 			if s != null and s.battery <= 0.0:
 				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
 			return
-		draw_texture(Assets.tex(_bg(s)), Vector2.ZERO)
+		var bg := _bg(s)
+		# the airlock door hisses open when a crewmate walks through, and clunks shut after
+		if cam == "airlock" and last_bg != "" and bg != last_bg:
+			Sfx.play("door_open" if bg == "cam_airlock_open" else "door_close", -12.0)
+		last_bg = bg
+		draw_texture(Assets.tex(bg), Vector2.ZERO)
 		# Solar Field gets darker as the battery charge drops
 		if cam == "solar_field":
 			draw_rect(Rect2(0, 0, 320, 180), Color(0.05, 0.02, 0.12, clampf((60.0 - s.battery) / 100.0, 0.0, 0.45)))
