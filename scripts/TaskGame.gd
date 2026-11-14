@@ -396,6 +396,13 @@ func _draw_area() -> void:
 	area.draw_set_transform(Vector2.ZERO)
 
 
+func _draw_bg(asset_name: String) -> bool:
+	if not Assets.has(asset_name):
+		return false
+	area.draw_texture_rect(Assets.tex(asset_name), Rect2(Vector2.ZERO, AREA), false)
+	return true
+
+
 func _mars_sky(horizon: float) -> void:
 	area.draw_rect(Rect2(0, 0, AREA.x, horizon), SKY_TOP)
 	area.draw_rect(Rect2(0, horizon - 30, AREA.x, 30), Color(Palette.SKY_VIOLET, 0.6))
@@ -408,7 +415,8 @@ func _mars_sky(horizon: float) -> void:
 
 
 func _draw_plug(f: Font) -> void:
-	_mars_sky(150)
+	if not _draw_bg("task_loose_cable"):
+		_mars_sky(150)
 	var c := Vector2(260, 115)
 	# three cable lights: one per plug
 	for i in 3:
@@ -432,12 +440,13 @@ func _draw_plug(f: Font) -> void:
 
 
 func _draw_sweep(f: Font) -> void:
-	_mars_sky(60)
-	area.draw_rect(Rect2(60, 50, 400, 160), Palette.SKY_INDIGO)
-	for x in range(60, 461, 50):
-		area.draw_line(Vector2(x, 50), Vector2(x, 210), Palette.SKY_HAZE, 1)
-	for y in range(50, 211, 40):
-		area.draw_line(Vector2(60, y), Vector2(460, y), Palette.SKY_HAZE, 1)
+	if not _draw_bg("task_panel_dust"):
+		_mars_sky(60)
+		area.draw_rect(Rect2(60, 50, 400, 160), Palette.SKY_INDIGO)
+		for x in range(60, 461, 50):
+			area.draw_line(Vector2(x, 50), Vector2(x, 210), Palette.SKY_HAZE, 1)
+		for y in range(50, 211, 40):
+			area.draw_line(Vector2(60, y), Vector2(460, y), Palette.SKY_HAZE, 1)
 	for d in dust:
 		area.draw_circle(d, 22, Palette.MARS_SAND)
 		area.draw_circle(d + Vector2(-6, -5), 9, Color(Palette.MARS_ORANGE, 0.5))
@@ -449,7 +458,8 @@ func _draw_sweep(f: Font) -> void:
 
 
 func _draw_moxie(f: Font) -> void:
-	area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), Palette.BASE_PLUM)
+	if not _draw_bg("task_clogged_filter"):
+		area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), Palette.BASE_PLUM)
 	# thermometer
 	area.draw_string(f, Vector2(30, 20), "HEAT", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 	area.draw_rect(Rect2(36, 30, 40, 180), Palette.INK)
@@ -474,15 +484,16 @@ func _draw_moxie(f: Font) -> void:
 
 
 func _draw_leaks(f: Font) -> void:
-	area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), SKY_TOP)
-	area.draw_rect(Rect2(0, 200, AREA.x, 30), Palette.MARS_RUST)
-	# airlock door: a round-cornered hatch
-	area.draw_rect(Rect2(150, 22, 220, 198), Palette.BASE_MAUVE)
-	area.draw_rect(Rect2(166, 34, 188, 174), Palette.BASE_STONE)
-	area.draw_rect(Rect2(166, 34, 188, 174), Palette.INK, false, 3)
-	area.draw_circle(Vector2(260, 121), 26, Palette.BASE_PLUM)
-	area.draw_arc(Vector2(260, 121), 26, 0, TAU, 24, Palette.INK, 3)
-	area.draw_line(Vector2(240, 121), Vector2(280, 121), Palette.BASE_CREAM, 4)
+	if not _draw_bg("task_airlock_leak"):
+		area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), SKY_TOP)
+		area.draw_rect(Rect2(0, 200, AREA.x, 30), Palette.MARS_RUST)
+		# airlock door: a round-cornered hatch
+		area.draw_rect(Rect2(150, 22, 220, 198), Palette.BASE_MAUVE)
+		area.draw_rect(Rect2(166, 34, 188, 174), Palette.BASE_STONE)
+		area.draw_rect(Rect2(166, 34, 188, 174), Palette.INK, false, 3)
+		area.draw_circle(Vector2(260, 121), 26, Palette.BASE_PLUM)
+		area.draw_arc(Vector2(260, 121), 26, 0, TAU, 24, Palette.INK, 3)
+		area.draw_line(Vector2(240, 121), Vector2(280, 121), Palette.BASE_CREAM, 4)
 	for i in leaks.size():
 		if leak_fixed[i]:
 			area.draw_rect(Rect2(leaks[i] - Vector2(12, 12), Vector2(24, 24)), Palette.STATUS_WARN)
@@ -493,7 +504,9 @@ func _draw_leaks(f: Font) -> void:
 
 
 func _draw_water(f: Font) -> void:
-	area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), Color("#1E3B2A"))
+	var has_bg := _draw_bg("task_greenhouse_leak")
+	if not has_bg:
+		area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), Color("#1E3B2A"))
 	# the pipe and its leak
 	area.draw_rect(Rect2(0, 28, AREA.x, 16), Palette.BASE_STONE)
 	area.draw_rect(Rect2(0, 28, AREA.x, 16), Palette.INK, false, 2)
@@ -507,10 +520,11 @@ func _draw_water(f: Font) -> void:
 		area.draw_circle(d, 5, EARTH_BLUE)
 		area.draw_colored_polygon(PackedVector2Array([d + Vector2(-4, -1), d + Vector2(4, -1), d + Vector2(0, -9)]), EARTH_BLUE)
 	# plants along the floor
-	for i in 7:
-		var x := 30.0 + i * 75.0
-		area.draw_rect(Rect2(x - 10, 214, 20, 16), Palette.MARS_CRIMSON)
-		area.draw_circle(Vector2(x, 208), 8, Palette.STATUS_OK)
+	if not has_bg:
+		for i in 7:
+			var x := 30.0 + i * 75.0
+			area.draw_rect(Rect2(x - 10, 214, 20, 16), Palette.MARS_CRIMSON)
+			area.draw_circle(Vector2(x, 208), 8, Palette.STATUS_OK)
 	# the cup
 	area.draw_rect(Rect2(cup_x - 24, 186, 48, 22), Palette.BASE_CREAM)
 	area.draw_rect(Rect2(cup_x - 24, 186, 48, 22), Palette.INK, false, 2)
@@ -519,7 +533,8 @@ func _draw_water(f: Font) -> void:
 
 
 func _draw_shield(f: Font) -> void:
-	_mars_sky(220)
+	if not _draw_bg("task_shelter_seal"):
+		_mars_sky(220)
 	var line_y := 214.0 - WALL_TARGET * 30.0
 	# space particles raining down; they stop on the wall where it is high enough
 	for k in 14:
@@ -540,7 +555,8 @@ func _draw_shield(f: Font) -> void:
 
 
 func _draw_earth(f: Font) -> void:
-	_mars_sky(190)
+	if not _draw_bg("task_dish_drift"):
+		_mars_sky(190)
 	var e := _earth_pos()
 	area.draw_circle(e, 12, Color(EARTH_BLUE, 0.25))
 	area.draw_circle(e, 6, EARTH_BLUE)
