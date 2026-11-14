@@ -48,3 +48,9 @@ Agreed, not all built yet.
 | D34 | Finishing Night 0 gives no stars or materials, only a "Ready for duty!" badge on the title screen. |
 | D35 | The desk fan is interactable. |
 | D36 | Whenever the game is paused, the screen behind the popup is darkened. |
+| D37 | The four sketch feeds (Airlock, Greenhouse, Life Support, Shelter) are repainted in the Solar Field (CF-03) painted pixel style, keeping each sketch's layout. Night palette for all. Sources: assets/source/feeds. |
+| D38 | Map buildings redrawn to match their feeds: Solar Field (tilted blue panels on white frames), Life Support (big round wall fan, pipes), Greenhouse (purple grow lamps, plant rows), Shelter (yellow-black striped blast door), Suit Bay (round vault door with wheel, from the Airlock feed). Battery, Comms Dish, Control Room unchanged. Top-down 3/4 view, 3 levels each adding more of the same feature. |
+| D39 | Dynamic feeds: Sky Radar glows in flares/particle storms, blips for crew outside, meteors on Night 7; Solar Field dusty in dust storms, darkens as charge drops; Airlock door opens while crew pass; Shelter door animates with the SHELTER button; Life Support fan speed follows Low/Mid/High and stops on empty battery; Greenhouse lamp on/off with CROP LAMP. All: dust haze overlay in dust storms, No Signal when off, crew walking through. |
+| D40 | Use the team's 39 NASA photos (building lessons), 7 minigame backgrounds, alert and button icons (assets/source/assets-main). Every real photo gets a border and a "Credit: NASA" line; each photo's source goes in the fact-check list. |
+| D41 | Automated hourly stages from 3:30 AM. If a run is cut short by the usage limit, the next run finishes it first and the schedule shifts. |
+| D42 | "Final draft" = the complete gameplay without the storyline. The story is written later, after the final draft. |
