@@ -1485,6 +1485,18 @@ class FeedView extends Control:
 	func _process(delta: float) -> void:
 		t += delta
 
+	## Which room's camera shows this crewmate right now, and how: "stand", walking "out"
+	## of the room (first half of a walk) or walking "in" to the next one (second half).
+	## p goes 0 -> 1 across that half.
+	static func where(c: Dictionary) -> Dictionary:
+		if c.walk_left <= 0.0 or str(c.target) == "":
+			return {"room": c.room, "mode": "stand", "p": 0.0}
+		var total: float = maxf(float(c.get("walk_total", c.walk_left)), c.walk_left)
+		var frac: float = 1.0 - float(c.walk_left) / maxf(total, 0.001)
+		if frac < 0.5:
+			return {"room": c.room, "mode": "out", "p": frac * 2.0}
+		return {"room": c.target, "mode": "in", "p": (frac - 0.5) * 2.0}
+
 	func _bg(s: OutpostSim) -> String:
 		match cam:
 			"sky_radar":
@@ -1492,7 +1504,8 @@ class FeedView extends Control:
 				return "cam_sky_radar_glow" if glowing else "cam_sky_radar"
 			"airlock":
 				for c in s.crew:
-					if c.walk_left > 0.0 and (c.room == "airlock" or OUTSIDE.has(c.room)):
+					var w: Dictionary = where(c)
+					if w.room == "airlock" and w.mode != "stand":
 						return "cam_airlock_open"
 				return "cam_airlock"
 			"solar_field": return "cam_solar_field_dusty" if s.hazard.dust > 0.0 else "cam_solar_field"
@@ -1504,15 +1517,35 @@ class FeedView extends Control:
 	func _draw() -> void:
 		var font: Font = preload("res://assets/fonts/Silkscreen-Regular.ttf")
 		var s: OutpostSim = SimState.sim
-		if cam == "" or s == null:
+		if cam == "" or s == null or s.battery <= 0.0 and int(fmod(t, 4.0)) == 0 and cam != "shelter":
+			# no camera, or the battery is empty: cameras flicker out to NO SIGNAL
 			draw_texture(Assets.tex("cam_off"), Vector2.ZERO)
+			if s != null and s.battery <= 0.0:
+				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
 			return
 		draw_texture(Assets.tex(_bg(s)), Vector2.ZERO)
+		# Solar Field gets darker as the battery charge drops
+		if cam == "solar_field":
+			draw_rect(Rect2(0, 0, 320, 180), Color(0.05, 0.02, 0.12, clampf((60.0 - s.battery) / 100.0, 0.0, 0.45)))
+		# Life Support: the big wall fan spins at the LOW / MID / HIGH setting, and stops with no power
+		if cam == "life_support":
+			var spin: float = [0.0, 1.5, 4.0, 8.0][s.life_support + 1] if s.battery > 0.0 else 0.0
+			if s.hazard.co2 > 0.0: spin *= 0.4
+			var ang := t * spin
+			var c0 := Vector2(160, 74)
+			for k in 4:
+				var a := ang + k * PI / 2.0
+				var tip := c0 + Vector2(cos(a), sin(a)) * 44.0
+				var side := Vector2(cos(a + 0.35), sin(a + 0.35)) * 30.0
+				draw_colored_polygon(PackedVector2Array([c0, c0 + side, tip]), Color(0.75, 0.68, 0.78, 0.55))
+			draw_circle(c0, 5.0, Palette.INK)
+			var lbl: String = ["FAN OFF", "FAN LOW", "FAN MID", "FAN HIGH"][s.life_support + 1] if s.battery > 0.0 else "FAN STOPPED"
+			draw_string(font, Vector2(8, 172), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 		# shelter door sliding shut (CF-11)
 		if cam == "shelter" and s.door_closing_left > 0.0:
 			var total: float = s.balance.door_close_sec[clampi(int(s.levels.get("shelter", 1)) - 1, 0, 2)]
 			var k := clampi(int((1.0 - s.door_closing_left / total) * 4.0), 0, 3)
-			draw_texture(Assets.frame("cam_shelter_door_anim", k), Vector2(150, -10))
+			draw_texture(Assets.frame("cam_shelter_door_anim", k), Vector2.ZERO)
 		# Night 7: the Bulalakaw meteor shower streaks across the Sky Radar
 		if cam == "sky_radar" and s.meteors_active():
 			for k in 7:
@@ -1549,29 +1582,43 @@ class FeedView extends Control:
 		crew_rects.clear()
 		var x := 24.0
 		for c in s.crew:
-			var room: String = c.room
+			var w: Dictionary = where(c)
+			var room: String = w.room
 			if ROOMS[cam].has(room):
-				var sheet := "crew_%s_eva" % c.id if OUTSIDE.has(room) or room == "airlock" else "crew_%s" % c.id
-				var walking: bool = c.walk_left > 0.0
-				# 16-frame sheets: DOWN 0-3, LEFT 4-7, RIGHT 8-11, UP 12-15. Standing = facing us; walking = side view
-				var f := (8 + int(t * 8.0) % 4) if walking else 0
-				var tex := Assets.frame(sheet, f)
-				var bob := 0.0 if walking else roundf(sin(t * 2.0 + x) * 0.6)
-				draw_texture_rect(tex, Rect2(x, 90 + bob, 48, 72), false)
-				draw_string(font, Vector2(x, 88), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-				crew_rects.append({"id": c.id, "rect": Rect2(x, 84, 48, 78)})
+				# EVA suit outside and in the airlock (they suit up there); indoor clothes elsewhere
+				var suited: bool = OUTSIDE.has(room) or room == "airlock" or (w.mode == "out" and OUTSIDE.has(str(c.target)))
+				var sheet := "crew_%s_eva" % c.id if suited else "crew_%s" % c.id
+				# 16-frame sheets: DOWN 0-3, LEFT 4-7, RIGHT 8-11, UP 12-15.
+				# Standing faces us; leaving walks RIGHT out of frame; arriving walks LEFT in from the right.
+				var f := 0
+				var cx := x
+				match w.mode:
+					"out":
+						f = 8 + int(t * 8.0) % 4
+						cx = lerpf(x, 330.0, w.p)
+					"in":
+						f = 4 + int(t * 8.0) % 4
+						cx = lerpf(330.0, x, w.p)
+				var bob := 0.0 if w.mode != "stand" else roundf(sin(t * 2.0 + x) * 0.6)
+				draw_texture_rect(Assets.frame(sheet, f), Rect2(cx, 90 + bob, 48, 72), false)
+				draw_string(font, Vector2(cx, 88), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+				crew_rects.append({"id": c.id, "rect": Rect2(cx, 84, 48, 78)})
 				if not s.open_request_for(c.id).is_empty():
-					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(x + 34, 66))
+					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(cx + 34, 66))
+				if c.held and w.mode != "stand":
+					draw_string(font, Vector2(cx - 4, 160), "RECALLED", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
 				x += 60
 		# dust haze on outside cameras (CF-09)
-		if cam in ["solar_field", "sky_radar", "airlock"] and s.hazard.dust > 0.0:
-			draw_texture(Assets.tex("fx_dust_haze"), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.dust, 0.0, 1.0)))
+		# dust haze on every feed in a dust storm: thick outside, a light film indoors (dust on the lenses)
+		if s.hazard.dust > 0.0:
+			var thick := 1.0 if cam in ["solar_field", "sky_radar", "airlock"] else 0.35
+			draw_texture(Assets.tex("fx_dust_haze"), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.dust, 0.0, 1.0) * thick))
 		# static when the link is weak (CF-08)
 		if s.hazard.comms_loss > 0.0:
 			draw_texture(Assets.frame("fx_static", int(t * 12.0) % 4), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.comms_loss, 0.2, 1.0)))
 		if cam == "shelter":
 			var door := "OPEN" if s.shelter_door_open else ("CLOSING" if s.door_closing_left > 0.0 else "CLOSED")
-			draw_string(font, Vector2(200, 20), "DOOR: " + door, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+			draw_string(font, Vector2(8, 20), "DOOR: " + door, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 		draw_string(font, Vector2(260, 172), s.clock_string(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 
 

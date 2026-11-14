@@ -1046,7 +1046,7 @@ func _build_crew() -> void:
 			Game.toast("%s was caught in last night's storm and is resting today." % str(id).to_upper(), "info", 6.0)
 			continue
 		var spot: String = CREW_SPOT.get(id, "")
-		var at: Vector2 = PLOT_POS[spot] + Vector2(84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
+		var at: Vector2 = PLOT_POS[spot] + Vector2(100 if id == "lani" else 84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
 		var s := Sprite2D.new()
 		s.texture = Assets.frame("crew_" + str(id), 0)
 		_stand(s, at, 2.0)

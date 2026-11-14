@@ -940,6 +940,7 @@ func _walk(c: Dictionary, room: String, sec: float) -> void:
 	else:
 		c.target = room
 		c.walk_left = sec
+		c.walk_total = sec
 
 
 func _lv(arr: Array[float], plot: String) -> float:
