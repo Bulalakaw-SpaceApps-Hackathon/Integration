@@ -11,7 +11,7 @@ signal message_arrived(kind: String)
 signal crew_said(crew_id: String, text: String)   # speech bubbles, so the crew are predictable
 signal fault_started(fault: Dictionary)
 signal request_started(request: Dictionary)
-signal sponsor_ad()
+signal sponsor_ad(index: int)
 signal radio(text: String)                 # Mission Control radio facts
 signal clue_found(clue: Dictionary)
 signal malfunction_fixed(cause: Dictionary)
@@ -81,7 +81,10 @@ var morale: int = 0
 var faults: Array[Dictionary] = []      # {kind, cam, pos, at, fixed_at}
 var requests: Array[Dictionary] = []    # {crew, text, yes, no, at, expires, answer}
 var discovery: Dictionary = {}          # {cam, pos, at, title, text, found}
-var sponsor := false                    # accepted a sponsor deal for tonight
+var sponsor := false                    # at least one sponsor deal is active tonight
+var sponsors: Array = []                # sponsor numbers (1..7) whose ads run tonight; each one pays
+var rough: Array[String] = []           # "oxygen" / "dose": the night went on, but it only earns the Survive star
+var _ad_turn := 0
 var sponsor_ads_closed := 0
 var extra_materials := 0                # from crew requests that pay off (only counts on a win)
 var ask_reply_received := false
@@ -259,6 +262,7 @@ func setup_malfunction(def: Dictionary) -> void:
 	var causes: Array = []
 	for c in def.get("causes", []):
 		causes.append({"id": c.id, "name": c.name, "rooms": c.get("rooms", []), "p": 0.0, "crossed": false})
+	causes.shuffle()                        # the real cause must not always be the first row
 	for c in causes:
 		c.p = 1.0 / causes.size()
 	var clues: Array = []
@@ -415,7 +419,23 @@ func science_met() -> bool:
 
 func show_sponsor_ad() -> void:
 	if sponsor:
-		sponsor_ad.emit()
+		var idx: int = sponsors[_ad_turn % sponsors.size()] if not sponsors.is_empty() else (config.id - 1) % 7 + 1
+		_ad_turn += 1
+		sponsor_ad.emit(idx)
+
+
+## How many sponsors pay tonight.
+func sponsor_count() -> int:
+	return maxi(sponsors.size(), 1) if sponsor else 0
+
+
+## Crew who were still outside when a storm hit: they rest tomorrow.
+func caught_outside() -> Array[String]:
+	var out: Array[String] = []
+	for c in crew:
+		if float(c.get("caught_sec", 0.0)) >= balance.caught_outside_sec:
+			out.append(c.id)
+	return out
 
 
 func discovery_found() -> bool:
@@ -662,6 +682,8 @@ func _tick_dose(dt: float) -> void:
 		alert.emit(Strings.t("alert.particles"), "dose")
 	for c in crew:
 		c.dose += p * dose_rate_for(c) * dt
+		if is_outside(c):
+			c["caught_sec"] = float(c.get("caught_sec", 0.0)) + dt
 
 
 func _tick_bookkeeping(dt: float) -> void:
@@ -682,17 +704,26 @@ func _tick_bookkeeping(dt: float) -> void:
 func _check_end() -> void:
 	if battery_zero_sec >= balance.battery_zero_grace_sec:
 		_lose("battery")
-	elif oxygen <= 0.0:
-		_lose("oxygen")
 	else:
+		# Only an empty battery ends the night. Bad air or too much radiation make it a ROUGH night:
+		# the crew put on masks / hide, the night goes on, but it can only earn the Survive star.
+		if oxygen <= 0.0:
+			oxygen = 0.0
+			_rough("oxygen")
 		for c in crew:
 			if c.dose > balance.dose_limit_xrays:
-				_lose("dose")
-				return
+				c.dose = balance.dose_limit_xrays
+				_rough("dose")
 		if clock_sec >= balance.night_length_sec:
 			finished = true
 			result = "won"
 			won.emit()
+
+
+func _rough(reason: String) -> void:
+	if not rough.has(reason):
+		rough.append(reason)
+		alert.emit(Strings.t("alert.rough_" + reason), "co2" if reason == "oxygen" else "dose")
 
 
 func _lose(reason: String) -> void:
@@ -856,14 +887,17 @@ func end_report() -> Dictionary:
 		"oxygen": oxygen,
 		"max_dose": max_dose(),
 		"bonus": bonus,
-		"stars": (1 + int(science_met()) + int(challenge_met())) if won_night else 0,
-		"star_science": science_met(),
-		"star_challenge": challenge_met(),
+		"stars": (1 + int(science_met() and rough.is_empty()) + int(challenge_met() and rough.is_empty())) if won_night else 0,
+		"star_science": science_met() and rough.is_empty(),
+		"star_challenge": challenge_met() and rough.is_empty(),
+		"rough": rough,
+		"resting": caught_outside(),
+		"sponsor_count": sponsor_count(),
 		"challenge": challenge,
 		"malfunction": malf,
 		"materials": (balance.survive_reward + balance.bonus_reward * (int(science_met()) + int(challenge_met())) + extra_materials
 			+ (balance.discovery_reward if discovery_found() else 0)
-			+ (balance.sponsor_reward if sponsor else 0)) if won_night else 0,
+			+ balance.sponsor_reward * sponsor_count()) if won_night else 0,
 		"discovery_found": discovery_found(),
 		"discovery": discovery,
 		"faults_total": faults.size(),

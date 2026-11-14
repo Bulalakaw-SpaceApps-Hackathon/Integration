@@ -60,7 +60,10 @@ func start_night(night_id: int) -> bool:
 	director = NightDirector.new()
 	sim.start(config, Balance.config, Progression.levels, Progression.food_for_night(config))
 	director.setup(sim, config, Balance.config, randi(), Progression.calm_mode)
-	sim.sponsor = sponsor_tonight
+	sim.sponsors = Progression.sponsors_tonight()
+	if sponsor_tonight and sim.sponsors.is_empty():
+		sim.sponsors = [(night_id - 1) % 7 + 1]
+	sim.sponsor = not sim.sponsors.is_empty()
 	director.plan_extras(night_extras(night_id), Balance.config, tutorial_tonight, story_beat(night_id))
 	frozen = false
 	running = true

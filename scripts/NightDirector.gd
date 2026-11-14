@@ -96,7 +96,7 @@ func plan_extras(info: Dictionary, bal: BalanceConfig, scripted: bool, story: Di
 		var t := bal.sponsor_first_sec
 		while t < bal.night_length_sec - 10.0:
 			_extras.append({"at": t, "kind": "sponsor", "data": {}})
-			t += bal.sponsor_gap_sec + rng.randf_range(-5.0, 5.0)
+			t += bal.sponsor_gap_sec / float(maxi(sim.sponsors.size(), 1)) + rng.randf_range(-4.0, 4.0)
 	if scripted:
 		_extras.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.at < b.at)
 		return

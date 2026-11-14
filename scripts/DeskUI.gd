@@ -43,6 +43,9 @@ var fan: TextureRect
 var fan_atlas: AtlasTexture
 var fan_frame: int = 0
 var fan_timer: float = 0.0
+var fan_speed := 2                 # 0 off, 1 slow, 2 fast: tap the fan to change it
+var fan_taps := 0
+var pause_dim: ColorRect           # darkens the desk behind any popup that pauses the night
 var cam_buttons: Array[Button] = []
 var ctl: Dictionary = {}            # control name -> Button
 var alert_box: VBoxContainer
@@ -87,6 +90,12 @@ var mon_off: Texture2D
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	_build_desk()
+	pause_dim = ColorRect.new()
+	pause_dim.color = Color(Palette.INK, 0.6)
+	pause_dim.size = Vector2(1280, 720)
+	pause_dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	pause_dim.visible = false
+	add_child(pause_dim)
 	SimState.night_started.connect(_on_night_started)
 	SimState.night_ended.connect(_on_night_ended)
 	if Game.flow:
@@ -310,7 +319,13 @@ func _build_desk() -> void:
 	fan = TextureRect.new()
 	fan.texture = fan_atlas
 	fan.position = Vector2(1104, 496)
-	fan.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fan.mouse_filter = Control.MOUSE_FILTER_STOP
+	fan.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	fan.tooltip_text = "Desk fan: tap to change the speed"
+	fan.gui_input.connect(func(e: InputEvent) -> void:
+		var mb := e as InputEventMouseButton
+		if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+			_tap_fan())
 	add_child(fan)
 
 	# alerts, particle banner, pause label
@@ -413,6 +428,7 @@ func _show_help(key: String) -> void:
 	ok.reparent(v)
 	ok.custom_minimum_size = Vector2(120, 40)
 	help_box.visible = true
+	pause_dim.move_to_front()
 	help_box.move_to_front()
 	if SimState.running:
 		SimState.paused = true
@@ -810,10 +826,18 @@ func _on_night_ended(report: Dictionary) -> void:
 		get_tree().create_timer(0.6).timeout.connect(func() -> void: Sfx.play("star"))
 		get_tree().create_timer(1.1).timeout.connect(func() -> void: Sfx.play("materials"))
 	else:
+		# kind try-again screen: what happened, one tip, two buttons. No stars list, nothing scary.
 		Sfx.play("evacuate")
-		_ov_label(Strings.t("evacuate"), 16, true, Palette.STATUS_DANGER_SHADE)
-		_ov_label("WHAT HAPPENED: " + Strings.t("lose.%s.what" % report.reason) + " WHY: " + Strings.t("lose.%s.why" % report.reason), 8, true)
-		_ov_label("TIP: " + Strings.t("lose.%s.tip" % report.reason), 8, true)
+		_ov_label(Strings.t("tryagain.title"), 24, true, Palette.SKY_INDIGO)
+		_ov_label(Strings.t("tryagain.body"), 16, false)
+		_ov_label("WHY: " + Strings.t("lose.%s.why" % report.reason), 8, true, Palette.BASE_PLUM)
+		_ov_label("TIP: " + Strings.t("lose.%s.tip" % report.reason), 16, true, Palette.STATUS_OK_SHADE)
+		_ov_label(Strings.t("tryagain.keep"), 8, true, Palette.BASE_PLUM)
+		if Game.flow:
+			_ov_buttons([["RETRY NIGHT", func() -> void: Game.night_finished(false)], ["BACK TO BASE", func() -> void: Game.goto("hub")]])
+		else:
+			_ov_buttons([["RETRY NIGHT", _show_briefing]])
+		return
 	var stars_row := VBoxContainer.new()
 	stars_row.add_theme_constant_override("separation", 2)
 	overlay_body.add_child(stars_row)
@@ -823,6 +847,10 @@ func _on_night_ended(report: Dictionary) -> void:
 		[won and report.star_science, "SCIENCE", "Malfunction solved and discovery found." if report.star_science else _science_miss(report)],
 		[won and report.star_challenge, "CHALLENGE", Strings.t("challenge." + str(report.challenge))],
 	]
+	var rough: Array = report.get("rough", [])
+	if not rough.is_empty():
+		lines[1][2] = Strings.t("rough." + str(rough[0]))
+		lines[2][2] = Strings.t("rough.challenge")
 	for l in lines:
 		var r := HBoxContainer.new()
 		r.add_theme_constant_override("separation", 8)
@@ -847,6 +875,8 @@ func _on_night_ended(report: Dictionary) -> void:
 		_ov_label("MALFUNCTION: IT WAS THE %s. %s" % [answer, mf.why], 8, true, Palette.BASE_PLUM)
 	if report.get("discovery_found", false):
 		_ov_label("DISCOVERY: %s: %s" % [report.discovery.title, report.discovery.text], 8, false, Palette.BASE_PLUM)
+	for id in report.get("resting", []):
+		_ov_label(Strings.t("rest.caught") % str(id).to_upper(), 8, true, Palette.STATUS_DANGER_SHADE)
 	if won and beat.has("close"):
 		_ov_label(str(beat.close), 8, true, Palette.SKY_INDIGO)
 	debrief_more = VBoxContainer.new()
@@ -880,7 +910,8 @@ func _debrief_extras(report: Dictionary) -> void:
 	if int(report.get("faults_total", 0)) > 0:
 		lines.append("PROBLEMS FIXED: %d OF %d" % [report.faults_fixed, report.faults_total])
 	if report.get("sponsor", false):
-		lines.append("SPONSOR PAID: +%d MATERIALS%s" % [Balance.config.sponsor_reward, "" if report.won else " (ONLY IF YOU SURVIVE)"])
+		var n := int(report.get("sponsor_count", 1))
+		lines.append("%d SPONSOR%s PAID: +%d MATERIALS" % [n, "" if n == 1 else "S", Balance.config.sponsor_reward * n])
 	if not lines.is_empty():
 		_ov_label("\n".join(lines), 8, true, Palette.BASE_PLUM)
 
@@ -1138,17 +1169,35 @@ func _close_answer() -> void:
 
 
 # ---------------------------------------------------------------- sponsor messages
-func _show_ad() -> void:
-	if ads[0] != null or ads[1] != null or overlay.visible:
-		return                                   # one sponsor message at a time
+func _tap_fan() -> void:
+	fan_speed = (fan_speed + 1) % 3
+	fan_taps += 1
+	Sfx.play("click")
+	if juice:
+		juice.pop(fan.position + Vector2(80, 10), ["FAN OFF", "FAN SLOW", "FAN FAST"][fan_speed], Palette.HIGHLIGHT)
+	if fan_taps == 3:
+		_radio(Strings.t("fan.fact"))
+
+
+func _show_ad(index: int = 0) -> void:
+	if overlay.visible or SimState.sim == null:
+		return
+	# one ad per active sponsor, at most 2 on screen, and only ever over the monitors
+	var showing := int(ads[0] != null) + int(ads[1] != null)
+	if showing >= mini(SimState.sim.balance.sponsor_max_on_screen, maxi(SimState.sim.sponsors.size(), 1)):
+		return
 	var i := randi() % 2
+	if ads[i] != null:
+		i = 1 - i
+	if index <= 0:
+		index = (SimState.config.id - 1) % 7 + 1
 	var brands: Array = []
 	var f := FileAccess.open("res://data/night_extras.json", FileAccess.READ)
 	if f:
 		var d: Variant = JSON.parse_string(f.get_as_text())
 		if d is Dictionary:
 			brands = d.get("sponsors", [])
-	var brand: String = brands[(SimState.config.id - 1) % brands.size()] if not brands.is_empty() else "SPONSOR"
+	var brand: String = brands[(index - 1) % brands.size()] if not brands.is_empty() else "SPONSOR"
 	var ad := TextureRect.new()
 	ad.texture = Assets.tex("ad_%d" % (randi() % 3 + 1))
 	ad.position = feeds[i].position
@@ -1164,7 +1213,7 @@ func _show_ad() -> void:
 	var l2 := Ui.label("SPONSOR MESSAGE", 8, true, Palette.INK)
 	l2.position = Vector2(10, 10)
 	ad.add_child(l2)
-	var lg := Ui.image("sponsor_logo_%d" % ((SimState.config.id - 1) % maxi(brands.size(), 1) + 1))
+	var lg := Ui.image("sponsor_logo_%d" % ((index - 1) % 7 + 1))
 	lg.position = Vector2(136, 22)
 	ad.add_child(lg)
 	var l3 := Ui.label("TAP X TO CLOSE", 8, true, Palette.INK, 280)
@@ -1282,6 +1331,15 @@ func _process(delta: float) -> void:
 	var s := SimState.sim
 	_update_windows(s)
 	pause_label.visible = SimState.paused and not Game.flow
+	# panels (pause menu, settings...) dim the screen themselves; this covers the desk's own popups
+	var top: Control = help_box if help_box.visible else (overlay if overlay.visible else null)
+	pause_dim.visible = (SimState.paused and Game.panels.is_empty()) or top != null
+	if pause_dim.visible:
+		if top == null:
+			pause_dim.move_to_front()
+			pause_label.move_to_front()
+		elif pause_dim.get_index() != top.get_index() - 1:
+			move_child(pause_dim, top.get_index())
 	if s == null:
 		return
 	# clock + battery + forecast
@@ -1363,8 +1421,8 @@ func _process(delta: float) -> void:
 	Sfx.loop("static_loop", SimState.running and s.hazard.comms_loss > 0.0, -12.0)
 	# fan spins; slower when the CO2 filter clogs
 	fan_timer += delta * SimState.speed
-	var period := 0.3 if s.hazard.co2 > 0.0 else 0.08
-	if fan_timer >= period:
+	var period := (0.3 if s.hazard.co2 > 0.0 else 0.08) * (2.5 if fan_speed == 1 else 1.0)
+	if fan_speed > 0 and fan_timer >= period:
 		fan_timer = 0.0
 		fan_frame = 1 - fan_frame
 		fan_atlas.region = Rect2(fan_frame * 160, 0, 160, 210)
