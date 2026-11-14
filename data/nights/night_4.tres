@@ -27,8 +27,8 @@ script = ExtResource("2_uloct")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.5
-source_name = "Based on Curiosity rover weather data (simplified)"
-why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
+why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_cjfrg"]
 script = ExtResource("2_uloct")
@@ -37,7 +37,10 @@ start_sec = 80.0
 peak_sec = 95.0
 end_sec = 120.0
 intensity = 0.5
-why_text = "Static on the radio! Something is weakening the link to Earth."
+real_date = "2021-02-18"
+source_name = "NASA Mars 2020 (Perseverance 11m 22s one-way light time)"
+badge = "real"
+why_text = "Static on the radio! Even at the speed of light, signals take 11 minutes 22 seconds to reach Earth."
 
 [resource]
 script = ExtResource("3_baoyx")
