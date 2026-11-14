@@ -54,3 +54,7 @@ Agreed, not all built yet.
 | D40 | Use the team's 39 NASA photos (building lessons), 7 minigame backgrounds, alert and button icons (assets/source/assets-main). Every real photo gets a border and a "Credit: NASA" line; each photo's source goes in the fact-check list. |
 | D41 | Automated hourly stages from 3:30 AM. If a run is cut short by the usage limit, the next run finishes it first and the schedule shifts. |
 | D42 | "Final draft" = the complete gameplay without the storyline. The story is written later, after the final draft. |
+| D43 | Push the project as it is (never add build/ or .godot/; leave the .exe and Audio-Design folder untouched). |
+| D44 | Push once, at the final draft, to GitHub Bulalakaw-SpaceApps-Hackathon/Integration branch final-gameplay. |
+| D45 | Merge the team's newer final-gameplay commits first; then open a PR final-gameplay -> main for the team to review (never merge it). Stop and ask on any conflict that touches someone else's work. |
+| D46 | Asset zips sent during the runs go to assets/source/; the team's art always wins over mine, and each run's summary says what it replaced. |
