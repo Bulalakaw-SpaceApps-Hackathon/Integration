@@ -28,8 +28,8 @@ script = ExtResource("2_s4sol")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.4
-source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
-why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_upy7v"]
 script = ExtResource("2_s4sol")
@@ -38,7 +38,7 @@ start_sec = 60.0
 peak_sec = 60.0
 end_sec = 75.0
 real_date = "2017-09-10"
-source_name = "NASA DONKI / Solar Observations (Sep 10, 2017 CME)"
+source_name = "NASA solar observations"
 badge = "real"
 
 [sub_resource type="Resource" id="Resource_ixj3a"]

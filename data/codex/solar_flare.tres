@@ -6,7 +6,7 @@
 script = ExtResource("1_2sc8a")
 id = "solar_flare"
 title = "SOLAR FLARES"
-text = "A solar flare is a sudden burst of energy from the Sun tracked by NASA DONKI. Its X-rays arrive first at light speed, while energetic particles arrive minutes later."
-real_number = "2024-05-20: estimated X12 flare"
-source = "NASA DONKI & MAVEN (June 2024)"
+text = "A solar flare is a sudden burst of light from the Sun. Its X-rays arrive first at the speed of light, and the energetic particles arrive later."
+real_number = "2024-05-20: an estimated X12 flare"
+source = "NASA (June 2024)"
 order = 6

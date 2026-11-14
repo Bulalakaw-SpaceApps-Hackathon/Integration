@@ -6,7 +6,6 @@
 script = ExtResource("1_wix4p")
 id = "food"
 title = "GROWING FOOD ON MARS"
-text = "Space greenhouses need grow lights, water, and warmth, and on Mars all three cost battery power. Martian soil also has perchlorate salts, so astronauts grow crops indoors."
-real_number = "Continuous LED photoperiods + thermal control"
-source = "CSA Food Production Toolkit & NASA Phoenix (2008)"
+text = "Plants need light, water and warmth, and on a Mars base all three cost power. Martian soil also contains perchlorate, a salt that is bad for people and plants."
+source = "NASA (Phoenix lander found perchlorate, 2008)"
 order = 4

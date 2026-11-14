@@ -6,8 +6,7 @@
 script = ExtResource("1_kdo0r")
 id = "battery_solar"
 title = "BATTERIES AND SOLAR POWER"
-text = "Solar panels only make power while the Sun is up. At night, when Mars drops to -80 C, the base runs on energy stored in its batteries."
-real_number = "Gale Crater nights: -20 C down to -80 C"
-source = "NASA Mars Science Laboratory (Curiosity REMS)"
+text = "Solar panels only make power while the Sun is up. At night a Mars base runs on the energy its batteries stored in the day."
+source = "NASA Mars Exploration (solar-powered missions)"
 badge = "simplified"
 order = 1

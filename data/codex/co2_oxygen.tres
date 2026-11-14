@@ -6,7 +6,6 @@
 script = ExtResource("1_yhvsc")
 id = "co2_oxygen"
 title = "AIR: CO2 AND OXYGEN"
-text = "Mars air is 95% carbon dioxide, which people cannot breathe. NASA's MOXIE experiment on Perseverance turned that CO2 into fresh oxygen using electric power."
-real_number = "~12 g oxygen/hour using ~300 W"
-source = "NASA Mars 2020 (Perseverance MOXIE)"
+text = "Mars air is mostly carbon dioxide, which people cannot breathe. NASA's MOXIE experiment on Perseverance made oxygen from that air, using electric power."
+source = "NASA Perseverance / MOXIE"
 order = 3

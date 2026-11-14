@@ -33,8 +33,8 @@ script = ExtResource("2_miod3")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.5
-source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
-why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_l3cis"]
 script = ExtResource("2_miod3")
@@ -43,7 +43,7 @@ start_sec = 50.0
 peak_sec = 50.0
 end_sec = 70.0
 real_date = "2024-05-20"
-source_name = "NASA DONKI / MAVEN: estimated X12 solar flare (2024-05-20)"
+source_name = "NASA: estimated X12 flare"
 badge = "real"
 
 [sub_resource type="Resource" id="Resource_b44a2"]
@@ -53,7 +53,7 @@ start_sec = 70.0
 peak_sec = 100.0
 end_sec = 160.0
 real_date = "2024-05-20"
-source_name = "Curiosity RAD (NASA): 8,100 µGy, about 30 chest X-rays"
+source_name = "Curiosity RAD (NASA): 8,100 micrograys, about 30 chest X-rays"
 badge = "real"
 
 [resource]
@@ -62,7 +62,7 @@ id = 6
 title = "Solar Flare Day"
 theme = "Big solar flare"
 briefing_text = "Tonight replays the real X12 solar flare that hit Mars on May 20, 2024. Be ready to shelter!"
-debrief_why = "Light moves at 300,000 km/s, so the flare's X-rays reached Mars first. Energetic particles arrived later!"
+debrief_why = "The flare's light reached Mars first. The particles came later, and Mars's thin air can't stop them."
 debrief_tip = "Recall the crew the moment the sky glows. Every second of warning counts."
 did_you_know = "Someone standing next to Curiosity on May 20, 2024 would have received a dose like 30 chest X-rays."
 did_you_know_source = "NASA (Curiosity RAD)"
