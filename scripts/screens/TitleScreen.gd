@@ -1,0 +1,56 @@
+extends Control
+## SC-01 Title screen: Play, Judge Mode, Codex, NASA Data, Settings, Credits.
+
+
+func _ready() -> void:
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+	var bg := Ui.image("screen_title")
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.stretch_mode = TextureRect.STRETCH_SCALE
+	add_child(bg)
+
+	var logo := Ui.image("logo")
+	logo.position = Vector2(340, 60)
+	logo.size = Vector2(600, 200)
+	add_child(logo)
+
+	var v := VBoxContainer.new()
+	v.position = Vector2(490, 300)
+	v.custom_minimum_size = Vector2(300, 0)
+	v.add_theme_constant_override("separation", 10)
+	add_child(v)
+	var play := "CONTINUE" if Progression.highest_unlocked > 1 or Progression.materials > 0 else "PLAY"
+	v.add_child(Ui.button(play, _play, Vector2(300, 64)))
+	v.add_child(Ui.button("JUDGE MODE", func() -> void: Game.open_panel("judge"), Vector2(300, 56)))
+	var r := Ui.row(v, 10)
+	r.add_child(Ui.button("CODEX", func() -> void: Game.open_panel("codex"), Vector2(145, 52)))
+	r.add_child(Ui.button("NASA DATA", func() -> void: Game.open_panel("nasa"), Vector2(145, 52)))
+	var r2 := Ui.row(v, 10)
+	r2.add_child(Ui.button("SETTINGS", func() -> void: Game.open_panel("settings"), Vector2(145, 52)))
+	r2.add_child(Ui.button("CREDITS", func() -> void: Game.open_panel("credits"), Vector2(145, 52)))
+
+	# live / archived NASA data status, bottom-right
+	var status := Ui.row(self, 8)
+	status.position = Vector2(860, 672)
+	_fill_status(status)
+	DonkiService.updated.connect(func() -> void:
+		for ch in status.get_children():
+			ch.queue_free()
+		_fill_status(status))
+	DonkiService.fetch()
+
+	var foot := Ui.label("A NASA SPACE APPS 2026 GAME BY TEAM ALT-F4", 8, false, Palette.HIGHLIGHT)
+	foot.position = Vector2(20, 696)
+	add_child(foot)
+
+
+func _fill_status(row: HBoxContainer) -> void:
+	row.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
+	row.add_child(Ui.label(DonkiService.short_status(), 8, false, Palette.HIGHLIGHT))
+
+
+func _play() -> void:
+	if Progression.judge_mode:
+		Progression.leave_judge_mode()
+	SimState.speed = 1.0
+	Game.goto("night_select")

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3]
+
+[ext_resource type="Script" path="res://resources/CodexEntry.gd" id="1_wix4p"]
+
+[resource]
+script = ExtResource("1_wix4p")
+id = "food"
+title = "GROWING FOOD ON MARS"
+text = "Plants need light, water and warmth, and on a Mars base all three cost power. Martian soil also contains perchlorate, a salt that is bad for people and plants."
+source = "NASA (Phoenix lander found perchlorate, 2008)"
+order = 4

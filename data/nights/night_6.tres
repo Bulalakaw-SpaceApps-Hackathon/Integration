@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="NightConfig" format=3]
+
+[ext_resource type="Script" path="res://resources/CrewSchedule.gd" id="1_uhk8k"]
+[ext_resource type="Script" path="res://resources/HazardEvent.gd" id="2_miod3"]
+[ext_resource type="Script" path="res://resources/NightConfig.gd" id="3_4p28p"]
+
+[sub_resource type="Resource" id="Resource_41eqa"]
+script = ExtResource("1_uhk8k")
+
+[sub_resource type="Resource" id="Resource_7d622"]
+script = ExtResource("1_uhk8k")
+crew_id = "maya"
+room = "greenhouse"
+
+[sub_resource type="Resource" id="Resource_uvlkj"]
+script = ExtResource("1_uhk8k")
+crew_id = "mateo"
+room = "galley"
+
+[sub_resource type="Resource" id="Resource_dm502"]
+script = ExtResource("1_uhk8k")
+crew_id = "carlo"
+room = "comms_dish"
+
+[sub_resource type="Resource" id="Resource_t3esf"]
+script = ExtResource("1_uhk8k")
+at_sec = 30.0
+room = "solar_field"
+walk_sec = 5.0
+
+[sub_resource type="Resource" id="Resource_c6rsu"]
+script = ExtResource("2_miod3")
+start_sec = 15.0
+peak_sec = 60.0
+intensity = 0.5
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+
+[sub_resource type="Resource" id="Resource_l3cis"]
+script = ExtResource("2_miod3")
+type = "flare"
+start_sec = 50.0
+peak_sec = 50.0
+end_sec = 70.0
+real_date = "2024-05-20"
+source_name = "NASA: estimated X12 flare"
+badge = "real"
+
+[sub_resource type="Resource" id="Resource_b44a2"]
+script = ExtResource("2_miod3")
+type = "particles"
+start_sec = 70.0
+peak_sec = 100.0
+end_sec = 160.0
+real_date = "2024-05-20"
+source_name = "Curiosity RAD (NASA): 8,100 micrograys, about 30 chest X-rays"
+badge = "real"
+
+[resource]
+script = ExtResource("3_4p28p")
+id = 6
+title = "Solar Flare Day"
+theme = "Big solar flare"
+briefing_text = "Tonight replays the real X12 solar flare that hit Mars on May 20, 2024. Be ready to shelter!"
+debrief_why = "The flare's light reached Mars first. The particles came later, and Mars's thin air can't stop them."
+debrief_tip = "Recall the crew the moment the sky glows. Every second of warning counts."
+did_you_know = "Someone standing next to Curiosity on May 20, 2024 would have received a dose like 30 chest X-rays."
+did_you_know_source = "NASA (Curiosity RAD)"
+hazard_events = Array[ExtResource("2_miod3")]([SubResource("Resource_c6rsu"), SubResource("Resource_l3cis"), SubResource("Resource_b44a2")])
+crew_ids = Array[String](["lani", "maya", "mateo", "carlo"])
+crew_schedule = Array[ExtResource("1_uhk8k")]([SubResource("Resource_41eqa"), SubResource("Resource_7d622"), SubResource("Resource_uvlkj"), SubResource("Resource_dm502"), SubResource("Resource_t3esf")])
+visible_meters = Array[String](["dose"])
+food_enabled = true
+unlocked_plots = Array[String](["solar", "battery", "life_support", "greenhouse", "shelter", "suit_bay", "comms_dish"])
+bonus_goals = Array[String](["shelter_fast", "battery_20", "food_grew"])
+comms_delay_real_min = 15.8

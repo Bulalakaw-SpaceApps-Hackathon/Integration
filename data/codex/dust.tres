@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3]
+
+[ext_resource type="Script" path="res://resources/CodexEntry.gd" id="1_xllvn"]
+
+[resource]
+script = ExtResource("1_xllvn")
+id = "dust"
+title = "DUST STORMS"
+text = "Mars has dust storms that can cover the whole planet. In 2018 a global storm blocked so much sunlight that the solar-powered Opportunity rover lost power."
+real_number = "Global dust storm, June 2018"
+source = "NASA JPL"
+order = 2

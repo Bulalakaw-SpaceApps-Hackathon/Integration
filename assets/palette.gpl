@@ -1,0 +1,32 @@
+GIMP Palette
+Name: Bulalakaw Station
+Columns: 4
+#
+252 165  74	mars_sand
+255 109   0	mars_orange
+253  81   0	mars_rust
+195   0  43	mars_crimson
+238 219 200	base_cream
+203 183 179	base_stone
+155 130 139	base_mauve
+104  66 102	base_plum
+134 189 200	sky_haze
+ 81  72 171	sky_indigo
+ 94   1 139	sky_violet
+ 85  36 101	sky_night
+239  93 192	crew_lani
+176  16 129	crew_lani_shade
+162 230 159	crew_maya
+ 87 190 107	crew_maya_shade
+255 134 150	crew_mateo
+216  48  91	crew_mateo_shade
+162 231  71	crew_carlo
+111 198  12	crew_carlo_shade
+254 228   0	status_warn
+202 168  54	status_warn_shade
+236   5   0	status_danger
+176  50  40	status_danger_shade
+ 56 169  24	status_ok
+ 68 114  28	status_ok_shade
+ 43  26  46	ink
+255 246 236	highlight

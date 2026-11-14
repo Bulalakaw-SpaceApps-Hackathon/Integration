@@ -1,0 +1,1530 @@
+{
+ "alert_battery": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_battery.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_co2": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_co2.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_cold": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_cold.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_comms": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_comms.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_dose": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_dose.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_dust": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_dust.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_flare": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_flare.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_hungry": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_hungry.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_info": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_info.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "alert_thump": {
+  "id": "AL-01",
+  "path": "res://assets/sprites/ui/alert_thump.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "badge_archived": {
+  "id": "SC-05",
+  "path": "res://assets/sprites/ui/badge_archived.png",
+  "w": 96,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "badge_live": {
+  "id": "SC-05",
+  "path": "res://assets/sprites/ui/badge_live.png",
+  "w": 96,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "badge_real": {
+  "id": "SC-05",
+  "path": "res://assets/sprites/ui/badge_real.png",
+  "w": 96,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "badge_simplified": {
+  "id": "SC-05",
+  "path": "res://assets/sprites/ui/badge_simplified.png",
+  "w": 96,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "bld_habitat": {
+  "id": "HM-02",
+  "path": "res://assets/sprites/hub/bld_habitat.png",
+  "w": 128,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "boot_splash": {
+  "id": "SB-02",
+  "path": "res://boot_splash.png",
+  "w": 1280,
+  "h": 720,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_airlock": {
+  "id": "CF-02",
+  "path": "res://assets/sprites/cameras/cam_airlock.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_airlock_open": {
+  "id": "CF-02",
+  "path": "res://assets/sprites/cameras/cam_airlock_open.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_greenhouse_off": {
+  "id": "CF-06",
+  "path": "res://assets/sprites/cameras/cam_greenhouse_off.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_greenhouse_on": {
+  "id": "CF-06",
+  "path": "res://assets/sprites/cameras/cam_greenhouse_on.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_life_support": {
+  "id": "CF-05",
+  "path": "res://assets/sprites/cameras/cam_life_support.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_life_support_slow": {
+  "id": "CF-05",
+  "path": "res://assets/sprites/cameras/cam_life_support_slow.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_off": {
+  "id": "CF-07",
+  "path": "res://assets/sprites/cameras/cam_off.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_shelter": {
+  "id": "CF-04",
+  "path": "res://assets/sprites/cameras/cam_shelter.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_shelter_closed": {
+  "id": "CF-04",
+  "path": "res://assets/sprites/cameras/cam_shelter_closed.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_shelter_door_anim": {
+  "id": "CF-11",
+  "path": "res://assets/sprites/cameras/cam_shelter_door_anim.png",
+  "w": 160,
+  "h": 200,
+  "frames": 4,
+  "kind": "image"
+ },
+ "cam_sky_radar": {
+  "id": "CF-01",
+  "path": "res://assets/sprites/cameras/cam_sky_radar.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_sky_radar_glow": {
+  "id": "CF-01",
+  "path": "res://assets/sprites/cameras/cam_sky_radar_glow.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_solar_field": {
+  "id": "CF-03",
+  "path": "res://assets/sprites/cameras/cam_solar_field.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "cam_solar_field_dusty": {
+  "id": "CF-03",
+  "path": "res://assets/sprites/cameras/cam_solar_field_dusty.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "char_commander": {
+  "id": "CH-01",
+  "path": "res://assets/sprites/characters/char_commander.png",
+  "w": 32,
+  "h": 32,
+  "frames": 16,
+  "kind": "image"
+ },
+ "codex_battery_solar": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_battery_solar.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_co2_oxygen": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_co2_oxygen.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_comms_delay": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_comms_delay.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_dust": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_dust.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_food": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_food.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_radiation": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_radiation.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_shelter_shielding": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_shelter_shielding.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_sol": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_sol.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "codex_solar_flare": {
+  "id": "SC-06",
+  "path": "res://assets/sprites/ui/codex_solar_flare.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "crew_carlo": {
+  "id": "CH-05",
+  "path": "res://assets/sprites/characters/crew_carlo.png",
+  "w": 32,
+  "h": 32,
+  "frames": 6,
+  "kind": "image"
+ },
+ "crew_carlo_eva": {
+  "id": "CH-06",
+  "path": "res://assets/sprites/characters/crew_carlo_eva.png",
+  "w": 32,
+  "h": 32,
+  "frames": 5,
+  "kind": "image"
+ },
+ "crew_lani": {
+  "id": "CH-02",
+  "path": "res://assets/sprites/characters/crew_lani.png",
+  "w": 32,
+  "h": 32,
+  "frames": 6,
+  "kind": "image"
+ },
+ "crew_lani_eva": {
+  "id": "CH-06",
+  "path": "res://assets/sprites/characters/crew_lani_eva.png",
+  "w": 32,
+  "h": 32,
+  "frames": 5,
+  "kind": "image"
+ },
+ "crew_mateo": {
+  "id": "CH-04",
+  "path": "res://assets/sprites/characters/crew_mateo.png",
+  "w": 32,
+  "h": 32,
+  "frames": 6,
+  "kind": "image"
+ },
+ "crew_mateo_eva": {
+  "id": "CH-06",
+  "path": "res://assets/sprites/characters/crew_mateo_eva.png",
+  "w": 32,
+  "h": 32,
+  "frames": 5,
+  "kind": "image"
+ },
+ "crew_maya": {
+  "id": "CH-03",
+  "path": "res://assets/sprites/characters/crew_maya.png",
+  "w": 32,
+  "h": 32,
+  "frames": 6,
+  "kind": "image"
+ },
+ "crew_maya_eva": {
+  "id": "CH-06",
+  "path": "res://assets/sprites/characters/crew_maya_eva.png",
+  "w": 32,
+  "h": 32,
+  "frames": 5,
+  "kind": "image"
+ },
+ "deco_antenna": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_antenna.png",
+  "w": 32,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "deco_crates": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_crates.png",
+  "w": 48,
+  "h": 40,
+  "frames": 1,
+  "kind": "image"
+ },
+ "deco_flag": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_flag.png",
+  "w": 32,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "deco_rocks": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_rocks.png",
+  "w": 48,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "deco_rover": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_rover.png",
+  "w": 64,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_bg": {
+  "id": "DK-01",
+  "path": "res://assets/sprites/desk/desk_bg.png",
+  "w": 1280,
+  "h": 720,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_clock": {
+  "id": "DK-06",
+  "path": "res://assets/sprites/desk/desk_clock.png",
+  "w": 236,
+  "h": 80,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_meter_panel": {
+  "id": "DK-09",
+  "path": "res://assets/sprites/desk/desk_meter_panel.png",
+  "w": 192,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_monitor": {
+  "id": "DK-02",
+  "path": "res://assets/sprites/desk/desk_monitor.png",
+  "w": 352,
+  "h": 272,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_monitor_off": {
+  "id": "DK-02",
+  "path": "res://assets/sprites/desk/desk_monitor_off.png",
+  "w": 352,
+  "h": 272,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_panel_left": {
+  "id": "DK-03",
+  "path": "res://assets/sprites/desk/desk_panel_left.png",
+  "w": 160,
+  "h": 330,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_panel_right": {
+  "id": "DK-04",
+  "path": "res://assets/sprites/desk/desk_panel_right.png",
+  "w": 160,
+  "h": 330,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_prop_cup": {
+  "id": "DK-10",
+  "path": "res://assets/sprites/desk/desk_prop_cup.png",
+  "w": 56,
+  "h": 92,
+  "frames": 1,
+  "kind": "image"
+ },
+ "desk_prop_fan": {
+  "id": "DK-10",
+  "path": "res://assets/sprites/desk/desk_prop_fan.png",
+  "w": 160,
+  "h": 210,
+  "frames": 2,
+  "kind": "image"
+ },
+ "desk_sticky_note": {
+  "id": "DK-05",
+  "path": "res://assets/sprites/desk/desk_sticky_note.png",
+  "w": 212,
+  "h": 196,
+  "frames": 1,
+  "kind": "image"
+ },
+ "fx_dust_haze": {
+  "id": "CF-09",
+  "path": "res://assets/sprites/cameras/fx_dust_haze.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "fx_radar_blip": {
+  "id": "CF-10",
+  "path": "res://assets/sprites/cameras/fx_radar_blip.png",
+  "w": 16,
+  "h": 16,
+  "frames": 2,
+  "kind": "image"
+ },
+ "fx_static": {
+  "id": "CF-08",
+  "path": "res://assets/sprites/cameras/fx_static.png",
+  "w": 320,
+  "h": 180,
+  "frames": 4,
+  "kind": "image"
+ },
+ "fx_upgrade": {
+  "id": "HM-13",
+  "path": "res://assets/sprites/hub/fx_upgrade.png",
+  "w": 64,
+  "h": 64,
+  "frames": 6,
+  "kind": "image"
+ },
+ "head_carlo": {
+  "id": "CH-09",
+  "path": "res://assets/sprites/characters/head_carlo.png",
+  "w": 24,
+  "h": 24,
+  "frames": 1,
+  "kind": "image"
+ },
+ "head_lani": {
+  "id": "CH-09",
+  "path": "res://assets/sprites/characters/head_lani.png",
+  "w": 24,
+  "h": 24,
+  "frames": 1,
+  "kind": "image"
+ },
+ "head_mateo": {
+  "id": "CH-09",
+  "path": "res://assets/sprites/characters/head_mateo.png",
+  "w": 24,
+  "h": 24,
+  "frames": 1,
+  "kind": "image"
+ },
+ "head_maya": {
+  "id": "CH-09",
+  "path": "res://assets/sprites/characters/head_maya.png",
+  "w": 24,
+  "h": 24,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon": {
+  "id": "FD-05",
+  "path": "res://icon.ico",
+  "w": 256,
+  "h": 256,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_ask_earth": {
+  "id": "BT-08",
+  "path": "res://assets/sprites/ui/icon_ask_earth.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_cam_airlock": {
+  "id": "BT-02",
+  "path": "res://assets/sprites/ui/icon_cam_airlock.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_cam_greenhouse": {
+  "id": "BT-02",
+  "path": "res://assets/sprites/ui/icon_cam_greenhouse.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_cam_life_support": {
+  "id": "BT-02",
+  "path": "res://assets/sprites/ui/icon_cam_life_support.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_cam_shelter": {
+  "id": "BT-02",
+  "path": "res://assets/sprites/ui/icon_cam_shelter.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_cam_sky_radar": {
+  "id": "BT-02",
+  "path": "res://assets/sprites/ui/icon_cam_sky_radar.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_cam_solar_field": {
+  "id": "BT-02",
+  "path": "res://assets/sprites/ui/icon_cam_solar_field.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_crop_lamp_off": {
+  "id": "BT-07",
+  "path": "res://assets/sprites/ui/icon_crop_lamp_off.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_crop_lamp_on": {
+  "id": "BT-07",
+  "path": "res://assets/sprites/ui/icon_crop_lamp_on.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_dish_off": {
+  "id": "BT-08",
+  "path": "res://assets/sprites/ui/icon_dish_off.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_dish_on": {
+  "id": "BT-08",
+  "path": "res://assets/sprites/ui/icon_dish_on.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_heater_high": {
+  "id": "BT-03",
+  "path": "res://assets/sprites/ui/icon_heater_high.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_heater_low": {
+  "id": "BT-03",
+  "path": "res://assets/sprites/ui/icon_heater_low.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_heater_mid": {
+  "id": "BT-03",
+  "path": "res://assets/sprites/ui/icon_heater_mid.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_hint": {
+  "id": "BT-09",
+  "path": "res://assets/sprites/ui/icon_hint.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_life_support_high": {
+  "id": "BT-04",
+  "path": "res://assets/sprites/ui/icon_life_support_high.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_life_support_low": {
+  "id": "BT-04",
+  "path": "res://assets/sprites/ui/icon_life_support_low.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_life_support_normal": {
+  "id": "BT-04",
+  "path": "res://assets/sprites/ui/icon_life_support_normal.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_materials": {
+  "id": "SC-04",
+  "path": "res://assets/sprites/ui/icon_materials.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_mute_off": {
+  "id": "BT-09",
+  "path": "res://assets/sprites/ui/icon_mute_off.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_mute_on": {
+  "id": "BT-09",
+  "path": "res://assets/sprites/ui/icon_mute_on.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_pause": {
+  "id": "BT-09",
+  "path": "res://assets/sprites/ui/icon_pause.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_recall": {
+  "id": "BT-06",
+  "path": "res://assets/sprites/ui/icon_recall.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_send_discovery": {
+  "id": "BT-08",
+  "path": "res://assets/sprites/ui/icon_send_discovery.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_settings": {
+  "id": "BT-09",
+  "path": "res://assets/sprites/ui/icon_settings.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_shelter_closed": {
+  "id": "BT-05",
+  "path": "res://assets/sprites/ui/icon_shelter_closed.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "icon_shelter_open": {
+  "id": "BT-05",
+  "path": "res://assets/sprites/ui/icon_shelter_open.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "logo": {
+  "id": "SC-01",
+  "path": "res://assets/sprites/screens/logo.png",
+  "w": 600,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "music_hub": {
+  "id": "AU-13",
+  "path": "res://assets/sfx/music_hub.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "loop"
+ },
+ "night_card_1": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_1.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_2": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_2.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_3": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_3.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_4": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_4.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_5": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_5.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_6": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_6.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_7": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_7.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "night_card_lock": {
+  "id": "SC-02",
+  "path": "res://assets/sprites/screens/night_card_lock.png",
+  "w": 240,
+  "h": 160,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_battery_l1": {
+  "id": "HM-04",
+  "path": "res://assets/sprites/hub/plot_battery_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_battery_l2": {
+  "id": "HM-04",
+  "path": "res://assets/sprites/hub/plot_battery_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_battery_l3": {
+  "id": "HM-04",
+  "path": "res://assets/sprites/hub/plot_battery_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_comms_dish_l1": {
+  "id": "HM-08",
+  "path": "res://assets/sprites/hub/plot_comms_dish_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_comms_dish_l2": {
+  "id": "HM-08",
+  "path": "res://assets/sprites/hub/plot_comms_dish_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_comms_dish_l3": {
+  "id": "HM-08",
+  "path": "res://assets/sprites/hub/plot_comms_dish_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_empty": {
+  "id": "HM-10",
+  "path": "res://assets/sprites/hub/plot_empty.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_greenhouse_l1": {
+  "id": "HM-09",
+  "path": "res://assets/sprites/hub/plot_greenhouse_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_greenhouse_l2": {
+  "id": "HM-09",
+  "path": "res://assets/sprites/hub/plot_greenhouse_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_greenhouse_l3": {
+  "id": "HM-09",
+  "path": "res://assets/sprites/hub/plot_greenhouse_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_life_support_l1": {
+  "id": "HM-05",
+  "path": "res://assets/sprites/hub/plot_life_support_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_life_support_l2": {
+  "id": "HM-05",
+  "path": "res://assets/sprites/hub/plot_life_support_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_life_support_l3": {
+  "id": "HM-05",
+  "path": "res://assets/sprites/hub/plot_life_support_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_locked": {
+  "id": "HM-10",
+  "path": "res://assets/sprites/hub/plot_locked.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_shelter_l1": {
+  "id": "HM-06",
+  "path": "res://assets/sprites/hub/plot_shelter_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_shelter_l2": {
+  "id": "HM-06",
+  "path": "res://assets/sprites/hub/plot_shelter_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_shelter_l3": {
+  "id": "HM-06",
+  "path": "res://assets/sprites/hub/plot_shelter_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_solar_l1": {
+  "id": "HM-03",
+  "path": "res://assets/sprites/hub/plot_solar_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_solar_l2": {
+  "id": "HM-03",
+  "path": "res://assets/sprites/hub/plot_solar_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_solar_l3": {
+  "id": "HM-03",
+  "path": "res://assets/sprites/hub/plot_solar_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_suit_bay_l1": {
+  "id": "HM-07",
+  "path": "res://assets/sprites/hub/plot_suit_bay_l1.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_suit_bay_l2": {
+  "id": "HM-07",
+  "path": "res://assets/sprites/hub/plot_suit_bay_l2.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "plot_suit_bay_l3": {
+  "id": "HM-07",
+  "path": "res://assets/sprites/hub/plot_suit_bay_l3.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "portrait_carlo": {
+  "id": "CH-07",
+  "path": "res://assets/sprites/characters/portrait_carlo.png",
+  "w": 128,
+  "h": 128,
+  "frames": 2,
+  "kind": "image"
+ },
+ "portrait_commander": {
+  "id": "CH-07",
+  "path": "res://assets/sprites/characters/portrait_commander.png",
+  "w": 128,
+  "h": 128,
+  "frames": 2,
+  "kind": "image"
+ },
+ "portrait_lani": {
+  "id": "CH-07",
+  "path": "res://assets/sprites/characters/portrait_lani.png",
+  "w": 128,
+  "h": 128,
+  "frames": 2,
+  "kind": "image"
+ },
+ "portrait_mateo": {
+  "id": "CH-07",
+  "path": "res://assets/sprites/characters/portrait_mateo.png",
+  "w": 128,
+  "h": 128,
+  "frames": 2,
+  "kind": "image"
+ },
+ "portrait_maya": {
+  "id": "CH-07",
+  "path": "res://assets/sprites/characters/portrait_maya.png",
+  "w": 128,
+  "h": 128,
+  "frames": 2,
+  "kind": "image"
+ },
+ "portrait_mission_control": {
+  "id": "CH-08",
+  "path": "res://assets/sprites/characters/portrait_mission_control.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "screen_complete": {
+  "id": "SC-08",
+  "path": "res://assets/sprites/screens/screen_complete.png",
+  "w": 1280,
+  "h": 720,
+  "frames": 1,
+  "kind": "image"
+ },
+ "screen_title": {
+  "id": "SC-01",
+  "path": "res://assets/sprites/screens/screen_title.png",
+  "w": 1280,
+  "h": 720,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sfx_camera": {
+  "id": "AU-02",
+  "path": "res://assets/sfx/sfx_camera.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_click": {
+  "id": "AU-01",
+  "path": "res://assets/sfx/sfx_click.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_door_close": {
+  "id": "AU-08",
+  "path": "res://assets/sfx/sfx_door_close.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_door_open": {
+  "id": "AU-08",
+  "path": "res://assets/sfx/sfx_door_open.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_dose_tick": {
+  "id": "AU-17",
+  "path": "res://assets/sfx/sfx_dose_tick.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_evacuate": {
+  "id": "AU-06",
+  "path": "res://assets/sfx/sfx_evacuate.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_flare_alarm": {
+  "id": "AU-07",
+  "path": "res://assets/sfx/sfx_flare_alarm.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_low_battery": {
+  "id": "AU-03",
+  "path": "res://assets/sfx/sfx_low_battery.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_materials": {
+  "id": "AU-16",
+  "path": "res://assets/sfx/sfx_materials.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_msg_received": {
+  "id": "AU-10",
+  "path": "res://assets/sfx/sfx_msg_received.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_msg_sent": {
+  "id": "AU-10",
+  "path": "res://assets/sfx/sfx_msg_sent.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_recall": {
+  "id": "AU-09",
+  "path": "res://assets/sfx/sfx_recall.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_star": {
+  "id": "AU-16",
+  "path": "res://assets/sfx/sfx_star.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_static_loop": {
+  "id": "AU-11",
+  "path": "res://assets/sfx/sfx_static_loop.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "loop"
+ },
+ "sfx_step_1": {
+  "id": "AU-14",
+  "path": "res://assets/sfx/sfx_step_1.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_step_2": {
+  "id": "AU-14",
+  "path": "res://assets/sfx/sfx_step_2.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_step_3": {
+  "id": "AU-14",
+  "path": "res://assets/sfx/sfx_step_3.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_sunrise": {
+  "id": "AU-05",
+  "path": "res://assets/sfx/sfx_sunrise.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_thump": {
+  "id": "AU-12",
+  "path": "res://assets/sfx/sfx_thump.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_upgrade": {
+  "id": "AU-15",
+  "path": "res://assets/sfx/sfx_upgrade.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "sound"
+ },
+ "sfx_wind_loop": {
+  "id": "AU-04",
+  "path": "res://assets/sfx/sfx_wind_loop.ogg",
+  "w": 0,
+  "h": 0,
+  "frames": 1,
+  "kind": "loop"
+ },
+ "tiles_mars": {
+  "id": "HM-01",
+  "path": "res://assets/sprites/hub/tiles_mars.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_battery_fill": {
+  "id": "DK-07",
+  "path": "res://assets/sprites/desk/ui_battery_fill.png",
+  "w": 428,
+  "h": 36,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_battery_frame": {
+  "id": "DK-07",
+  "path": "res://assets/sprites/desk/ui_battery_frame.png",
+  "w": 456,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_battery_low": {
+  "id": "DK-07",
+  "path": "res://assets/sprites/desk/ui_battery_low.png",
+  "w": 428,
+  "h": 36,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_briefing": {
+  "id": "SC-03",
+  "path": "res://assets/sprites/ui/ui_briefing.png",
+  "w": 96,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_button": {
+  "id": "BT-01",
+  "path": "res://assets/sprites/ui/ui_button.png",
+  "w": 96,
+  "h": 96,
+  "frames": 3,
+  "kind": "image"
+ },
+ "ui_certificate": {
+  "id": "SC-08",
+  "path": "res://assets/sprites/ui/ui_certificate.png",
+  "w": 96,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_codex_page": {
+  "id": "SC-14",
+  "path": "res://assets/sprites/ui/ui_codex_page.png",
+  "w": 96,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_cursor": {
+  "id": "FD-07",
+  "path": "res://assets/sprites/ui/ui_cursor.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_cursor_hand": {
+  "id": "FD-07",
+  "path": "res://assets/sprites/ui/ui_cursor_hand.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_debrief": {
+  "id": "SC-04",
+  "path": "res://assets/sprites/ui/ui_debrief.png",
+  "w": 96,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_forecast_moon": {
+  "id": "DK-08",
+  "path": "res://assets/sprites/desk/ui_forecast_moon.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_forecast_sun": {
+  "id": "DK-08",
+  "path": "res://assets/sprites/desk/ui_forecast_sun.png",
+  "w": 32,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_hint_arrow": {
+  "id": "AL-04",
+  "path": "res://assets/sprites/ui/ui_hint_arrow.png",
+  "w": 64,
+  "h": 64,
+  "frames": 2,
+  "kind": "image"
+ },
+ "ui_joystick_base": {
+  "id": "SC-09",
+  "path": "res://assets/sprites/ui/ui_joystick_base.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_joystick_knob": {
+  "id": "SC-09",
+  "path": "res://assets/sprites/ui/ui_joystick_knob.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_meter_comms": {
+  "id": "DK-09",
+  "path": "res://assets/sprites/desk/ui_meter_comms.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_meter_dose": {
+  "id": "DK-09",
+  "path": "res://assets/sprites/desk/ui_meter_dose.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_meter_food": {
+  "id": "DK-09",
+  "path": "res://assets/sprites/desk/ui_meter_food.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_meter_oxygen": {
+  "id": "DK-09",
+  "path": "res://assets/sprites/desk/ui_meter_oxygen.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_nasa_panel": {
+  "id": "SC-07",
+  "path": "res://assets/sprites/ui/ui_nasa_panel.png",
+  "w": 96,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_panel": {
+  "id": "SC-12",
+  "path": "res://assets/sprites/ui/ui_panel.png",
+  "w": 96,
+  "h": 96,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_plot_highlight": {
+  "id": "HM-11",
+  "path": "res://assets/sprites/hub/ui_plot_highlight.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_popup": {
+  "id": "AL-02",
+  "path": "res://assets/sprites/ui/ui_popup.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_prompt_build": {
+  "id": "HM-11",
+  "path": "res://assets/sprites/hub/ui_prompt_build.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_star_empty": {
+  "id": "SC-04",
+  "path": "res://assets/sprites/ui/ui_star_empty.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_star_full": {
+  "id": "SC-04",
+  "path": "res://assets/sprites/ui/ui_star_full.png",
+  "w": 64,
+  "h": 64,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_toggle_off": {
+  "id": "SC-13",
+  "path": "res://assets/sprites/ui/ui_toggle_off.png",
+  "w": 64,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_toggle_on": {
+  "id": "SC-13",
+  "path": "res://assets/sprites/ui/ui_toggle_on.png",
+  "w": 64,
+  "h": 32,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_warning_banner": {
+  "id": "AL-03",
+  "path": "res://assets/sprites/ui/ui_warning_banner.png",
+  "w": 400,
+  "h": 60,
+  "frames": 1,
+  "kind": "image"
+ }
+}

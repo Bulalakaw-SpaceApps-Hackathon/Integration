@@ -1,0 +1,87 @@
+[gd_resource type="Resource" script_class="NightConfig" format=3]
+
+[ext_resource type="Script" path="res://resources/CrewSchedule.gd" id="1_o0ixq"]
+[ext_resource type="Script" path="res://resources/HazardEvent.gd" id="2_sb0tu"]
+[ext_resource type="Script" path="res://resources/NightConfig.gd" id="3_f8dk8"]
+
+[sub_resource type="Resource" id="Resource_8uqwb"]
+script = ExtResource("1_o0ixq")
+
+[sub_resource type="Resource" id="Resource_jyf0x"]
+script = ExtResource("1_o0ixq")
+crew_id = "maya"
+room = "greenhouse"
+
+[sub_resource type="Resource" id="Resource_pk1ee"]
+script = ExtResource("1_o0ixq")
+crew_id = "mateo"
+room = "galley"
+
+[sub_resource type="Resource" id="Resource_uexur"]
+script = ExtResource("1_o0ixq")
+crew_id = "carlo"
+room = "airlock"
+
+[sub_resource type="Resource" id="Resource_c63g4"]
+script = ExtResource("1_o0ixq")
+at_sec = 100.0
+crew_id = "carlo"
+room = "solar_field"
+walk_sec = 5.0
+
+[sub_resource type="Resource" id="Resource_pnhq5"]
+script = ExtResource("2_sb0tu")
+type = "dust"
+intensity = 0.8
+real_date = "2018-06-10"
+source_name = "NASA Mars missions (2018 global dust storm)"
+badge = "real"
+why_text = "Dust in the sky blocked the sunlight, so the battery starts lower tonight."
+
+[sub_resource type="Resource" id="Resource_76pwf"]
+script = ExtResource("2_sb0tu")
+start_sec = 15.0
+peak_sec = 60.0
+intensity = 0.5
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+
+[sub_resource type="Resource" id="Resource_mgvxm"]
+script = ExtResource("2_sb0tu")
+type = "thump"
+start_sec = 50.0
+peak_sec = 50.0
+end_sec = 53.0
+intensity = 0.5
+why_text = "Thump! A gust of wind threw dust against the hull."
+optional = true
+
+[sub_resource type="Resource" id="Resource_h5aey"]
+script = ExtResource("2_sb0tu")
+type = "thump"
+start_sec = 130.0
+peak_sec = 130.0
+end_sec = 133.0
+intensity = 0.5
+why_text = "Thump! Wind is rattling a loose solar panel."
+optional = true
+
+[resource]
+script = ExtResource("3_f8dk8")
+id = 5
+title = "The Big Dust"
+theme = "Dust storm"
+briefing_text = "A planet-wide dust storm like the real one in 2018 has covered the sky. The panels made less power today."
+debrief_why = "Martian dust is very fine and sticky. It blocks sunlight and covers solar panels."
+debrief_tip = "On dust nights, start with less: fewer cameras and a lower heater."
+did_you_know = "In 2018 a dust storm covered all of Mars for weeks."
+did_you_know_source = "NASA"
+hazard_events = Array[ExtResource("2_sb0tu")]([SubResource("Resource_pnhq5"), SubResource("Resource_76pwf"), SubResource("Resource_mgvxm"), SubResource("Resource_h5aey")])
+crew_ids = Array[String](["lani", "maya", "mateo", "carlo"])
+crew_schedule = Array[ExtResource("1_o0ixq")]([SubResource("Resource_8uqwb"), SubResource("Resource_jyf0x"), SubResource("Resource_pk1ee"), SubResource("Resource_uexur"), SubResource("Resource_c63g4")])
+visible_meters = Array[String](["comms"])
+food_enabled = true
+unlocked_plots = Array[String](["solar", "battery", "life_support", "greenhouse", "shelter", "suit_bay", "comms_dish"])
+bonus_goals = Array[String](["battery_20", "food_grew", "all_inside_end"])
+comms_delay_real_min = 4.6
+codex_unlocks = Array[String](["dust"])

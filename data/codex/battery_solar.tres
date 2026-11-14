@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3]
+
+[ext_resource type="Script" path="res://resources/CodexEntry.gd" id="1_kdo0r"]
+
+[resource]
+script = ExtResource("1_kdo0r")
+id = "battery_solar"
+title = "BATTERIES AND SOLAR POWER"
+text = "Solar panels only make power while the Sun is up. At night a Mars base runs on the energy its batteries stored in the day."
+source = "NASA Mars Exploration (solar-powered missions)"
+badge = "simplified"
+order = 1

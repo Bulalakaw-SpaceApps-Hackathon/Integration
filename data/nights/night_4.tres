@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="NightConfig" format=3]
+
+[ext_resource type="Script" path="res://resources/CrewSchedule.gd" id="1_iorw2"]
+[ext_resource type="Script" path="res://resources/HazardEvent.gd" id="2_uloct"]
+[ext_resource type="Script" path="res://resources/NightConfig.gd" id="3_baoyx"]
+
+[sub_resource type="Resource" id="Resource_lt5kn"]
+script = ExtResource("1_iorw2")
+
+[sub_resource type="Resource" id="Resource_byj87"]
+script = ExtResource("1_iorw2")
+crew_id = "maya"
+room = "greenhouse"
+
+[sub_resource type="Resource" id="Resource_6m7mi"]
+script = ExtResource("1_iorw2")
+crew_id = "mateo"
+room = "galley"
+
+[sub_resource type="Resource" id="Resource_c2ndl"]
+script = ExtResource("1_iorw2")
+crew_id = "carlo"
+room = "comms_dish"
+
+[sub_resource type="Resource" id="Resource_k5hcr"]
+script = ExtResource("2_uloct")
+start_sec = 15.0
+peak_sec = 60.0
+intensity = 0.5
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+
+[sub_resource type="Resource" id="Resource_cjfrg"]
+script = ExtResource("2_uloct")
+type = "comms_loss"
+start_sec = 80.0
+peak_sec = 95.0
+end_sec = 120.0
+intensity = 0.5
+why_text = "Static on the radio! Something is weakening the link to Earth."
+
+[resource]
+script = ExtResource("3_baoyx")
+id = 4
+title = "Hello, Earth!"
+theme = "Communication delay"
+briefing_text = "Carlo is outside fixing the Comms Dish. Messages to Earth take minutes, so you must decide things yourself!"
+debrief_why = "Radio signals take minutes to travel between Mars and Earth, so help from Earth always arrives late."
+debrief_tip = "Don't wait for Earth's answer. Bring Carlo inside before sunrise."
+did_you_know = "When Perseverance landed in 2021, its signal took 11 minutes and 22 seconds to reach Earth, so it had to land itself."
+did_you_know_source = "NASA Mars 2020"
+hazard_events = Array[ExtResource("2_uloct")]([SubResource("Resource_k5hcr"), SubResource("Resource_cjfrg")])
+crew_ids = Array[String](["lani", "maya", "mateo", "carlo"])
+crew_schedule = Array[ExtResource("1_iorw2")]([SubResource("Resource_lt5kn"), SubResource("Resource_byj87"), SubResource("Resource_6m7mi"), SubResource("Resource_c2ndl")])
+visible_meters = Array[String](["comms"])
+food_enabled = true
+unlocked_plots = Array[String](["solar", "battery", "life_support", "greenhouse", "shelter", "suit_bay", "comms_dish"])
+bonus_goals = Array[String](["all_inside_end", "battery_20", "food_grew"])
+comms_delay_real_min = 11.37
+codex_unlocks = Array[String](["comms_delay"])

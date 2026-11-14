@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3]
+
+[ext_resource type="Script" path="res://resources/CodexEntry.gd" id="1_ybv1w"]
+
+[resource]
+script = ExtResource("1_ybv1w")
+id = "shelter_shielding"
+title = "SHELTER AND SHIELDING"
+text = "Shielding means putting thick material between people and radiation. A shelter with thick walls lets far fewer particles reach the crew."
+real_number = "In the game: shelter cuts dose to 20% (L1) down to 5% (L3)"
+source = "NASA space radiation research (simplified)"
+badge = "simplified"
+order = 7

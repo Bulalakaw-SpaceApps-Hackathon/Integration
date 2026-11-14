@@ -1,0 +1,84 @@
+[gd_resource type="Resource" script_class="NightConfig" format=3]
+
+[ext_resource type="Script" path="res://resources/CrewSchedule.gd" id="1_dq2ml"]
+[ext_resource type="Script" path="res://resources/HazardEvent.gd" id="2_nnqfm"]
+[ext_resource type="Script" path="res://resources/NightConfig.gd" id="3_pu7i7"]
+
+[sub_resource type="Resource" id="Resource_r6gg6"]
+script = ExtResource("1_dq2ml")
+
+[sub_resource type="Resource" id="Resource_dw4te"]
+script = ExtResource("1_dq2ml")
+crew_id = "maya"
+room = "greenhouse"
+
+[sub_resource type="Resource" id="Resource_60tli"]
+script = ExtResource("1_dq2ml")
+crew_id = "mateo"
+room = "galley"
+
+[sub_resource type="Resource" id="Resource_67qkk"]
+script = ExtResource("1_dq2ml")
+crew_id = "carlo"
+room = "comms_dish"
+
+[sub_resource type="Resource" id="Resource_6tkam"]
+script = ExtResource("2_nnqfm")
+type = "dust"
+intensity = 0.6
+real_date = "2018-06-10"
+source_name = "Two real events combined: 2018 dust storm + 2024 flare"
+why_text = "Dust again! Less sunlight means a weaker battery tonight."
+
+[sub_resource type="Resource" id="Resource_1b0eo"]
+script = ExtResource("2_nnqfm")
+start_sec = 15.0
+peak_sec = 60.0
+intensity = 0.6
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+
+[sub_resource type="Resource" id="Resource_jhkla"]
+script = ExtResource("2_nnqfm")
+type = "flare"
+start_sec = 90.0
+peak_sec = 90.0
+end_sec = 110.0
+real_date = "2024-05-20"
+source_name = "Two real events combined: 2018 dust storm + 2024 flare"
+
+[sub_resource type="Resource" id="Resource_exddv"]
+script = ExtResource("2_nnqfm")
+type = "particles"
+start_sec = 110.0
+peak_sec = 135.0
+end_sec = 175.0
+intensity = 0.8
+real_date = "2024-05-20"
+source_name = "Two real events combined"
+
+[sub_resource type="Resource" id="Resource_l7d2o"]
+script = ExtResource("2_nnqfm")
+type = "comms_loss"
+start_sec = 150.0
+peak_sec = 150.0
+why_text = "Radio blackout! The storm has cut the link to Earth."
+
+[resource]
+script = ExtResource("3_pu7i7")
+id = 7
+title = "The Bulalakaw Night"
+theme = "Finale"
+briefing_text = "Dust, a solar flare and a radio blackout, all at once! Keep everyone safe and send our discovery to Earth."
+debrief_why = "Real missions have to juggle power, air, food and radiation all at the same time."
+debrief_tip = "Send important messages early. The radio delay means late messages may never arrive."
+did_you_know = "This night combines two real events: the 2018 global dust storm and the May 2024 solar flare."
+did_you_know_source = "NASA"
+hazard_events = Array[ExtResource("2_nnqfm")]([SubResource("Resource_6tkam"), SubResource("Resource_1b0eo"), SubResource("Resource_jhkla"), SubResource("Resource_exddv"), SubResource("Resource_l7d2o")])
+crew_ids = Array[String](["lani", "maya", "mateo", "carlo"])
+crew_schedule = Array[ExtResource("1_dq2ml")]([SubResource("Resource_r6gg6"), SubResource("Resource_dw4te"), SubResource("Resource_60tli"), SubResource("Resource_67qkk")])
+visible_meters = Array[String](["comms"])
+food_enabled = true
+unlocked_plots = Array[String](["solar", "battery", "life_support", "greenhouse", "shelter", "suit_bay", "comms_dish"])
+bonus_goals = Array[String](["discovery_sent", "shelter_fast", "battery_20"])
+comms_delay_real_min = 4.6

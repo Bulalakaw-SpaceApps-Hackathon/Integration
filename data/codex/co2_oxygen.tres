@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3]
+
+[ext_resource type="Script" path="res://resources/CodexEntry.gd" id="1_yhvsc"]
+
+[resource]
+script = ExtResource("1_yhvsc")
+id = "co2_oxygen"
+title = "AIR: CO2 AND OXYGEN"
+text = "Mars air is mostly carbon dioxide, which people cannot breathe. NASA's MOXIE experiment on Perseverance made oxygen from that air, using electric power."
+source = "NASA Perseverance / MOXIE"
+order = 3
