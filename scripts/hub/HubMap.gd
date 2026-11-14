@@ -665,6 +665,7 @@ func _build_sponsor_panel() -> void:
 		return
 	sponsor_index = (Game.night - 1) % brands.size() + 1
 	sponsor_brand = brands[sponsor_index - 1]
+	sponsor_decided = Progression.sponsor_answered == Game.night
 	sponsor_icon = TextureButton.new()
 	sponsor_icon.texture_normal = Assets.tex("sponsor_logo_%d" % sponsor_index)
 	sponsor_icon.position = Vector2(1184, 560)
@@ -698,22 +699,40 @@ func _show_sponsor_poster() -> void:
 	poster.add_child(offer)
 	v.add_child(Ui.label(Strings.t("sponsor.warning"), 8, true, Palette.STATUS_DANGER_SHADE, 340))
 	var row := Ui.row(v, 10)
-	row.add_child(Ui.button("ACCEPT +%d" % Balance.config.sponsor_reward, func() -> void: _decide_sponsor(true), Vector2(170, 52)))
-	row.add_child(Ui.button("NO THANKS", func() -> void: _decide_sponsor(false), Vector2(150, 52)))
+	if sponsor_decided:
+		row.add_child(Ui.button("CLOSE", _close_card, Vector2(170, 52)))
+	else:
+		row.add_child(Ui.button("ACCEPT +%d" % Balance.config.sponsor_reward, func() -> void: _decide_sponsor(true), Vector2(170, 52)))
+		row.add_child(Ui.button("NO THANKS", func() -> void: _decide_sponsor(false), Vector2(150, 52)))
 
 
 func _decide_sponsor(accept: bool) -> void:
+	if sponsor_decided:
+		_close_card()
+		return                                   # a deal can't be changed or cancelled
 	SimState.sponsor_tonight = accept
 	sponsor_decided = true
+	Progression.sponsor_answered = Game.night
+	if accept:
+		Progression.add_sponsor(sponsor_index)
+	Progression.save_game()
 	_close_card()
 	_refresh_sponsor(true)
-	Game.toast("Sponsor accepted: +%d materials if you survive. Pop-ups tonight!" % Balance.config.sponsor_reward if accept else "No sponsor tonight. No pop-ups!", "info")
+	var n := Progression.sponsors_tonight().size()
+	if accept:
+		Game.toast("%s signed for %d nights: +%d materials each night you survive. %d sponsor%s sending pop-ups tonight!" % [sponsor_brand, Balance.config.sponsor_nights, Balance.config.sponsor_reward, n, "" if n == 1 else "s"], "info")
+	else:
+		Game.toast("No new sponsor." + (" %d older sponsor%s still sending pop-ups tonight." % [n, "" if n == 1 else "s"] if n > 0 else " No pop-ups tonight!"), "info")
 
 
 func _refresh_sponsor(_decided: bool) -> void:
 	if sponsor_mark == null:
 		return
-	if SimState.sponsor_tonight:
+	var active := Progression.sponsors_tonight().size()
+	if sponsor_decided and active > 0:
+		sponsor_mark.text = "ADS x%d" % active
+		sponsor_mark.add_theme_color_override("font_color", Palette.STATUS_OK)
+	elif SimState.sponsor_tonight:
 		sponsor_mark.text = "ON"
 		sponsor_mark.add_theme_color_override("font_color", Palette.STATUS_OK)
 	elif sponsor_decided:

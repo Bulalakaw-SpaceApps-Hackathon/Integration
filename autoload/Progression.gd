@@ -23,6 +23,10 @@ var seen_guides: Array[int] = []   # nights whose first-time guide popup was sho
 var tutorial_done: bool = false
 var story_seen: bool = false
 var discoveries: Dictionary = {}   # night id -> discovery title
+var sponsor_deals: Array = []      # [[sponsor number, nights left], ...]: accepted sponsors keep sending ads
+var sponsor_answered: int = 0      # the day whose sponsor offer was already answered
+var resting: Array = []            # crew ids resting today (caught outside in last night's storm)
+var ready_badge: bool = false      # finished the Night 0 tutorial
 
 
 ## A plot can be built once any night up to `night_id` has unlocked it.
@@ -102,10 +106,30 @@ func apply_night_result(cfg: NightConfig, report: Dictionary) -> void:
 		for entry in cfg.codex_unlocks:
 			if not codex.has(entry):
 				codex.append(entry)
+		resting = report.get("resting", [])
+		for d in sponsor_deals:
+			d[1] = int(d[1]) - 1
+		sponsor_deals = sponsor_deals.filter(func(d: Array) -> bool: return int(d[1]) > 0)
 	else:
 		fails[cfg.id] = int(fails.get(cfg.id, 0)) + 1
 	save_game()
 	changed.emit()
+
+
+## Accept today's sponsor: its ads (and pay) last Balance.sponsor_nights nights.
+func add_sponsor(index: int) -> void:
+	for d in sponsor_deals:
+		if int(d[0]) == index:
+			d[1] = Balance.config.sponsor_nights
+			return
+	sponsor_deals.append([index, Balance.config.sponsor_nights])
+
+
+func sponsors_tonight() -> Array:
+	var out: Array = []
+	for d in sponsor_deals:
+		out.append(int(d[0]))
+	return out
 
 
 func show_hint_arrow(night_id: int) -> bool:
@@ -130,6 +154,10 @@ func save_game() -> void:
 	f.set_value("progress", "tutorial_done", tutorial_done)
 	f.set_value("progress", "story_seen", story_seen)
 	f.set_value("progress", "discoveries", discoveries)
+	f.set_value("progress", "sponsor_deals", sponsor_deals)
+	f.set_value("progress", "sponsor_answered", sponsor_answered)
+	f.set_value("progress", "resting", resting)
+	f.set_value("progress", "ready_badge", ready_badge)
 	var err := f.save(SAVE_PATH)
 	if err != OK:
 		push_warning("Could not save progress (%s)" % error_string(err))
@@ -147,6 +175,9 @@ func leave_judge_mode() -> void:
 	fails.clear()
 	codex.clear()
 	discoveries.clear()
+	sponsor_deals.clear()
+	sponsor_answered = 0
+	resting.clear()
 	load_game()
 	changed.emit()
 
@@ -169,6 +200,10 @@ func load_game() -> void:
 	tutorial_done = f.get_value("progress", "tutorial_done", false)
 	story_seen = f.get_value("progress", "story_seen", false)
 	discoveries = f.get_value("progress", "discoveries", {})
+	sponsor_deals = f.get_value("progress", "sponsor_deals", [])
+	sponsor_answered = f.get_value("progress", "sponsor_answered", 0)
+	resting = f.get_value("progress", "resting", [])
+	ready_badge = f.get_value("progress", "ready_badge", false)
 
 
 func new_game() -> void:
@@ -183,5 +218,8 @@ func new_game() -> void:
 	tutorial_done = false
 	story_seen = false
 	discoveries.clear()
+	sponsor_deals.clear()
+	sponsor_answered = 0
+	resting.clear()
 	save_game()
 	changed.emit()

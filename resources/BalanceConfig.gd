@@ -82,6 +82,9 @@ extends Resource
 @export var sponsor_first_sec: float = 20.0
 @export var sponsor_gap_sec: float = 28.0
 @export var sponsor_close_delay_sec: float = 1.5
+@export var sponsor_nights: int = 2            # an accepted sponsor keeps sending ads this many nights
+@export var sponsor_max_on_screen: int = 2
+@export var caught_outside_sec: float = 4.0    # outside this long in a particle storm = rests tomorrow
 @export var fault_dust_drain: float = 0.05
 @export var fault_dish_comms: float = 0.4            # link quality x0.4 while the dish has drifted
 @export_group("Malfunction, clues and scan")

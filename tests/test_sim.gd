@@ -60,6 +60,16 @@ func _init() -> void:
 	check("N2 ASK EARTH reply arrives after the round trip", asked.reply > 0.0 and asked.reply - asked.sent >= want - 1.0)
 	check("N2 Earth's reply crosses off a wrong cause", asked.crossed >= 1)
 
+	# --- The real cause must not always be the first row
+	var first_true := 0
+	for i in 20:
+		var ss := OutpostSim.new()
+		ss.balance = bal
+		ss.setup_malfunction(story2["3"].malfunction)
+		if ss.malf.causes[0].id == ss.malf["true"]:
+			first_true += 1
+	check("Malfunction rows are shuffled (true cause first in %d of 20)" % first_true, first_true < 16)
+
 	# --- Night 3: small real particle storm ---------------------------------
 	r = play(3, func(_s: OutpostSim, _d: NightDirector) -> void: pass)
 	check("N3 small storm is survivable without sheltering (gentle intro)", r.won)
@@ -90,7 +100,7 @@ func _init() -> void:
 
 	# --- Night 6: the real X12 flare -----------------------------------------
 	r = play(6, func(_s: OutpostSim, _d: NightDirector) -> void: pass)
-	check("N6 doing nothing = too much radiation", not r.won and r.reason == "dose")
+	check("N6 doing nothing = rough night (radiation): Survive star only, crew rest", r.rough.has("dose") and r.stars <= 1 and not r.resting.is_empty())
 
 	r = play(6, good_shelter_player())
 	check("N6 good sheltering survives", r.won)
@@ -102,7 +112,7 @@ func _init() -> void:
 			s.toggle_shelter_door()   # opens and calls inside crew, but forgets the outside crew
 		if s.shelter_door_open and s.clock_sec - s.flare_alarm_at > 8.0:
 			s.toggle_shelter_door())
-	check("N6 forgetting the outside crew still fails", not r.won and r.reason == "dose")
+	check("N6 forgetting the outside crew = rough night, they rest tomorrow", r.rough.has("dose") and r.stars <= 1 and not r.resting.is_empty())
 
 	# --- Night 7: finale ----------------------------------------------------
 	var shelter := good_shelter_player()
@@ -194,16 +204,16 @@ func _init() -> void:
 	m.setup_malfunction({"true": "a", "causes": [{"id": "a", "name": "A", "rooms": ["airlock"]}, {"id": "b", "name": "B", "rooms": ["greenhouse"]}, {"id": "c", "name": "C", "rooms": ["shelter"]}], "clues": []})
 	check("Malfunction starts even (1/3 each)", is_equal_approx(m.malf.causes[0].p, 1.0 / 3.0))
 	m._apply_clue({"points": "a", "reliability": 4})
-	check("A 4-in-5 clue makes its cause most likely but not certain", m.malf.causes[0].p > 0.7 and m.malf.causes[0].p < 0.95)
+	check("A 4-in-5 clue makes its cause most likely but not certain", _cause(m, "a").p > 0.7 and _cause(m, "a").p < 0.95)
 	var b0m := m.battery
-	check("Wrong diagnosis is refused, costs battery, crosses the cause off", not m.diagnose("b") and m.malf.causes[1].crossed and m.battery < b0m)
+	check("Wrong diagnosis is refused, costs battery, crosses the cause off", not m.diagnose("b") and _cause(m, "b").crossed and m.battery < b0m)
 	check("Right diagnosis solves it", m.diagnose("a") and m.malfunction_solved())
 	var m2 := OutpostSim.new()
 	m2.start(load("res://data/nights/night_2.tres"), bal, {}, 4)
 	m2.setup_malfunction({"true": "a", "causes": [{"id": "a", "name": "A", "rooms": ["airlock"]}, {"id": "b", "name": "B", "rooms": ["greenhouse"]}], "clues": []})
 	m2.toggle_camera("greenhouse")
 	var res := m2.scan("greenhouse")
-	check("Empty SCAN lowers the causes tied to that room", res.get("empty", false) and m2.malf.causes[1].p < 0.5)
+	check("Empty SCAN lowers the causes tied to that room", res.get("empty", false) and _cause(m2, "b").p < 0.5)
 	check("SCAN has a cooldown", not m2.can_scan("greenhouse"))
 	for n in range(1, 8):
 		var sb: Dictionary = JSON.parse_string(FileAccess.open("res://data/story.json", FileAccess.READ).get_as_text()).get(str(n), {})
@@ -331,3 +341,10 @@ func check(name: String, ok: bool) -> void:
 	print(("  PASS  " if ok else "  FAIL  ") + name)
 	if not ok:
 		failures += 1
+
+
+func _cause(sim: OutpostSim, id: String) -> Dictionary:
+	for c in sim.malf.causes:
+		if c.id == id:
+			return c
+	return {}
