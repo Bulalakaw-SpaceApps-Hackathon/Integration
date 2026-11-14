@@ -267,7 +267,7 @@
   "id": "CH-01",
   "path": "res://assets/sprites/characters/char_commander.png",
   "w": 32,
-  "h": 32,
+  "h": 48,
   "frames": 16,
   "kind": "image"
  },
@@ -347,64 +347,64 @@
   "id": "CH-05",
   "path": "res://assets/sprites/characters/crew_carlo.png",
   "w": 32,
-  "h": 32,
-  "frames": 6,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_carlo_eva": {
   "id": "CH-06",
   "path": "res://assets/sprites/characters/crew_carlo_eva.png",
   "w": 32,
-  "h": 32,
-  "frames": 5,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_lani": {
   "id": "CH-02",
   "path": "res://assets/sprites/characters/crew_lani.png",
   "w": 32,
-  "h": 32,
-  "frames": 6,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_lani_eva": {
   "id": "CH-06",
   "path": "res://assets/sprites/characters/crew_lani_eva.png",
   "w": 32,
-  "h": 32,
-  "frames": 5,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_mateo": {
   "id": "CH-04",
   "path": "res://assets/sprites/characters/crew_mateo.png",
   "w": 32,
-  "h": 32,
-  "frames": 6,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_mateo_eva": {
   "id": "CH-06",
   "path": "res://assets/sprites/characters/crew_mateo_eva.png",
   "w": 32,
-  "h": 32,
-  "frames": 5,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_maya": {
   "id": "CH-03",
   "path": "res://assets/sprites/characters/crew_maya.png",
   "w": 32,
-  "h": 32,
-  "frames": 6,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "crew_maya_eva": {
   "id": "CH-06",
   "path": "res://assets/sprites/characters/crew_maya_eva.png",
   "w": 32,
-  "h": 32,
-  "frames": 5,
+  "h": 48,
+  "frames": 16,
   "kind": "image"
  },
  "deco_antenna": {
@@ -1458,41 +1458,41 @@
  "portrait_carlo": {
   "id": "CH-07",
   "path": "res://assets/sprites/characters/portrait_carlo.png",
-  "w": 128,
-  "h": 128,
-  "frames": 2,
+  "w": 96,
+  "h": 96,
+  "frames": 3,
   "kind": "image"
  },
  "portrait_commander": {
   "id": "CH-07",
   "path": "res://assets/sprites/characters/portrait_commander.png",
-  "w": 128,
-  "h": 128,
-  "frames": 2,
+  "w": 96,
+  "h": 96,
+  "frames": 3,
   "kind": "image"
  },
  "portrait_lani": {
   "id": "CH-07",
   "path": "res://assets/sprites/characters/portrait_lani.png",
-  "w": 128,
-  "h": 128,
-  "frames": 2,
+  "w": 96,
+  "h": 96,
+  "frames": 3,
   "kind": "image"
  },
  "portrait_mateo": {
   "id": "CH-07",
   "path": "res://assets/sprites/characters/portrait_mateo.png",
-  "w": 128,
-  "h": 128,
-  "frames": 2,
+  "w": 96,
+  "h": 96,
+  "frames": 3,
   "kind": "image"
  },
  "portrait_maya": {
   "id": "CH-07",
   "path": "res://assets/sprites/characters/portrait_maya.png",
-  "w": 128,
-  "h": 128,
-  "frames": 2,
+  "w": 96,
+  "h": 96,
+  "frames": 3,
   "kind": "image"
  },
  "portrait_mission_control": {
@@ -2052,6 +2052,14 @@
   "path": "res://assets/sprites/ui/ui_warning_banner.png",
   "w": 400,
   "h": 60,
+  "frames": 1,
+  "kind": "image"
+ },
+ "head_commander": {
+  "id": "CH-09",
+  "path": "res://assets/sprites/characters/head_commander.png",
+  "w": 24,
+  "h": 24,
   "frames": 1,
   "kind": "image"
  }

@@ -23,6 +23,8 @@ func _ready() -> void:
 	add_child(shape)
 	sprite = Sprite2D.new()
 	sprite.texture = Assets.frame("char_commander", 0)
+	sprite.scale = Vector2(2, 2)             # 32x48 art shown at 2x (buildings are 3x)
+	sprite.offset = Vector2(0, -16)          # feet sit on the collision circle
 	add_child(sprite)
 
 

@@ -895,6 +895,17 @@ func _on_night_ended(report: Dictionary) -> void:
 		_ov_label("MALFUNCTION: IT WAS THE %s. %s" % [answer, mf.why], 8, true, Palette.BASE_PLUM)
 	if report.get("discovery_found", false):
 		_ov_label("DISCOVERY: %s: %s" % [report.discovery.title, report.discovery.text], 8, false, Palette.BASE_PLUM)
+	# the crew's faces: happy after a good night, worried after a rough one or if they were caught outside
+	var faces := HBoxContainer.new()
+	faces.add_theme_constant_override("separation", 6)
+	overlay_body.add_child(faces)
+	for c in SimState.sim.crew:
+		var sad: bool = not rough.is_empty() or (report.get("resting", []) as Array).has(c.id)
+		var tr := TextureRect.new()
+		tr.texture = Assets.frame("portrait_" + str(c.id), 1 if sad else 0)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.custom_minimum_size = Vector2(56, 56)
+		faces.add_child(tr)
 	for id in report.get("resting", []):
 		_ov_label(Strings.t("rest.caught") % str(id).to_upper(), 8, true, Palette.STATUS_DANGER_SHADE)
 	if won and beat.has("close"):
@@ -1095,7 +1106,8 @@ func _close_diagnose() -> void:
 # ---------------------------------------------------------------- crew talk + requests
 ## Crew chatter goes on ONE radio line under the battery (replaced, never stacked).
 func _crew_said(crew_id: String, text: String) -> void:
-	radio_icon.texture = Assets.tex("head_" + crew_id)
+	# worried portrait when someone is caught outside in a storm; their head icon otherwise
+	radio_icon.texture = Assets.frame("portrait_" + crew_id, 1) if text == Strings.t("crew.caught") else Assets.tex("head_" + crew_id)
 	radio_label.text = "%s: %s" % [crew_id.to_upper(), text]
 	radio.visible = true
 	radio_until = Time.get_ticks_msec() + 4500
@@ -1158,7 +1170,11 @@ func _open_answer(i: int, crew_id: String) -> void:
 	answer_box.add_child(v)
 	var head := HBoxContainer.new()
 	v.add_child(head)
-	head.add_child(Ui.image("head_" + crew_id))
+	var face := TextureRect.new()
+	face.texture = Assets.frame("portrait_" + crew_id, 2)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.custom_minimum_size = Vector2(48, 48)
+	head.add_child(face)
 	head.add_child(Ui.label(crew_id.to_upper() + " ASKS:", 8, true))
 	v.add_child(Ui.label(r.text, 8, false, Palette.INK, 290))
 	var row := HBoxContainer.new()
@@ -1537,13 +1553,15 @@ class FeedView extends Control:
 			if ROOMS[cam].has(room):
 				var sheet := "crew_%s_eva" % c.id if OUTSIDE.has(room) or room == "airlock" else "crew_%s" % c.id
 				var walking: bool = c.walk_left > 0.0
-				var f := (2 + int(t * 8.0) % 4) if walking and Assets.frame_count(sheet) >= 6 else (1 + int(t * 8.0) % 4 if walking else int(t * 2.0) % 2)
+				# 16-frame sheets: DOWN 0-3, LEFT 4-7, RIGHT 8-11, UP 12-15. Standing = facing us; walking = side view
+				var f := (8 + int(t * 8.0) % 4) if walking else 0
 				var tex := Assets.frame(sheet, f)
-				draw_texture_rect(tex, Rect2(x, 112, 48, 48), false)
-				draw_string(font, Vector2(x, 108), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-				crew_rects.append({"id": c.id, "rect": Rect2(x, 100, 48, 60)})
+				var bob := 0.0 if walking else roundf(sin(t * 2.0 + x) * 0.6)
+				draw_texture_rect(tex, Rect2(x, 90 + bob, 48, 72), false)
+				draw_string(font, Vector2(x, 88), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+				crew_rects.append({"id": c.id, "rect": Rect2(x, 84, 48, 78)})
 				if not s.open_request_for(c.id).is_empty():
-					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(x + 30, 84))
+					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(x + 34, 66))
 				x += 60
 		# dust haze on outside cameras (CF-09)
 		if cam in ["solar_field", "sky_radar", "airlock"] and s.hazard.dust > 0.0:

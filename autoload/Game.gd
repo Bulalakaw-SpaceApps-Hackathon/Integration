@@ -35,6 +35,7 @@ var overlay_root: Control
 var panels: Array[Control] = []
 var toast_box: VBoxContainer
 var visited: Dictionary = {}     # night -> Array of plot ids the Commander went inside today
+var talked: Dictionary = {}      # night -> Array of crew ids the Commander talked to today
 var theme: Theme                 # FD-02, also set on Controls under CanvasLayers (they don't inherit)
 
 

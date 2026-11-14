@@ -685,7 +685,10 @@ func _tick_dose(dt: float) -> void:
 	for c in crew:
 		c.dose += p * dose_rate_for(c) * dt
 		if is_outside(c):
-			c["caught_sec"] = float(c.get("caught_sec", 0.0)) + dt
+			var before := float(c.get("caught_sec", 0.0))
+			c["caught_sec"] = before + dt
+			if before < balance.caught_outside_sec and before + dt >= balance.caught_outside_sec:
+				crew_said.emit(c.id, Strings.t("crew.caught"))
 
 
 func _tick_bookkeeping(dt: float) -> void:
