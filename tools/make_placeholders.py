@@ -248,6 +248,62 @@ S(haze, "CF-09", CF, "fx_dust_haze.png")
 S(strip([shape_icon(16, "diamond", WARN), shape_icon(16, "diamond", HI)]), "CF-10", CF, "fx_radar_blip.png", 2)
 S(strip([box(160, 200, STONE, INK, f"DOOR\n{k * 33}%") for k in range(4)]), "CF-11", CF, "cam_shelter_door_anim.png", 4)
 
+# camera interaction effects (CF-12..CF-14) + sponsor message art (SP-01)
+def spark(k):
+    f = Image.new("RGBA", (32, 32), CLEAR); fd = ImageDraw.Draw(f)
+    pts = [(16, 2), (20, 12), (30, 10), (22, 18), (28, 30), (16, 22), (4, 30), (10, 18), (2, 10), (12, 12)]
+    fd.polygon(pts if k == 0 else [(p[0], 32 - p[1]) for p in pts], fill=WARN if k == 0 else ORANGE, outline=INK)
+    return f
+S(strip([spark(0), spark(1)]), "CF-12", CF, "fx_fault.png", 2)
+S(strip([shape_icon(32, "star", HI), shape_icon(32, "star", HAZE)]), "CF-13", CF, "fx_discovery.png", 2)
+def bubble(k):
+    f = Image.new("RGBA", (24, 24), CLEAR); fd = ImageDraw.Draw(f)
+    fd.rounded_rectangle((1, 1 + k, 22, 18 + k), radius=6, fill=HI, outline=INK); fd.polygon([(6, 18 + k), (10, 18 + k), (4, 23)], fill=HI)
+    fd.text((9, 3 + k), "!", font=font(16), fill=DANGER)
+    return f
+S(strip([bubble(0), bubble(1)]), "CF-14", CF, "fx_request.png", 2)
+def mag(k):
+    f = Image.new("RGBA", (32, 32), CLEAR); fd = ImageDraw.Draw(f)
+    fd.ellipse((3 + k, 3, 21 + k, 21), fill=HAZE, outline=INK, width=3); fd.line((18 + k, 18, 29, 29), fill=INK, width=5)
+    return f
+S(strip([mag(0), mag(1)]), "CF-15", CF, "fx_clue.png", 2)
+for k, col in enumerate([SAND, HAZE, c("EF5DC0")]):
+    # clean card: solid colour, thick frame, empty middle (code writes the brand, the tag and the X)
+    ad = Image.new("RGBA", (320, 180), col); dd = ImageDraw.Draw(ad)
+    dd.rectangle((0, 0, 319, 179), outline=INK, width=4)
+    dd.rectangle((8, 8, 311, 171), outline=HI, width=2)
+    dd.text((236, 166), "SP-01 #%d" % (k + 1), font=font(8), fill=INK)
+    S(ad, "SP-01", CF, "ad_%d.png" % (k + 1))
+# SP-02 made-up sponsor logos (one per brand in data/night_extras.json), BT-11 attention badge
+brands = json.load(open(f"{ROOT}/data/night_extras.json"))["sponsors"]
+for k, brand in enumerate(brands, 1):
+    lg = Image.new("RGBA", (48, 48), CLEAR); ld = ImageDraw.Draw(lg)
+    col = [SAND, HAZE, c("EF5DC0"), OK, WARN, ORANGE, c("A2E747")][(k - 1) % 7]
+    ld.rounded_rectangle((1, 1, 46, 46), radius=12, fill=col, outline=INK, width=3)
+    initials = "".join(w[0] for w in brand.split()[:2])
+    ld.text((24 - ld.textlength(initials, font=font(16)) / 2, 14), initials, font=font(16), fill=INK)
+    S(lg, "SP-02", "sprites/ui", "sponsor_logo_%d.png" % k)
+# SP-03 sponsor posters (300x380): no words in the art, code writes brand (top) and offer (bottom)
+for k, brand in enumerate(brands, 1):
+    col = [SAND, HAZE, c("EF5DC0"), OK, WARN, ORANGE, c("A2E747")][(k - 1) % 7]
+    po = Image.new("RGBA", (300, 380), col); pd = ImageDraw.Draw(po)
+    pd.rectangle((0, 0, 299, 379), outline=INK, width=6); pd.rectangle((10, 10, 289, 369), outline=HI, width=2)
+    pd.rectangle((10, 280, 289, 340), fill=HI)                               # offer text zone
+    pd.ellipse((90, 90, 210, 210), fill=HI, outline=INK, width=4)           # mascot / product spot
+    pd.text((112, 140), "SP-03", font=font(16), fill=INK)
+    S(po, "SP-03", "sprites/ui", "sponsor_poster_%d.png" % k)
+def att(k):
+    f = Image.new("RGBA", (22, 22), CLEAR); fd = ImageDraw.Draw(f)
+    fd.ellipse((1, 1, 20, 20), fill=DANGER if k == 0 else WARN, outline=INK, width=2)
+    fd.text((8, 2), "!", font=font(16), fill=HI if k == 0 else INK)
+    return f
+S(strip([att(0), att(1)]), "BT-11", "sprites/ui", "ui_attention.png", 2)
+hp = Image.new("RGBA", (20, 20), CLEAR); hd = ImageDraw.Draw(hp)
+hd.ellipse((0, 0, 19, 19), fill=HAZE, outline=INK, width=2)
+qb = hd.textbbox((0, 0), "?", font=font(16))
+hd.text(((20 - (qb[2] - qb[0])) / 2 - qb[0], (20 - (qb[3] - qb[1])) / 2 - qb[1]), "?", font=font(16), fill=INK)
+S(hp, "BT-10", "sprites/ui", "icon_help.png")
+
 # ======================================================================== DESK BUTTONS + UI
 UI = "sprites/ui"
 S(strip([nine(96, 96, CREAM, INK, STONE), nine(96, 96, WARN, INK, c("C9B500")), nine(96, 96, MAUVE, PLUM)]), "BT-01", UI, "ui_button.png", 3)
@@ -271,7 +327,7 @@ for n, (sh, f, l) in {"pause": ("rounded", CREAM, "II"), "mute_on": ("rounded", 
     S(shape_icon(48, sh, f, l), "BT-09", UI, f"icon_{n}.png")
 ALERT = {"battery": ("circle", OK), "co2": ("hexagon", HAZE), "flare": ("triangle", WARN), "dose": ("diamond", c("A2E747")),
          "dust": ("octagon", SAND), "comms": ("rounded", INDIGO), "cold": ("star", HAZE), "thump": ("square", MAUVE),
-         "hungry": ("pentagon", ORANGE), "info": ("circle", CREAM)}
+         "hungry": ("pentagon", ORANGE), "info": ("drop", CREAM)}
 for kind, (shape, fill) in ALERT.items():
     S(shape_icon(48, shape, fill, kind[:3].upper()), "AL-01", UI, f"alert_{kind}.png")
 S(nine(64, 64, HI, INK, STONE), "AL-02", UI, "ui_popup.png")
@@ -338,8 +394,29 @@ S(box(64, 64, RUST, INK, "EMPTY", stripes=False), "HM-10", HM, "plot_empty.png")
 hl = Image.new("RGBA", (64, 64), CLEAR); ImageDraw.Draw(hl).rounded_rectangle((0, 0, 63, 63), radius=8, outline=WARN, width=3)
 S(hl, "HM-11", HM, "ui_plot_highlight.png")
 S(shape_icon(48, "rounded", WARN, "E"), "HM-11", HM, "ui_prompt_build.png")
-for name, (w, h, col) in {"rover": (64, 48, STONE), "flag": (32, 48, CREAM), "antenna": (32, 64, MAUVE), "crates": (48, 40, SAND), "rocks": (48, 32, CRIMSON)}.items():
+for name, (w, h, col) in {"rover": (64, 48, STONE), "antenna": (32, 64, MAUVE), "rocks": (48, 32, CRIMSON)}.items():
     S(box(w, h, col, INK, name.upper()), "HM-12", HM, f"deco_{name}.png")
+# Filipino touches: the Philippine flag, a sari-sari supply crate, a parol (Christmas star lantern)
+import math
+fl = Image.new("RGBA", (32, 48), CLEAR); fd = ImageDraw.Draw(fl)
+fd.rectangle((2, 2, 3, 47), fill=INK)
+fd.rectangle((4, 4, 31, 11), fill=(0, 56, 168, 255)); fd.rectangle((4, 12, 31, 19), fill=(206, 17, 38, 255))
+fd.polygon([(4, 4), (4, 19), (16, 11)], fill=(255, 255, 255, 255)); fd.ellipse((6, 9, 9, 12), fill=(252, 209, 22, 255))
+fd.rectangle((4, 4, 31, 19), outline=INK)
+S(fl, "HM-12", HM, "deco_flag.png")
+cr = box(72, 40, SAND, INK, "SARI-SARI")
+S(cr, "HM-12", HM, "deco_crates.png")
+pa = Image.new("RGBA", (32, 48), CLEAR); pd = ImageDraw.Draw(pa)
+pts = []
+for k in range(10):
+    r = 14 if k % 2 == 0 else 6
+    a = -math.pi / 2 + k * math.pi / 5
+    pts.append((16 + r * math.cos(a), 16 + r * math.sin(a)))
+pd.polygon(pts, fill=WARN, outline=INK)
+pd.ellipse((12, 12, 20, 20), fill=(236, 5, 0, 255), outline=INK)
+for x in (11, 16, 21):
+    pd.line((x, 28, x + (x - 16) // 2, 46), fill=(236, 5, 0, 255), width=2)
+S(pa, "HM-12", HM, "deco_parol.png")
 fx = []
 for k in range(6):
     f = Image.new("RGBA", (64, 64), CLEAR); fd = ImageDraw.Draw(f)
@@ -410,6 +487,24 @@ for n, hand in (("ui_cursor.png", False), ("ui_cursor_hand.png", True)):
     if hand: d.rounded_rectangle((8, 2, 22, 28), radius=5, fill=HI, outline=INK, width=2)
     else: d.polygon([(2, 2), (2, 26), (9, 20), (14, 30), (18, 28), (13, 18), (22, 18)], fill=HI, outline=INK)
     S(img, "FD-07", UI, n)
+
+# ======================================================================== BUILDING LESSON PHOTOS (NI-xx)
+# One photo slot per lesson: the team puts the suggested NASA image here (public domain, credit NASA).
+LES = json.load(open(f"{ROOT}/data/building_lessons.json"))
+for pid, lessons in LES.items():
+    for k, les in enumerate(lessons, 1):
+        img = Image.new("RGBA", (320, 200), NIGHT); d = ImageDraw.Draw(img)
+        d.rectangle((0, 0, 319, 199), outline=INK, width=3)
+        d.rectangle((10, 10, 309, 150), outline=MAUVE, width=1)
+        d.text((16, 16), "NASA PHOTO SLOT", font=font(8), fill=WARN)
+        words, line, y = les["image"].upper().split(), "", 34
+        for w_ in words:
+            if d.textlength(line + w_ + " ", font=font(8)) > 280:
+                d.text((16, y), line, font=font(8), fill=HI); y += 12; line = ""
+            line += w_ + " "
+        d.text((16, y), line, font=font(8), fill=HI)
+        d.text((16, 160), "NI: nasa_%s_%d.png 320x200" % (pid, k), font=font(8), fill=STONE)
+        S(img, "NI-%s" % pid, "sprites/info", "nasa_%s_%d.png" % (pid, k))
 
 # ======================================================================== ROOT ICONS
 icon = Image.new("RGBA", (256, 256), CLEAR); d = ImageDraw.Draw(icon)

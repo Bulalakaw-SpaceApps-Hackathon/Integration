@@ -8,9 +8,32 @@ signal alert(text: String, kind: String)
 signal lost(reason: String)
 signal won()
 signal message_arrived(kind: String)
+signal crew_said(crew_id: String, text: String)   # speech bubbles, so the crew are predictable
+signal fault_started(fault: Dictionary)
+signal request_started(request: Dictionary)
+signal sponsor_ad()
+signal radio(text: String)                 # Mission Control radio facts
+signal clue_found(clue: Dictionary)
+signal malfunction_fixed(cause: Dictionary)
 
-enum Heater { LOW, MID, HIGH }
-enum LifeSupport { LOW, NORMAL, HIGH }
+enum Heater { OFF = -1, LOW, MID, HIGH }
+enum LifeSupport { OFF = -1, LOW, NORMAL, HIGH }
+
+## Problems that only show on one camera. Open that camera and tap the problem to fix it.
+const FAULTS := {
+	"loose_cable": {"cam": "solar_field", "pos": Vector2(200, 128)},
+	"clogged_filter": {"cam": "life_support", "pos": Vector2(250, 70)},
+	"airlock_leak": {"cam": "airlock", "pos": Vector2(250, 60)},
+	"greenhouse_leak": {"cam": "greenhouse", "pos": Vector2(140, 100)},
+	"shelter_seal": {"cam": "shelter", "pos": Vector2(60, 60)},
+	"panel_dust": {"cam": "solar_field", "pos": Vector2(110, 130)},
+	"dish_drift": {"cam": "sky_radar", "pos": Vector2(250, 50)},
+}
+const CLUE_SECONDS := 15.0       # a scheduled clue shows on its camera this long
+const CLUE_WATCH_SEC := 1.5      # watching it this long logs it
+## Which camera shows which room.
+const ROOM_CAM := {"solar_field": "solar_field", "outside": "sky_radar", "comms_dish": "sky_radar", "airlock": "airlock",
+	"shelter": "shelter", "life_support": "life_support", "greenhouse": "greenhouse", "galley": ""}
 
 const CAMERAS: Array[String] = ["sky_radar", "airlock", "solar_field", "shelter", "life_support", "greenhouse"]
 const OUTSIDE_ROOMS: Array[String] = ["solar_field", "comms_dish", "outside"]
@@ -55,9 +78,22 @@ var crop_lamp_on_sec: float = 0.0
 var heater_low_sec: float = 0.0
 var battery_zero_sec: float = 0.0
 var morale: int = 0
+var faults: Array[Dictionary] = []      # {kind, cam, pos, at, fixed_at}
+var requests: Array[Dictionary] = []    # {crew, text, yes, no, at, expires, answer}
+var discovery: Dictionary = {}          # {cam, pos, at, title, text, found}
+var sponsor := false                    # accepted a sponsor deal for tonight
+var sponsor_ads_closed := 0
+var extra_materials := 0                # from crew requests that pay off (only counts on a win)
+var ask_reply_received := false
+var challenge := ""                     # tonight's Challenge star goal
+# --- Malfunction: {title, why, true, solved, causes:[{id,name,rooms,p,crossed}], clues:[{at,cam,text,reliability,points/away,found,watch}]}
+var malf: Dictionary = {}
+var scan_ready_at: Dictionary = {}      # cam -> clock time when SCAN works again
+var scanned_empty: Array[String] = []   # rooms already counted as "nothing unusual"
 var _low_battery_warned: bool = false
 var _particles_warned: bool = false
 var _battery_empty_warned: bool = false
+var _all_clear_said: bool = false
 
 
 # ============================================================================
@@ -81,10 +117,10 @@ func start(cfg: NightConfig, bal: BalanceConfig, plot_levels: Dictionary, food_s
 	hungry = cfg.food_enabled and food <= 0
 	if hungry:
 		alert.emit(Strings.t("alert.hungry"), "hungry")
-	dish = cfg.comms_delay_real_min > 0.0
+	dish = cfg.comms_delay_real_min > 0.0 and cfg.id >= 4   # Nights 2-3: dish starts off, ASK turns it on
 	crew.clear()
 	for id in cfg.crew_ids:
-		crew.append({"id": id, "room": "life_support", "dose": 0.0, "target": "", "walk_left": 0.0, "held": false})
+		crew.append({"id": id, "room": "life_support", "dose": 0.0, "target": "", "walk_left": 0.0, "held": false, "job": "life_support"})
 	_tick_comms(0.0)   # so the link quality is correct before the first frame
 
 
@@ -92,11 +128,298 @@ func start(cfg: NightConfig, bal: BalanceConfig, plot_levels: Dictionary, food_s
 # Player actions (called by the desk UI)
 # ============================================================================
 func set_heater(level: int) -> void:
-	heater = clampi(level, Heater.LOW, Heater.HIGH)
+	heater = clampi(level, Heater.OFF, Heater.HIGH)
 
 
 func set_life_support(level: int) -> void:
-	life_support = clampi(level, LifeSupport.LOW, LifeSupport.HIGH)
+	life_support = clampi(level, LifeSupport.OFF, LifeSupport.HIGH)
+
+
+# ---------------------------------------------------------------- faults (camera problems)
+func add_fault(kind: String) -> void:
+	if not FAULTS.has(kind) or fault_active(kind):
+		return
+	var f := {"kind": kind, "cam": FAULTS[kind].cam, "pos": FAULTS[kind].pos, "at": clock_sec, "fixed_at": -1.0}
+	faults.append(f)
+	alert.emit(Strings.t("fault.%s.start" % kind), "info")
+	fault_started.emit(f)
+
+
+func fault_active(kind: String) -> bool:
+	for f in faults:
+		if f.kind == kind and f.fixed_at < 0.0:
+			return true
+	return false
+
+
+func faults_on_cam(cam: String) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for f in faults:
+		if f.cam == cam and f.fixed_at < 0.0:
+			out.append(f)
+	return out
+
+
+## Its Task was finished: fixed, wherever the cameras are now.
+func complete_task(kind: String) -> bool:
+	for f in faults:
+		if f.kind == kind and f.fixed_at < 0.0:
+			f.fixed_at = clock_sec
+			alert.emit(Strings.t("fault.%s.fixed" % kind), "info")
+			return true
+	return false
+
+
+## The player tapped the problem on a camera. Works only while that camera is on.
+func fix_fault(kind: String) -> bool:
+	for f in faults:
+		if f.kind == kind and f.fixed_at < 0.0 and cameras_on.has(f.cam):
+			f.fixed_at = clock_sec
+			alert.emit(Strings.t("fault.%s.fixed" % kind), "info")
+			return true
+	return false
+
+
+# ---------------------------------------------------------------- crew requests
+## yes / no effects: {"battery": -5, "oxygen": 5, "materials": 1, "morale": 1, "lamp": true, "move": "solar_field"}
+func add_request(crew_id: String, text: String, yes: Dictionary, no: Dictionary, timeout_sec: float) -> void:
+	if not has_crew(crew_id):
+		return
+	for c in crew:
+		if c.id == crew_id and (c.held or c.room == "shelter"):
+			return                             # sheltering crew don't ask for jobs
+	var r := {"crew": crew_id, "text": text, "yes": yes, "no": no, "at": clock_sec, "expires": clock_sec + timeout_sec, "answer": ""}
+	requests.append(r)
+	request_started.emit(r)
+
+
+func open_request_for(crew_id: String) -> Dictionary:
+	for r in requests:
+		if r.crew == crew_id and r.answer == "":
+			return r
+	return {}
+
+
+func answer_request(crew_id: String, yes: bool) -> bool:
+	var r := open_request_for(crew_id)
+	if r.is_empty():
+		return false
+	r.answer = "yes" if yes else "no"
+	_apply_effect(crew_id, r.yes if yes else r.no)
+	crew_said.emit(crew_id, Strings.t("crew.thanks") if yes else Strings.t("crew.okay"))
+	return true
+
+
+func _apply_effect(crew_id: String, e: Dictionary) -> void:
+	battery = maxf(0.0, battery + float(e.get("battery", 0.0)))
+	oxygen = clampf(oxygen + float(e.get("oxygen", 0.0)), 0.0, 100.0)
+	extra_materials += int(e.get("materials", 0))
+	morale += int(e.get("morale", 0))
+	if e.has("lamp"):
+		set_crop_lamp(bool(e.lamp))
+	if e.has("move"):
+		for c in crew:
+			if c.id == crew_id:
+				_walk(c, str(e.move), 6.0)
+
+
+func has_crew(crew_id: String) -> bool:
+	for c in crew:
+		if c.id == crew_id:
+			return true
+	return false
+
+
+func crew_cam(crew_id: String) -> String:
+	for c in crew:
+		if c.id == crew_id:
+			return ROOM_CAM.get(c.room, "")
+	return ""
+
+
+# ---------------------------------------------------------------- tonight's science discovery
+func place_discovery(cam: String, pos: Vector2, title: String, text: String) -> void:
+	discovery = {"cam": cam, "pos": pos, "at": clock_sec, "title": title, "text": text, "found": false}
+	alert.emit(Strings.t("discovery.appeared") % Strings.t("cam." + cam), "info")
+
+
+func collect_discovery() -> bool:
+	if discovery.is_empty() or discovery.found or not cameras_on.has(discovery.cam):
+		return false
+	discovery.found = true
+	alert.emit(Strings.t("discovery.found") % discovery.title, "info")
+	return true
+
+
+# ---------------------------------------------------------------- the Malfunction (camera detective)
+func setup_malfunction(def: Dictionary) -> void:
+	malf = {}
+	if def.is_empty():
+		return
+	var causes: Array = []
+	for c in def.get("causes", []):
+		causes.append({"id": c.id, "name": c.name, "rooms": c.get("rooms", []), "p": 0.0, "crossed": false})
+	for c in causes:
+		c.p = 1.0 / causes.size()
+	var clues: Array = []
+	for c in def.get("clues", []):
+		var k: Dictionary = c.duplicate()
+		k["found"] = false
+		k["watch"] = 0.0
+		clues.append(k)
+	malf = {"title": def.get("title", "MALFUNCTION"), "why": def.get("why", ""), "true": def.get("true", ""),
+		"solved": false, "causes": causes, "clues": clues, "wrong": 0}
+
+
+func has_malfunction() -> bool:
+	return not malf.is_empty()
+
+
+func malfunction_solved() -> bool:
+	return has_malfunction() and malf.solved
+
+
+## Bayes update. A clue from a sensor that is right r times in 5:
+## "points" to X: X x r/5, every other cause x (1 - r/5)/(n - 1).
+## "away" from X (looks normal): X x (1 - r/5), others x r/5.
+func _apply_clue(k: Dictionary) -> void:
+	var r: float = clampf(float(k.get("reliability", 4)) / 5.0, 0.0, 1.0)
+	var live: Array = malf.causes.filter(func(c: Dictionary) -> bool: return not c.crossed)
+	var n := live.size()
+	if n <= 1:
+		return
+	for c in live:
+		if k.has("points"):
+			c.p *= r if c.id == k.points else maxf((1.0 - r) / (n - 1), 0.02)
+		elif k.has("away"):
+			c.p *= maxf(1.0 - r, 0.05) if c.id == k.away else r
+	_normalize()
+
+
+func _normalize() -> void:
+	var total := 0.0
+	for c in malf.causes:
+		if not c.crossed:
+			total += c.p
+	for c in malf.causes:
+		c.p = 0.0 if c.crossed else (c.p / total if total > 0.0 else 0.0)
+
+
+func _find_clue(k: Dictionary) -> void:
+	if k.found:
+		return
+	k.found = true
+	_apply_clue(k)
+	clue_found.emit(k)
+
+
+## Clues visible on a camera right now (scheduled window), for the feed to draw.
+func clues_on_cam(cam: String) -> Array:
+	var out: Array = []
+	if has_malfunction() and not malf.solved:
+		for k in malf.clues:
+			if k.cam == cam and not k.found and clock_sec >= k.at and clock_sec < k.at + CLUE_SECONDS:
+				out.append(k)
+	return out
+
+
+func _tick_clues(dt: float) -> void:
+	if not has_malfunction() or malf.solved:
+		return
+	for k in malf.clues:
+		if k.found or clock_sec < k.at or clock_sec >= k.at + CLUE_SECONDS:
+			continue
+		if cameras_on.has(k.cam):
+			k.watch += dt
+			if k.watch >= CLUE_WATCH_SEC:
+				_find_clue(k)
+
+
+func can_scan(cam: String) -> bool:
+	return cameras_on.has(cam) and clock_sec >= float(scan_ready_at.get(cam, 0.0)) and has_malfunction() and not malf.solved
+
+
+## SCAN a camera: reveals that room's clue (even one not shown yet); if there is none,
+## "nothing unusual" is evidence too and lowers the causes tied to that room.
+func scan(cam: String) -> Dictionary:
+	if not can_scan(cam):
+		return {}
+	scan_ready_at[cam] = clock_sec + balance.scan_cooldown_sec
+	battery = maxf(0.0, battery - balance.scan_cost)
+	for k in malf.clues:
+		if k.cam == cam and not k.found:
+			_find_clue(k)
+			return {"clue": k}
+	if not scanned_empty.has(cam):
+		scanned_empty.append(cam)
+		for c in malf.causes:
+			if not c.crossed and (c.rooms as Array).has(cam):
+				_apply_clue({"away": c.id, "reliability": balance.scan_empty_reliability})
+	return {"empty": true}
+
+
+## Pick a cause. Right: fixed. Wrong: costs battery, that cause is crossed off.
+func diagnose(cause_id: String) -> bool:
+	if not has_malfunction() or malf.solved:
+		return false
+	for c in malf.causes:
+		if c.id != cause_id or c.crossed:
+			continue
+		if cause_id == malf["true"]:
+			malf.solved = true
+			for o in malf.causes:
+				o.p = 1.0 if o.id == cause_id else 0.0
+			alert.emit(Strings.t("malf.right") % c.name, "info")
+			malfunction_fixed.emit(c)
+			return true
+		c.crossed = true
+		malf.wrong += 1
+		battery = maxf(0.0, battery - balance.wrong_diagnosis_cost)
+		_normalize()
+		alert.emit(Strings.t("malf.wrong") % c.name, "info")
+		return false
+	return false
+
+
+## Extra drain while unsolved, growing every game hour.
+func malfunction_drain() -> float:
+	if not has_malfunction() or malf.solved:
+		return 0.0
+	var hours := clock_sec / (balance.night_length_sec / 12.0)
+	return balance.malfunction_drain + balance.malfunction_drain_per_hour * hours
+
+
+# ---------------------------------------------------------------- the 3 stars
+func challenge_met() -> bool:
+	match challenge:
+		"battery_20": return battery >= balance.battery_bonus_pct
+		"food_grew": return food_grew()
+		"shelter_fast": return all_sheltered_at >= 0.0 and all_sheltered_at - flare_alarm_at <= balance.shelter_fast_sec
+		"carlo_reply":
+			for c in crew:
+				if c.id == "carlo" and is_outside(c):
+					return false
+			return ask_reply_received
+		"all_fixed":
+			for f in faults:
+				if f.fixed_at < 0.0:
+					return false
+			return true
+		"discovery_sent": return discovery_sent
+	return false
+
+
+func science_met() -> bool:
+	return (malfunction_solved() or not has_malfunction()) and discovery_found()
+
+
+func show_sponsor_ad() -> void:
+	if sponsor:
+		sponsor_ad.emit()
+
+
+func discovery_found() -> bool:
+	return not discovery.is_empty() and discovery.found
 
 
 func toggle_camera(cam: String) -> bool:
@@ -120,6 +443,12 @@ func set_dish(on: bool) -> void:
 
 ## Open: call every inside crewmate to the shelter. Close: protect whoever is inside.
 func toggle_shelter_door() -> void:
+	if not shelter_door_open and not danger_active() and _anyone_held():
+		# all clear: opening the door lets the crew go back to their jobs
+		shelter_door_open = true
+		door_closing_left = 0.0
+		release_crew()
+		return
 	if shelter_door_open:
 		shelter_door_open = false
 		door_closing_left = _lv(balance.door_close_sec, "shelter")
@@ -131,6 +460,31 @@ func toggle_shelter_door() -> void:
 			if not is_outside(c) and c.room != "shelter":
 				_walk(c, "shelter", balance.shelter_walk_sec)
 				c.held = true
+				crew_said.emit(c.id, Strings.t("crew.to_shelter"))
+
+
+## True from the flare alarm until the particles have passed.
+func danger_active() -> bool:
+	if hazard.particles > 0.0 or hazard.flare > 0.0:
+		return true
+	return flare_alarm_at >= 0.0 and not _particles_warned
+
+
+func _anyone_held() -> bool:
+	for c in crew:
+		if c.held:
+			return true
+	return false
+
+
+## Send everyone the Commander was holding back to their own job.
+func release_crew() -> void:
+	for c in crew:
+		if c.held:
+			c.held = false
+			if c.room != c.job:
+				_walk(c, c.job, balance.shelter_walk_sec)
+				crew_said.emit(c.id, Strings.t("crew.back_to_work"))
 
 
 ## Bring every outside crewmate back to the airlock (then on to the shelter if it is open).
@@ -142,22 +496,69 @@ func recall_crew() -> void:
 		if is_outside(c) or OUTSIDE_ROOMS.has(c.target):
 			_walk(c, "airlock", t)
 			c.held = true
+			crew_said.emit(c.id, Strings.t("crew.recalled"))
 
 
 ## kind: "ask_earth" or "discovery". Returns false if there is no link.
 func send_message(kind: String) -> bool:
+	if not dish and config.comms_delay_real_min > 0.0 and battery > 0.0:
+		set_dish(true)
+		_tick_comms(0.0)
 	if comms < balance.min_comms_to_send or config.comms_delay_real_min <= 0.0:
 		alert.emit(Strings.t("alert.no_link"), "comms")
 		return false
-	messages.append({"kind": kind, "arrive_at": clock_sec + message_delay_sec()})
+	if kind == "ask_earth" and ask_in_flight():
+		alert.emit(Strings.t("alert.ask_waiting"), "comms")
+		return false
+	# Radio goes at the speed of light: one way for news, there AND back for a question.
+	var one_way := message_delay_sec()
+	var trips := 2.0 if kind == "ask_earth" else 1.0
+	messages.append({"kind": kind, "sent_at": clock_sec, "turn_at": clock_sec + one_way,
+		"arrive_at": clock_sec + one_way * trips})
 	return true
+
+
+func ask_in_flight() -> bool:
+	for m in messages:
+		if m.kind == "ask_earth":
+			return true
+	return false
+
+
+## Light minutes from Earth to Mars tonight (real distance). Night 1 has no dish yet, but
+## Mission Control's radio lines still took this long to arrive.
+const LIGHT_MIN_FALLBACK := {1: 5.0, 2: 7.5, 3: 9.2}
+func light_minutes() -> float:
+	if config.comms_delay_real_min > 0.0:
+		return config.comms_delay_real_min
+	return float(LIGHT_MIN_FALLBACK.get(config.id, 6.0))
+
+
+## What Earth answers. They have a copy of the base, so they can test what we can't.
+func _earth_reply() -> String:
+	if has_malfunction() and not malf.solved:
+		var wrong: Array = malf.causes.filter(func(c: Dictionary) -> bool: return not c.crossed and c.id != malf["true"])
+		if not wrong.is_empty():
+			wrong.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.p > b.p)
+			wrong[0].crossed = true
+			_normalize()
+			return Strings.t("earth.reply_malf") % wrong[0].name
+	for e in config.hazard_events:
+		if e.start_sec > clock_sec:
+			var mins := int((e.start_sec - clock_sec) / balance.night_length_sec * 12.0 * 60.0)
+			return Strings.t("earth.reply_warn") % [Strings.t("earth.hz.%s" % e.type), mins / 60, mins % 60]
+	return Strings.t("earth.reply_quiet")
 
 
 ## Called by NightDirector's crew schedule. Ignored once the player has taken charge of a crewmate.
 func schedule_move(crew_id: String, room: String, walk_sec: float) -> void:
 	for c in crew:
+		if c.id == crew_id:
+			c.job = room                       # remembered, so they can go back after an emergency
 		if c.id == crew_id and not c.held:
 			_walk(c, room, walk_sec)
+			if Strings.has("crew.go.%s" % room):
+				crew_said.emit(crew_id, Strings.t("crew.go.%s" % room))
 
 
 func on_flare_alarm() -> void:
@@ -182,6 +583,7 @@ func tick(dt: float) -> void:
 	_tick_oxygen(dt)
 	_tick_comms(dt)
 	_tick_dose(dt)
+	_tick_clues(dt)
 	_tick_bookkeeping(dt)
 	_check_end()
 
@@ -197,6 +599,8 @@ func _tick_crew(dt: float) -> void:
 				# Recalled crew keep going to the shelter if it is open.
 				if c.room == "airlock" and c.held and shelter_door_open:
 					_walk(c, "shelter", balance.shelter_walk_sec)
+				elif c.room == "airlock" and c.held and not danger_active():
+					c.held = false                 # recalled with no danger: wait at the airlock for the next job
 
 
 func _tick_battery(dt: float) -> void:
@@ -227,6 +631,8 @@ func _tick_comms(dt: float) -> void:
 		var resist := _lv(balance.dish_static_resist, "comms_dish")
 		var loss: float = (hazard.dust * balance.dust_comms_penalty + hazard.flare * balance.flare_comms_penalty) * resist
 		comms = clampf(100.0 - loss - hazard.comms_loss * 100.0, 0.0, 100.0)
+		if fault_active("dish_drift"):
+			comms *= balance.fault_dish_comms
 	# Messages in flight are lost if the link drops; delivered ones fire their effect.
 	for i in range(messages.size() - 1, -1, -1):
 		var m: Dictionary = messages[i]
@@ -239,13 +645,17 @@ func _tick_comms(dt: float) -> void:
 				discovery_sent = true
 				alert.emit(Strings.t("alert.discovery_sent"), "comms")
 			else:
-				alert.emit(Strings.t("alert.ask_earth_reply"), "comms")
+				ask_reply_received = true
+				radio.emit(_earth_reply())
 			message_arrived.emit(m.kind)
 
 
 func _tick_dose(dt: float) -> void:
 	var p: float = hazard.particles
 	if p <= 0.0:
+		if _particles_warned and not _all_clear_said and hazard.flare <= 0.0:
+			_all_clear_said = true
+			alert.emit(Strings.t("alert.all_clear"), "info")
 		return
 	if not _particles_warned:
 		_particles_warned = true
@@ -255,10 +665,16 @@ func _tick_dose(dt: float) -> void:
 
 
 func _tick_bookkeeping(dt: float) -> void:
-	if crop_lamp and battery > 0.0:
+	if crop_lamp and battery > 0.0 and not fault_active("greenhouse_leak"):
 		crop_lamp_on_sec += dt
-	if heater == Heater.LOW:
+	if heater <= Heater.LOW:
 		heater_low_sec += dt
+	for r in requests:
+		if r.answer == "" and clock_sec >= r.expires:
+			r.answer = "timeout"
+			_apply_effect(r.crew, r.no)
+			morale -= 1
+			crew_said.emit(r.crew, Strings.t("crew.no_answer"))
 	if flare_alarm_at >= 0.0 and all_sheltered_at < 0.0 and everyone_protected():
 		all_sheltered_at = clock_sec
 
@@ -293,8 +709,15 @@ func drain_per_sec() -> float:
 	if battery <= 0.0:
 		return 0.0   # everything is off
 	var d := balance.base_load
-	d += balance.life_support_cost[life_support]
-	d += balance.heater_cost[heater] * (1.0 + balance.cold_heater_extra * hazard.cold)
+	if life_support >= 0:
+		d += balance.life_support_cost[life_support]
+	if heater >= 0:
+		d += balance.heater_cost[heater] * (1.0 + balance.cold_heater_extra * hazard.cold)
+	if fault_active("loose_cable"):
+		d += balance.fault_cable_drain
+	if fault_active("panel_dust"):
+		d += balance.fault_dust_drain
+	d += malfunction_drain()
 	d += cameras_on.size() * balance.camera_cost
 	if crop_lamp:
 		d += balance.crop_lamp_cost
@@ -305,14 +728,17 @@ func drain_per_sec() -> float:
 
 func oxygen_per_sec() -> float:
 	var made := 0.0
-	if battery > 0.0:
+	if battery > 0.0 and life_support >= 0:
 		made = balance.life_support_output[life_support] * _lv(balance.life_support_upgrade_multiplier, "life_support")
 		made *= 1.0 - balance.co2_output_loss * hazard.co2
+		if fault_active("clogged_filter"):
+			made *= balance.fault_filter_output
 		if hungry:
 			made *= balance.hungry_life_support_multiplier
 		if crop_lamp:
 			made += _lv(balance.greenhouse_oxygen_bonus, "greenhouse")
-	return made - balance.breath_rate * crew_inside_count()
+	var leak := balance.fault_airlock_leak if fault_active("airlock_leak") else 0.0
+	return made - balance.breath_rate * crew_inside_count() - leak
 
 
 func dose_rate_for(c: Dictionary) -> float:
@@ -320,7 +746,10 @@ func dose_rate_for(c: Dictionary) -> float:
 		return balance.outside_dose_rate * _lv(balance.suit_dose_multiplier, "suit_bay")
 	var r := balance.inside_dose_rate * _lv(balance.habitat_shield_multiplier, "shelter")
 	if c.room == "shelter" and door_fully_closed():
-		r *= _lv(balance.shelter_inside_multiplier, "shelter")
+		var m := _lv(balance.shelter_inside_multiplier, "shelter")
+		if fault_active("shelter_seal"):
+			m = minf(1.0, m * balance.fault_seal_multiplier)
+		r *= m
 	return r
 
 
@@ -415,6 +844,8 @@ func end_report() -> Dictionary:
 	var mor := morale
 	if heater == Heater.HIGH:
 		mor += 1
+	if heater == Heater.OFF:
+		mor -= 1
 	if heater_low_sec > 60.0:
 		mor -= 1
 	return {
@@ -425,8 +856,19 @@ func end_report() -> Dictionary:
 		"oxygen": oxygen,
 		"max_dose": max_dose(),
 		"bonus": bonus,
-		"stars": clampi(met, 1, 3) if won_night else 0,
-		"materials": (balance.survive_reward + balance.bonus_reward * met) if won_night else 0,
+		"stars": (1 + int(science_met()) + int(challenge_met())) if won_night else 0,
+		"star_science": science_met(),
+		"star_challenge": challenge_met(),
+		"challenge": challenge,
+		"malfunction": malf,
+		"materials": (balance.survive_reward + balance.bonus_reward * (int(science_met()) + int(challenge_met())) + extra_materials
+			+ (balance.discovery_reward if discovery_found() else 0)
+			+ (balance.sponsor_reward if sponsor else 0)) if won_night else 0,
+		"discovery_found": discovery_found(),
+		"discovery": discovery,
+		"faults_total": faults.size(),
+		"faults_fixed": faults.filter(func(f: Dictionary) -> bool: return f.fixed_at >= 0.0).size(),
+		"sponsor": sponsor,
 		"food_after": food_after,
 		"morale": mor,
 	}

@@ -30,12 +30,36 @@ final file name, folder and size, so finals drop in without code changes (see "S
 | Codex data | `data/codex/*.tres` (made by `tools/build_codex.gd`) |
 | Credits + Godot MIT notice | `CREDITS.md` (shown in game) |
 
+## How a night plays (after tester feedback)
+- **Big goal** (story card on the first base visit, always on the base HUD): keep the crew safe for 7 nights until the **supply ship** lands, and find **one science discovery** each night.
+- **Cameras matter:** problems (loose cable, clogged filter, airlock leak, pipe leak, shelter seal) only show on their camera. Tap the sparks to fix. Crew **call for help**: open the camera where they are, tap them, answer YES / NO (each has a cost). The **discovery** sparkles on one camera: tap it. Camera buttons blink `!` when that camera needs you.
+- **Crew talk:** crew say where they are going ("Off to the greenhouse!"), so they are predictable.
+- **Every switch can go OFF:** heater and life support cycle OFF > LOW > MID/NORM > HIGH. Locked controls say LOCKED NIGHT n.
+- **Sponsor deals** (Night 2+, on the briefing card): accept for +3 materials (only if you survive); made-up sponsor messages then pop over a monitor and must be tapped closed.
+- **Help:** a `?` on every control; Night 1 is a guided walkthrough (clock frozen until you finish it).
+- Data: `data/night_extras.json` (discoveries, crew requests, sponsor names). Numbers: the "Camera problems" group in `balance.tres`.
+
+## Day / build time (mandatory, hands-on)
+- Between nights it is **day**. The Commander must **walk into every unlocked building** before the Control Room opens (START NIGHT shows `VISIT BUILDINGS 2/4`). Tapping a far building makes the Commander walk there.
+- **Inside each building:** today's NASA lesson (2 sentences, honesty badge, source), a **chart drawn from the real numbers**, a **NASA photo slot**, and the building's upgrade. The lesson changes every day (39 lessons in `data/building_lessons.json`).
+- **NASA photos:** `assets/sprites/info/nasa_<building>_<n>.png` (320x200). Each placeholder names the NASA image to use; NASA images are generally free to use with credit "NASA". Add each one to CREDITS.md.
+- **Campaign:** the title has CONTINUE (latest night reached) and NEW GAME (Night 1). Picking any night is Judge Mode only (Judge Mode also skips the visit rule).
+
+## Nights v2: never idle, always learning
+- **3 stars every night:** SURVIVE (06:00) · SCIENCE (solve the Malfunction AND find the Discovery) · CHALLENGE (one per night, in `data/story.json`). Live strip under the clock.
+- **Malfunction (camera detective):** the hanging scroll becomes the Malfunction board, with one Likelihood bar per cause. Clues show on cameras for 15 s (watch that camera to log them); some sensors are only "right N in 5 times". **SCAN** (2% battery, 20 s cooldown) reveals a room's clue, or "nothing unusual", which also lowers that room's causes. **DIAGNOSE** any time: right = solved; wrong = 3% battery and that cause is crossed off. While unsolved it drains a little extra power that grows every hour.
+- **Tasks:** tapping a Problem opens a 10–20 s hands-on repair (`scripts/TaskGame.gd`): wires, dust, filter, airlock seal, pipes, door cracks, dish. Skill only; hazards just shorten the timer. Each ends with a real fact.
+- **Radio facts** from Mission Control on the radio line, timed per night.
+- **Story:** `data/story.json` (placeholder story beats). The writer fills `docs/STORY_TEMPLATE.md`; the integrator copies it into the JSON.
+- Glossary of these terms: `CONTEXT.md`.
+
 Judge Mode is a sandbox: nothing it does is written to the player's save.
 
 ## Swapping in final art and sound
 - Every file on the Assets sheet already exists as a placeholder (191 files: art in `assets/sprites/<characters|desk|cameras|ui|hub|screens>/`, sounds in `assets/sfx/`, `icon.png`, `boot_splash.png`, `icon.ico`).
 - To use a final: **overwrite the placeholder with the same file name and the same size** (sprite sheets: same frame size and count, frames in one row). Godot re-imports it; nothing else changes.
 - `python3 tools/make_placeholders.py .` remakes missing placeholders and `data/assets.json`. It never overwrites an existing file unless you add `--force`.
+- **Layout templates for artists** are in `assets/templates/` (made by `tools/make_layout_templates.py`): camera feed, base map, buildings/plots, title, night select, mission complete, UI frames and icons. Each shows exact sizes and the zones where code draws text or sprites. `*_1x.png` files are exact-size guides to draw on.
 - 9-slice frames (ui_panel, ui_button, ui_popup, ui_briefing, ui_debrief, ui_codex_page, ui_nasa_panel, ui_certificate) keep a ~12 px border; the code stretches the middle.
 
 ## Build for the web / Windows

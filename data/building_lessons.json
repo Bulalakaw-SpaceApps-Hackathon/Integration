@@ -1,0 +1,847 @@
+{
+ "solar": [
+  {
+   "title": "SUNLIGHT ON MARS IS WEAKER",
+   "text": "Mars is about 1.5 times farther from the Sun than Earth. So sunlight there is a bit less than half as strong as on Earth.",
+   "figure": {
+    "title": "SUNLIGHT STRENGTH",
+    "unit": "%",
+    "bars": [
+     [
+      "EARTH",
+      100
+     ],
+     [
+      "MARS",
+      43
+     ]
+    ]
+   },
+   "image": "NASA photo of a sunset on Mars (Curiosity or Spirit)",
+   "source": "NASA Mars Exploration",
+   "badge": "simplified"
+  },
+  {
+   "title": "NO POWER AT NIGHT",
+   "text": "A day on Mars (a sol) lasts about 24 hours and 39 minutes. Solar panels only work while the Sun is up, so at night the base runs on batteries.",
+   "figure": {
+    "title": "SOLAR POWER DURING ONE SOL",
+    "unit": "%",
+    "bars": [
+     [
+      "MORNING",
+      40
+     ],
+     [
+      "NOON",
+      100
+     ],
+     [
+      "EVENING",
+      40
+     ],
+     [
+      "NIGHT",
+      0
+     ]
+    ]
+   },
+   "image": "NASA photo of a solar-powered lander's panels (InSight)",
+   "source": "NASA Mars Facts",
+   "badge": "simplified"
+  },
+  {
+   "title": "A ROVER THAT KEPT GOING",
+   "text": "The solar-powered rover Opportunity was planned to work for 90 sols. It kept working for more than 5,000 sols, from 2004 to 2018!",
+   "figure": {
+    "title": "OPPORTUNITY: SOLS OF WORK",
+    "unit": "SOLS",
+    "bars": [
+     [
+      "PLANNED",
+      90
+     ],
+     [
+      "ACTUAL",
+      5000
+     ]
+    ]
+   },
+   "image": "NASA image of the Opportunity rover",
+   "source": "NASA JPL",
+   "badge": "real"
+  },
+  {
+   "title": "A SOLAR HELICOPTER",
+   "text": "NASA's Ingenuity helicopter charged its batteries with a small solar panel. It was planned for 5 flights and flew 72 times on Mars.",
+   "figure": {
+    "title": "INGENUITY FLIGHTS",
+    "unit": "FLIGHTS",
+    "bars": [
+     [
+      "PLANNED",
+      5
+     ],
+     [
+      "FLOWN",
+      72
+     ]
+    ]
+   },
+   "image": "NASA photo of the Ingenuity helicopter on Mars",
+   "source": "NASA JPL (2024)",
+   "badge": "real"
+  },
+  {
+   "title": "DUST COVERS THE PANELS",
+   "text": "The InSight lander had two round solar panels, each about 2.2 meters wide. Dust slowly covered them, and its mission ended in December 2022 when power ran low.",
+   "figure": {
+    "title": "INSIGHT PANEL WIDTH",
+    "unit": "M",
+    "bars": [
+     [
+      "ONE PANEL",
+      2.2
+     ],
+     [
+      "A KID (TALL)",
+      1.4
+     ]
+    ]
+   },
+   "image": "NASA selfie of InSight with dusty solar panels",
+   "source": "NASA JPL (2022)",
+   "badge": "real"
+  },
+  {
+   "title": "STORMS BLOCK THE SUN",
+   "text": "In 2018 a dust storm covered all of Mars. The sky got so dark that the rover Opportunity could not charge, and NASA lost contact with it.",
+   "figure": {
+    "title": "SUNLIGHT IN A BIG STORM",
+    "unit": "%",
+    "bars": [
+     [
+      "CLEAR DAY",
+      100
+     ],
+     [
+      "DUST STORM",
+      5
+     ]
+    ]
+   },
+   "image": "NASA before/after images of Mars in the 2018 global dust storm",
+   "source": "NASA JPL (2018-2019)",
+   "badge": "simplified"
+  },
+  {
+   "title": "POWER WITHOUT THE SUN",
+   "text": "Curiosity and Perseverance don't use solar panels. A nuclear power source turns heat into about 110 watts of electricity, day and night.",
+   "figure": {
+    "title": "STEADY POWER",
+    "unit": "W",
+    "bars": [
+     [
+      "ROVER MMRTG",
+      110
+     ],
+     [
+      "LIGHT BULB",
+      60
+     ]
+    ]
+   },
+   "image": "NASA photo of the Perseverance rover's power system (MMRTG)",
+   "source": "NASA Mars 2020",
+   "badge": "real"
+  }
+ ],
+ "battery": [
+  {
+   "title": "SAVING THE DAY FOR THE NIGHT",
+   "text": "Batteries store energy from the solar panels during the day. At night the whole base uses that stored energy.",
+   "figure": {
+    "title": "BATTERY DURING ONE SOL",
+    "unit": "%",
+    "bars": [
+     [
+      "SUNRISE",
+      30
+     ],
+     [
+      "NOON",
+      70
+     ],
+     [
+      "SUNSET",
+      100
+     ],
+     [
+      "MIDNIGHT",
+      60
+     ]
+    ]
+   },
+   "image": "NASA diagram of a rover's power system",
+   "source": "NASA Mars Exploration",
+   "badge": "simplified"
+  },
+  {
+   "title": "COLD MARS NIGHTS",
+   "text": "Nights on Mars often fall below minus 70 degrees Celsius. Batteries must be kept warm, and heating them uses energy too.",
+   "figure": {
+    "title": "TEMPERATURE AT A ROVER SITE",
+    "unit": "C",
+    "bars": [
+     [
+      "DAY",
+      0
+     ],
+     [
+      "NIGHT",
+      -70
+     ]
+    ]
+   },
+   "image": "NASA Curiosity weather (REMS) temperature chart",
+   "source": "NASA Curiosity REMS (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "ROVER BATTERIES",
+   "text": "Perseverance carries two rechargeable lithium-ion batteries. They give extra power when the rover needs more than its power source makes.",
+   "figure": {
+    "title": "PERSEVERANCE BATTERIES",
+    "unit": "",
+    "bars": [
+     [
+      "BATTERIES",
+      2
+     ]
+    ]
+   },
+   "image": "NASA image of the Perseverance rover",
+   "source": "NASA Mars 2020",
+   "badge": "real"
+  },
+  {
+   "title": "EVERY WATT COUNTS",
+   "text": "Mission teams plan each sol around the energy they have. In our base, these are the things that use the battery (game numbers).",
+   "figure": {
+    "title": "OUR BASE: POWER USE PER SECOND",
+    "unit": "%/S",
+    "bars": [
+     [
+      "AIR (NORM)",
+      0.15
+     ],
+     [
+      "HEATER (MID)",
+      0.1
+     ],
+     [
+      "2 CAMERAS",
+      0.08
+     ],
+     [
+      "BASE",
+      0.05
+     ]
+    ]
+   },
+   "image": "NASA photo of the rover operations team planning a sol",
+   "source": "Game balance (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "SLEEP MODE",
+   "text": "When power gets very low, a rover can switch almost everything off and wait. Opportunity did this during the 2018 dust storm.",
+   "figure": {
+    "title": "POWER USE",
+    "unit": "%",
+    "bars": [
+     [
+      "NORMAL",
+      100
+     ],
+     [
+      "SLEEP MODE",
+      5
+     ]
+    ]
+   },
+   "image": "NASA image of Opportunity during the 2018 storm",
+   "source": "NASA JPL (2018)",
+   "badge": "simplified"
+  },
+  {
+   "title": "BATTERIES GET TIRED",
+   "text": "Rechargeable batteries hold a little less energy as they get older. Engineers check battery health so they don't run out by surprise.",
+   "figure": {
+    "title": "BATTERY HEALTH OVER TIME",
+    "unit": "%",
+    "bars": [
+     [
+      "NEW",
+      100
+     ],
+     [
+      "OLDER",
+      80
+     ]
+    ]
+   },
+   "image": "NASA photo of engineers testing rover batteries",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "POWER FOR FUTURE BASES",
+   "text": "In 2018 NASA tested a small nuclear reactor called Kilopower. Reactors like it could power a base on the Moon or Mars, day and night.",
+   "figure": {
+    "title": "KILOPOWER TEST",
+    "unit": "YEAR",
+    "bars": [
+     [
+      "TESTED",
+      2018
+     ]
+    ]
+   },
+   "image": "NASA photo of the Kilopower reactor test",
+   "source": "NASA (2018)",
+   "badge": "real"
+  }
+ ],
+ "life_support": [
+  {
+   "title": "WHAT IS MARS AIR?",
+   "text": "Mars air is about 95% carbon dioxide and is very thin. People cannot breathe it, so the base must make its own oxygen.",
+   "figure": {
+    "title": "MARS AIR (MEASURED BY CURIOSITY)",
+    "unit": "%",
+    "bars": [
+     [
+      "CO2",
+      95
+     ],
+     [
+      "NITROGEN",
+      2.8
+     ],
+     [
+      "ARGON",
+      2
+     ],
+     [
+      "OXYGEN",
+      0.17
+     ]
+    ]
+   },
+   "image": "NASA graphic of Mars atmosphere composition",
+   "source": "NASA Curiosity",
+   "badge": "real"
+  },
+  {
+   "title": "MOXIE MADE OXYGEN",
+   "text": "MOXIE, a machine on Perseverance, made oxygen from Mars air. From 2021 to 2023 it made 122 grams, up to 12 grams per hour.",
+   "figure": {
+    "title": "MOXIE OXYGEN",
+    "unit": "G",
+    "bars": [
+     [
+      "TOTAL MADE",
+      122
+     ],
+     [
+      "BEST HOUR",
+      12
+     ]
+    ]
+   },
+   "image": "NASA photo of MOXIE being put into Perseverance",
+   "source": "NASA (2023)",
+   "badge": "real"
+  },
+  {
+   "title": "HOW MUCH AIR DO WE NEED?",
+   "text": "One astronaut uses about 0.84 kg of oxygen every day. That is much more than MOXIE made in its whole mission!",
+   "figure": {
+    "title": "OXYGEN",
+    "unit": "G",
+    "bars": [
+     [
+      "ONE PERSON, 1 DAY",
+      840
+     ],
+     [
+      "MOXIE, ALL RUNS",
+      122
+     ]
+    ]
+   },
+   "image": "NASA photo of the space station's oxygen system",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "CLEANING OUT CO2",
+   "text": "We breathe out carbon dioxide, and too much makes people sleepy and gives headaches. Life support machines pull CO2 out of the air.",
+   "figure": {
+    "title": "A CLOGGED FILTER (GAME)",
+    "unit": "%",
+    "bars": [
+     [
+      "CLEAN",
+      100
+     ],
+     [
+      "CLOGGED",
+      40
+     ]
+    ]
+   },
+   "image": "NASA photo of the space station's CO2 removal system",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "RECYCLING WATER",
+   "text": "The space station recycles about 98% of its water, even from sweat and urine. A Mars base would have to recycle almost everything too.",
+   "figure": {
+    "title": "WATER RECYCLED ON THE SPACE STATION",
+    "unit": "%",
+    "bars": [
+     [
+      "RECYCLED",
+      98
+     ],
+     [
+      "LOST",
+      2
+     ]
+    ]
+   },
+   "image": "NASA photo of the space station water recovery system",
+   "source": "NASA (2023)",
+   "badge": "real"
+  },
+  {
+   "title": "PLANTS HELP BREATHE",
+   "text": "Plants take in carbon dioxide and give out oxygen. Future bases may use greenhouses as part of their life support.",
+   "figure": {
+    "title": "A PLANT",
+    "unit": "",
+    "bars": [
+     [
+      "TAKES IN: CO2",
+      1
+     ],
+     [
+      "GIVES: OXYGEN",
+      1
+     ]
+    ]
+   },
+   "image": "NASA photo of plants growing on the space station",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  }
+ ],
+ "greenhouse": [
+  {
+   "title": "SALAD IN SPACE",
+   "text": "In 2015 astronauts on the space station ate red romaine lettuce they grew themselves. The plant chamber is called Veggie.",
+   "figure": {
+    "title": "FIRST SPACE SALAD",
+    "unit": "YEAR",
+    "bars": [
+     [
+      "EATEN",
+      2015
+     ]
+    ]
+   },
+   "image": "NASA photo of astronauts eating space-grown lettuce",
+   "source": "NASA (2015)",
+   "badge": "real"
+  },
+  {
+   "title": "LIGHTS FOR PLANTS",
+   "text": "Space greenhouses use LED lights, mostly red and blue, instead of sunlight. Lights use power, just like our Crop Lamp.",
+   "figure": {
+    "title": "CROP LAMP (GAME)",
+    "unit": "%/S",
+    "bars": [
+     [
+      "LAMP ON",
+      0.06
+     ],
+     [
+      "LAMP OFF",
+      0
+     ]
+    ]
+   },
+   "image": "NASA photo of the Veggie chamber's pink-purple light",
+   "source": "NASA Veggie",
+   "badge": "simplified"
+  },
+  {
+   "title": "SALTY MARS SOIL",
+   "text": "In 2008 the Phoenix lander found perchlorate in Mars soil, about half a percent. It is bad for people and plants, so soil must be cleaned first.",
+   "figure": {
+    "title": "PERCHLORATE IN SOIL",
+    "unit": "%",
+    "bars": [
+     [
+      "MARS SOIL",
+      0.5
+     ]
+    ]
+   },
+   "image": "NASA photo of Phoenix lander's scoop and soil",
+   "source": "NASA Phoenix (2008)",
+   "badge": "real"
+  },
+  {
+   "title": "HOT PEPPERS IN ORBIT",
+   "text": "In 2021 astronauts grew chile peppers on the space station. Peppers took about four months to grow.",
+   "figure": {
+    "title": "CHILE PEPPER GROWING",
+    "unit": "MONTHS",
+    "bars": [
+     [
+      "GROW TIME",
+      4
+     ]
+    ]
+   },
+   "image": "NASA photo of chile peppers growing on the space station",
+   "source": "NASA (2021)",
+   "badge": "real"
+  },
+  {
+   "title": "WATER FROM ICE",
+   "text": "Mars has water ice at its poles and under the ground. In 2008 the Phoenix lander dug up ice just under the soil.",
+   "figure": {
+    "title": "WHERE MARS WATER IS",
+    "unit": "",
+    "bars": [
+     [
+      "POLES",
+      1
+     ],
+     [
+      "UNDERGROUND",
+      1
+     ]
+    ]
+   },
+   "image": "NASA Phoenix images of ice in a trench",
+   "source": "NASA Phoenix (2008)",
+   "badge": "real"
+  },
+  {
+   "title": "FOOD FOR A LONG TRIP",
+   "text": "A trip to Mars and back could take years. Growing some food on Mars would mean carrying less from Earth.",
+   "figure": {
+    "title": "OUR CREW EATS (GAME)",
+    "unit": "MEALS",
+    "bars": [
+     [
+      "PER NIGHT",
+      4
+     ],
+     [
+      "LAMP GROWS",
+      2
+     ]
+    ]
+   },
+   "image": "NASA concept art of a Mars greenhouse",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  }
+ ],
+ "shelter": [
+  {
+   "title": "WHAT IS SHIELDING?",
+   "text": "Shielding means putting material between people and radiation. Materials full of hydrogen, like water and plastic, block particles well.",
+   "figure": {
+    "title": "RADIATION LET IN (GAME SHELTER)",
+    "unit": "%",
+    "bars": [
+     [
+      "NO SHELTER",
+      100
+     ],
+     [
+      "SHELTER L1",
+      20
+     ],
+     [
+      "SHELTER L3",
+      5
+     ]
+    ]
+   },
+   "image": "NASA graphic of radiation shielding",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "RADIATION EVERY DAY",
+   "text": "Curiosity measures about 210 microgray of radiation on a normal day on Mars. On 2024-05-20 a solar storm gave 8,100 in one go!",
+   "figure": {
+    "title": "CURIOSITY RAD (MICROGRAY)",
+    "unit": "",
+    "bars": [
+     [
+      "NORMAL DAY",
+      210
+     ],
+     [
+      "MAY 20, 2024",
+      8100
+     ]
+    ]
+   },
+   "image": "NASA image of Curiosity's RAD instrument",
+   "source": "NASA Curiosity RAD",
+   "badge": "real"
+  },
+  {
+   "title": "HIDING UNDER MARS SOIL",
+   "text": "A thick layer of Mars soil or rock above a base would block most particles. Caves or buried rooms could make good shelters.",
+   "figure": {
+    "title": "BLOCKED BY A THICK ROOF",
+    "unit": "%",
+    "bars": [
+     [
+      "THIN WALL",
+      30
+     ],
+     [
+      "THICK SOIL ROOF",
+      90
+     ]
+    ]
+   },
+   "image": "NASA concept art of a Mars base covered with soil",
+   "source": "NASA (simplified)",
+   "badge": "simplified"
+  },
+  {
+   "title": "A SHELTER MADE OF BAGS",
+   "text": "In NASA's Orion spaceship, astronauts can build a storm shelter from their supply bags. More stuff around you means more shielding.",
+   "figure": {
+    "title": "ORION STORM SHELTER",
+    "unit": "",
+    "bars": [
+     [
+      "CREW",
+      4
+     ]
+    ]
+   },
+   "image": "NASA photo of the Orion radiation shelter test",
+   "source": "NASA Orion",
+   "badge": "real"
+  },
+  {
+   "title": "NO MAGNETIC SHIELD",
+   "text": "Earth's magnetic field and thick air protect us from solar particles. Mars lost its global magnetic field long ago, so its ground gets much more radiation.",
+   "figure": {
+    "title": "PROTECTION",
+    "unit": "",
+    "bars": [
+     [
+      "EARTH",
+      2
+     ],
+     [
+      "MARS",
+      0
+     ]
+    ]
+   },
+   "image": "NASA MAVEN graphic of the solar wind hitting Mars",
+   "source": "NASA MAVEN",
+   "badge": "simplified"
+  }
+ ],
+ "suit_bay": [
+  {
+   "title": "A SPACESUIT IS A TINY SPACESHIP",
+   "text": "A spacesuit gives air to breathe, keeps the right pressure, and keeps the astronaut warm or cool. Outside, it is all that keeps them alive.",
+   "figure": {
+    "title": "SUIT JOBS",
+    "unit": "",
+    "bars": [
+     [
+      "AIR",
+      1
+     ],
+     [
+      "PRESSURE",
+      1
+     ],
+     [
+      "TEMPERATURE",
+      1
+     ]
+    ]
+   },
+   "image": "NASA photo of an astronaut in a spacesuit",
+   "source": "NASA",
+   "badge": "simplified"
+  },
+  {
+   "title": "TESTING SUITS ON MARS",
+   "text": "Perseverance carries five small samples of spacesuit material. Scientists watch how Mars sunlight and dust change them.",
+   "figure": {
+    "title": "SUIT SAMPLES ON PERSEVERANCE",
+    "unit": "",
+    "bars": [
+     [
+      "SAMPLES",
+      5
+     ]
+    ]
+   },
+   "image": "NASA image of the SHERLOC calibration target with suit samples",
+   "source": "NASA Mars 2020",
+   "badge": "real"
+  },
+  {
+   "title": "STICKY, SHARP DUST",
+   "text": "Moon dust stuck to Apollo astronauts' suits and wore them down. Mars dust is also fine and sticky, so suits must be cleaned.",
+   "figure": {
+    "title": "APOLLO MOON WALKERS",
+    "unit": "",
+    "bars": [
+     [
+      "ASTRONAUTS",
+      12
+     ]
+    ]
+   },
+   "image": "NASA photo of a dusty Apollo spacesuit",
+   "source": "NASA Apollo",
+   "badge": "real"
+  },
+  {
+   "title": "HOW LONG IS A SPACEWALK?",
+   "text": "Spacewalks outside the space station usually last about 6 and a half hours. On Mars, crews must get back fast when danger comes.",
+   "figure": {
+    "title": "TYPICAL SPACEWALK",
+    "unit": "HOURS",
+    "bars": [
+     [
+      "SPACEWALK",
+      6.5
+     ]
+    ]
+   },
+   "image": "NASA photo of a spacewalk outside the space station",
+   "source": "NASA",
+   "badge": "real"
+  }
+ ],
+ "comms_dish": [
+  {
+   "title": "MESSAGES TAKE MINUTES",
+   "text": "Radio waves travel at the speed of light, but Mars is far away. A message takes between about 3 and 22 minutes to arrive, depending on where the planets are.",
+   "figure": {
+    "title": "ONE-WAY DELAY (MINUTES)",
+    "unit": "MIN",
+    "bars": [
+     [
+      "CLOSEST",
+      3
+     ],
+     [
+      "2021-02-18",
+      11.4
+     ],
+     [
+      "FARTHEST",
+      22
+     ]
+    ]
+   },
+   "image": "NASA graphic of Earth and Mars orbits",
+   "source": "NASA",
+   "badge": "real"
+  },
+  {
+   "title": "GIANT EARS ON EARTH",
+   "text": "NASA's Deep Space Network has three big antenna sites: California, Spain and Australia. As Earth spins, one of them can always hear Mars.",
+   "figure": {
+    "title": "DEEP SPACE NETWORK SITES",
+    "unit": "",
+    "bars": [
+     [
+      "CALIFORNIA",
+      1
+     ],
+     [
+      "SPAIN",
+      1
+     ],
+     [
+      "AUSTRALIA",
+      1
+     ]
+    ]
+   },
+   "image": "NASA photo of a Deep Space Network antenna",
+   "source": "NASA DSN",
+   "badge": "real"
+  },
+  {
+   "title": "ORBITERS PASS IT ON",
+   "text": "Rovers send most of their data to spacecraft circling Mars, like the Mars Reconnaissance Orbiter. The orbiters send it on to Earth.",
+   "figure": {
+    "title": "HOW DATA TRAVELS",
+    "unit": "",
+    "bars": [
+     [
+      "ROVER",
+      1
+     ],
+     [
+      "ORBITER",
+      2
+     ],
+     [
+      "EARTH",
+      3
+     ]
+    ]
+   },
+   "image": "NASA image of the Mars Reconnaissance Orbiter",
+   "source": "NASA JPL",
+   "badge": "real"
+  },
+  {
+   "title": "WHEN THE SUN IS IN THE WAY",
+   "text": "About every two years the Sun sits between Earth and Mars. Mission teams stop sending commands for about two weeks until it moves.",
+   "figure": {
+    "title": "SOLAR CONJUNCTION",
+    "unit": "WEEKS",
+    "bars": [
+     [
+      "NO COMMANDS",
+      2
+     ]
+    ]
+   },
+   "image": "NASA graphic of Mars solar conjunction",
+   "source": "NASA",
+   "badge": "real"
+  }
+ ]
+}

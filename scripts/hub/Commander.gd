@@ -8,6 +8,7 @@ const DIRS := {"down": 0, "left": 4, "right": 8, "up": 12}
 
 var sprite: Sprite2D
 var joystick := Vector2.ZERO      # set by the touch joystick
+var auto_target := Vector2.INF    # tap-to-walk: walk here by itself
 var facing := "down"
 var anim_t := 0.0
 var step_t := 0.0
@@ -29,6 +30,13 @@ func _physics_process(delta: float) -> void:
 	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if dir == Vector2.ZERO:
 		dir = joystick
+	if dir != Vector2.ZERO:
+		auto_target = Vector2.INF        # the player took over
+	elif auto_target != Vector2.INF:
+		if position.distance_to(auto_target) < 10.0 or get_slide_collision_count() > 0 and velocity.length() < 5.0:
+			auto_target = Vector2.INF
+		else:
+			dir = (auto_target - position).normalized()
 	velocity = dir.limit_length(1.0) * SPEED
 	move_and_slide()
 	if dir.length() > 0.1:

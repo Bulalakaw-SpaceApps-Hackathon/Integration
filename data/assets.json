@@ -1,4 +1,28 @@
 {
+ "ad_1": {
+  "id": "SP-01",
+  "path": "res://assets/sprites/cameras/ad_1.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ad_2": {
+  "id": "SP-01",
+  "path": "res://assets/sprites/cameras/ad_2.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ad_3": {
+  "id": "SP-01",
+  "path": "res://assets/sprites/cameras/ad_3.png",
+  "w": 320,
+  "h": 180,
+  "frames": 1,
+  "kind": "image"
+ },
  "alert_battery": {
   "id": "AL-01",
   "path": "res://assets/sprites/ui/alert_battery.png",
@@ -394,7 +418,7 @@
  "deco_crates": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_crates.png",
-  "w": 48,
+  "w": 72,
   "h": 40,
   "frames": 1,
   "kind": "image"
@@ -402,6 +426,14 @@
  "deco_flag": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_flag.png",
+  "w": 32,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "deco_parol": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_parol.png",
   "w": 32,
   "h": 48,
   "frames": 1,
@@ -503,6 +535,22 @@
   "frames": 1,
   "kind": "image"
  },
+ "fx_clue": {
+  "id": "CF-15",
+  "path": "res://assets/sprites/cameras/fx_clue.png",
+  "w": 32,
+  "h": 32,
+  "frames": 2,
+  "kind": "image"
+ },
+ "fx_discovery": {
+  "id": "CF-13",
+  "path": "res://assets/sprites/cameras/fx_discovery.png",
+  "w": 32,
+  "h": 32,
+  "frames": 2,
+  "kind": "image"
+ },
  "fx_dust_haze": {
   "id": "CF-09",
   "path": "res://assets/sprites/cameras/fx_dust_haze.png",
@@ -511,11 +559,27 @@
   "frames": 1,
   "kind": "image"
  },
+ "fx_fault": {
+  "id": "CF-12",
+  "path": "res://assets/sprites/cameras/fx_fault.png",
+  "w": 32,
+  "h": 32,
+  "frames": 2,
+  "kind": "image"
+ },
  "fx_radar_blip": {
   "id": "CF-10",
   "path": "res://assets/sprites/cameras/fx_radar_blip.png",
   "w": 16,
   "h": 16,
+  "frames": 2,
+  "kind": "image"
+ },
+ "fx_request": {
+  "id": "CF-14",
+  "path": "res://assets/sprites/cameras/fx_request.png",
+  "w": 24,
+  "h": 24,
   "frames": 2,
   "kind": "image"
  },
@@ -687,6 +751,14 @@
   "frames": 1,
   "kind": "image"
  },
+ "icon_help": {
+  "id": "BT-10",
+  "path": "res://assets/sprites/ui/icon_help.png",
+  "w": 20,
+  "h": 20,
+  "frames": 1,
+  "kind": "image"
+ },
  "icon_hint": {
   "id": "BT-09",
   "path": "res://assets/sprites/ui/icon_hint.png",
@@ -806,6 +878,318 @@
   "h": 0,
   "frames": 1,
   "kind": "loop"
+ },
+ "nasa_battery_1": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_battery_2": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_battery_3": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_battery_4": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_battery_5": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_5.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_battery_6": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_6.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_battery_7": {
+  "id": "NI-battery",
+  "path": "res://assets/sprites/info/nasa_battery_7.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_comms_dish_1": {
+  "id": "NI-comms_dish",
+  "path": "res://assets/sprites/info/nasa_comms_dish_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_comms_dish_2": {
+  "id": "NI-comms_dish",
+  "path": "res://assets/sprites/info/nasa_comms_dish_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_comms_dish_3": {
+  "id": "NI-comms_dish",
+  "path": "res://assets/sprites/info/nasa_comms_dish_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_comms_dish_4": {
+  "id": "NI-comms_dish",
+  "path": "res://assets/sprites/info/nasa_comms_dish_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_greenhouse_1": {
+  "id": "NI-greenhouse",
+  "path": "res://assets/sprites/info/nasa_greenhouse_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_greenhouse_2": {
+  "id": "NI-greenhouse",
+  "path": "res://assets/sprites/info/nasa_greenhouse_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_greenhouse_3": {
+  "id": "NI-greenhouse",
+  "path": "res://assets/sprites/info/nasa_greenhouse_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_greenhouse_4": {
+  "id": "NI-greenhouse",
+  "path": "res://assets/sprites/info/nasa_greenhouse_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_greenhouse_5": {
+  "id": "NI-greenhouse",
+  "path": "res://assets/sprites/info/nasa_greenhouse_5.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_greenhouse_6": {
+  "id": "NI-greenhouse",
+  "path": "res://assets/sprites/info/nasa_greenhouse_6.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_life_support_1": {
+  "id": "NI-life_support",
+  "path": "res://assets/sprites/info/nasa_life_support_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_life_support_2": {
+  "id": "NI-life_support",
+  "path": "res://assets/sprites/info/nasa_life_support_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_life_support_3": {
+  "id": "NI-life_support",
+  "path": "res://assets/sprites/info/nasa_life_support_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_life_support_4": {
+  "id": "NI-life_support",
+  "path": "res://assets/sprites/info/nasa_life_support_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_life_support_5": {
+  "id": "NI-life_support",
+  "path": "res://assets/sprites/info/nasa_life_support_5.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_life_support_6": {
+  "id": "NI-life_support",
+  "path": "res://assets/sprites/info/nasa_life_support_6.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_shelter_1": {
+  "id": "NI-shelter",
+  "path": "res://assets/sprites/info/nasa_shelter_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_shelter_2": {
+  "id": "NI-shelter",
+  "path": "res://assets/sprites/info/nasa_shelter_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_shelter_3": {
+  "id": "NI-shelter",
+  "path": "res://assets/sprites/info/nasa_shelter_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_shelter_4": {
+  "id": "NI-shelter",
+  "path": "res://assets/sprites/info/nasa_shelter_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_shelter_5": {
+  "id": "NI-shelter",
+  "path": "res://assets/sprites/info/nasa_shelter_5.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_1": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_2": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_3": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_4": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_5": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_5.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_6": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_6.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_solar_7": {
+  "id": "NI-solar",
+  "path": "res://assets/sprites/info/nasa_solar_7.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_suit_bay_1": {
+  "id": "NI-suit_bay",
+  "path": "res://assets/sprites/info/nasa_suit_bay_1.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_suit_bay_2": {
+  "id": "NI-suit_bay",
+  "path": "res://assets/sprites/info/nasa_suit_bay_2.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_suit_bay_3": {
+  "id": "NI-suit_bay",
+  "path": "res://assets/sprites/info/nasa_suit_bay_3.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
+ },
+ "nasa_suit_bay_4": {
+  "id": "NI-suit_bay",
+  "path": "res://assets/sprites/info/nasa_suit_bay_4.png",
+  "w": 320,
+  "h": 200,
+  "frames": 1,
+  "kind": "image"
  },
  "night_card_1": {
   "id": "SC-02",
@@ -1287,12 +1671,132 @@
   "frames": 1,
   "kind": "loop"
  },
+ "sponsor_logo_1": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_1.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_logo_2": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_2.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_logo_3": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_3.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_logo_4": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_4.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_logo_5": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_5.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_logo_6": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_6.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_logo_7": {
+  "id": "SP-02",
+  "path": "res://assets/sprites/ui/sponsor_logo_7.png",
+  "w": 48,
+  "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_1": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_1.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_2": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_2.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_3": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_3.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_4": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_4.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_5": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_5.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_6": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_6.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
+ "sponsor_poster_7": {
+  "id": "SP-03",
+  "path": "res://assets/sprites/ui/sponsor_poster_7.png",
+  "w": 300,
+  "h": 380,
+  "frames": 1,
+  "kind": "image"
+ },
  "tiles_mars": {
   "id": "HM-01",
   "path": "res://assets/sprites/hub/tiles_mars.png",
   "w": 128,
   "h": 128,
   "frames": 1,
+  "kind": "image"
+ },
+ "ui_attention": {
+  "id": "BT-11",
+  "path": "res://assets/sprites/ui/ui_attention.png",
+  "w": 22,
+  "h": 22,
+  "frames": 2,
   "kind": "image"
  },
  "ui_battery_fill": {

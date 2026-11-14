@@ -61,7 +61,10 @@ func _process(_d: float) -> bool:
 		6: shot("settings")
 		7: game.close_all_panels(); game.goto("night_select")
 		8: shot("night_select")
-		9: game.goto("hub", 1)
+		9:
+			prog.story_seen = true
+			prog.tutorial_done = true      # the guided Night 1 has its own test (feature_playtest.gd)
+			game.goto("hub", 1)
 		10: shot("hub_briefing")
 		11:
 			game.screen._close_card()
@@ -85,6 +88,8 @@ func _process(_d: float) -> bool:
 			var desk = game.screen
 			desk.overlay.visible = false
 			ss.paused = false
+			ss.frozen = false
+			desk.tut_box.visible = false
 			prog.seen_guides.append(1)
 			desk._press_camera("solar_field")
 			desk._press_heater()      # MID -> HIGH
@@ -118,6 +123,8 @@ func _process(_d: float) -> bool:
 			var desk = game.screen
 			desk.overlay.visible = false
 			ss.paused = false
+			ss.frozen = false
+			desk.tut_box.visible = false
 			ss.speed = 4.0
 			desk._press_camera("sky_radar")
 			desk._press_camera("shelter")

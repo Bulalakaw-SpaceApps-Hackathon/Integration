@@ -33,6 +33,7 @@ why_text = "The fan is slowing and the air feels heavy. The CO2 filter is cloggi
 script = ExtResource("3_ho1md")
 id = 2
 title = "Air and Food"
+comms_delay_real_min = 7.5
 theme = "Life support and food"
 briefing_text = "Maya has joined! Keep the air fresh, and decide if the Crop Lamp is worth the power."
 debrief_why = "Making oxygen and growing food both need electricity, and the battery is shared."

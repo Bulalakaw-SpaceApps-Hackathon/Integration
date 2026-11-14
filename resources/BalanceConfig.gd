@@ -69,6 +69,28 @@ extends Resource
 @export var shelter_fast_sec: float = 30.0
 @export var battery_bonus_pct: float = 20.0
 
+@export_group("Camera problems, crew requests, discovery, sponsors")
+@export var fault_cable_drain: float = 0.10          # %/s extra while a cable is loose
+@export var fault_filter_output: float = 0.4         # life support makes 40% while clogged
+@export var fault_airlock_leak: float = 0.12         # oxygen %/s lost while the airlock leaks
+@export var fault_seal_multiplier: float = 3.0       # shelter lets in 3x more while its seal is broken
+@export var faults_per_night: Array[int] = [1, 2, 2, 3, 3, 3, 4]
+@export var requests_per_night: Array[int] = [1, 1, 2, 2, 2, 2, 3]
+@export var request_timeout_sec: float = 30.0
+@export var discovery_reward: int = 1
+@export var sponsor_reward: int = 3
+@export var sponsor_first_sec: float = 20.0
+@export var sponsor_gap_sec: float = 28.0
+@export var sponsor_close_delay_sec: float = 1.5
+@export var fault_dust_drain: float = 0.05
+@export var fault_dish_comms: float = 0.4            # link quality x0.4 while the dish has drifted
+@export_group("Malfunction, clues and scan")
+@export var malfunction_drain: float = 0.01          # %/s while unsolved...
+@export var malfunction_drain_per_hour: float = 0.004  # ...plus this much more every game hour
+@export var wrong_diagnosis_cost: float = 3.0        # % battery per wrong guess
+@export var scan_cost: float = 2.0                   # % battery per SCAN
+@export var scan_cooldown_sec: float = 20.0
+@export var scan_empty_reliability: float = 3.0      # "nothing unusual" is right 3 in 5 times
 @export_group("Calm Mode and randomness")
 @export var calm_warning_multiplier: float = 1.5
 @export var event_jitter_sec: float = 5.0

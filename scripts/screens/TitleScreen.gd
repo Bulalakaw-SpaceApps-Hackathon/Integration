@@ -19,8 +19,11 @@ func _ready() -> void:
 	v.custom_minimum_size = Vector2(300, 0)
 	v.add_theme_constant_override("separation", 10)
 	add_child(v)
-	var play := "CONTINUE" if Progression.highest_unlocked > 1 or Progression.materials > 0 else "PLAY"
-	v.add_child(Ui.button(play, _play, Vector2(300, 64)))
+	# Campaign: always starts at Night 1. CONTINUE goes to the latest night reached.
+	var has_progress := Progression.highest_unlocked > 1 or Progression.story_seen
+	if has_progress:
+		v.add_child(Ui.button("CONTINUE · NIGHT %d" % Progression.highest_unlocked, _continue, Vector2(300, 64)))
+	v.add_child(Ui.button("NEW GAME", _new_game, Vector2(300, 56 if has_progress else 64)))
 	v.add_child(Ui.button("JUDGE MODE", func() -> void: Game.open_panel("judge"), Vector2(300, 56)))
 	var r := Ui.row(v, 10)
 	r.add_child(Ui.button("CODEX", func() -> void: Game.open_panel("codex"), Vector2(145, 52)))
@@ -49,8 +52,26 @@ func _fill_status(row: HBoxContainer) -> void:
 	row.add_child(Ui.label(DonkiService.short_status(), 8, false, Palette.HIGHLIGHT))
 
 
-func _play() -> void:
+func _leave_judge() -> void:
 	if Progression.judge_mode:
 		Progression.leave_judge_mode()
 	SimState.speed = 1.0
-	Game.goto("night_select")
+
+
+func _continue() -> void:
+	_leave_judge()
+	Game.goto("hub", Progression.highest_unlocked)
+
+
+var _confirm_new := false
+
+func _new_game() -> void:
+	_leave_judge()
+	var has_progress := Progression.highest_unlocked > 1 or Progression.story_seen
+	if has_progress and not _confirm_new:
+		_confirm_new = true
+		Game.toast("This erases your saved progress. Press NEW GAME again to start over at Night 1.", "info", 5.0)
+		return
+	Progression.new_game()
+	Game.visited.clear()
+	Game.goto("hub", 1)

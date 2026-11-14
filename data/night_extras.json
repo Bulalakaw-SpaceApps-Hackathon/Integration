@@ -1,0 +1,170 @@
+{
+	"discoveries": {
+		"1": {
+			"cam": "solar_field",
+			"pos": [
+				70,
+				60
+			],
+			"at": 70,
+			"title": "FROST ON THE GROUND",
+			"text": "Thin water-ice frost forms on Mars on cold nights. NASA's Viking 2 lander photographed frost on the ground in 1979.",
+			"source": "NASA Viking 2"
+		},
+		"2": {
+			"cam": "greenhouse",
+			"pos": [
+				250,
+				60
+			],
+			"at": 60,
+			"title": "WATER HIDING IN SOIL",
+			"text": "Mars soil holds water locked inside its minerals. Curiosity's first soil sample in 2012 was about 2% water.",
+			"source": "NASA Curiosity (2013)"
+		},
+		"3": {
+			"cam": "sky_radar",
+			"pos": [
+				60,
+				40
+			],
+			"at": 50,
+			"title": "A RADIATION RECORD",
+			"text": "Curiosity's RAD instrument has measured radiation on the ground of Mars since 2012. That helps plan how to protect astronauts.",
+			"source": "NASA Curiosity RAD"
+		},
+		"4": {
+			"cam": "airlock",
+			"pos": [
+				80,
+				50
+			],
+			"at": 55,
+			"title": "A ROCK FROM AN OLD LAKE",
+			"text": "Curiosity found rocks that formed in an ancient lake in Gale Crater. Long ago, water stayed on Mars for a long time.",
+			"source": "NASA Curiosity (2013)"
+		},
+		"5": {
+			"cam": "solar_field",
+			"pos": [
+				270,
+				40
+			],
+			"at": 90,
+			"title": "A DUST DEVIL",
+			"text": "Whirlwinds called dust devils cross Mars. Sometimes they blew dust off rover solar panels and gave them more power.",
+			"source": "NASA Spirit and Opportunity"
+		},
+		"6": {
+			"cam": "sky_radar",
+			"pos": [
+				250,
+				40
+			],
+			"at": 30,
+			"title": "AURORA OVER MARS",
+			"text": "During the May 2024 solar storm, NASA's MAVEN orbiter saw auroras glowing across Mars. Mars has auroras even without a global magnetic field.",
+			"source": "NASA MAVEN (2024)"
+		},
+		"7": {
+			"cam": "solar_field",
+			"pos": [
+				60,
+				40
+			],
+			"at": 40,
+			"title": "A BULALAKAW!",
+			"text": "Space rocks hit Mars more often than Earth because its air is so thin. NASA's InSight lander even felt meteoroid impacts as marsquakes.",
+			"source": "NASA InSight (2022)"
+		}
+	},
+	"requests": [
+		{
+			"crew": "lani",
+			"text": "The battery cells are cold. Can I warm them up? It costs a little power, but I'll find spare parts too!",
+			"yes": {
+				"battery": -4,
+				"materials": 1
+			},
+			"no": {}
+		},
+		{
+			"crew": "lani",
+			"text": "Can I go outside to tighten a loose solar panel? I'll bring back spare parts.",
+			"yes": {
+				"move": "solar_field",
+				"materials": 1
+			},
+			"no": {
+				"morale": -1
+			}
+		},
+		{
+			"crew": "maya",
+			"text": "The plants look sad. Can I switch on the Crop Lamp for them?",
+			"yes": {
+				"lamp": true
+			},
+			"no": {
+				"morale": -1
+			}
+		},
+		{
+			"crew": "maya",
+			"text": "Can I run a soil experiment? It uses some power, but we might learn something!",
+			"yes": {
+				"battery": -5,
+				"materials": 1
+			},
+			"no": {}
+		},
+		{
+			"crew": "mateo",
+			"text": "Can I use a spare oxygen tank to check everyone's suits? It keeps the crew safe and happy.",
+			"yes": {
+				"oxygen": -5,
+				"morale": 1
+			},
+			"no": {
+				"morale": -1
+			}
+		},
+		{
+			"crew": "mateo",
+			"text": "Can I take the crew's health readings? It uses a little power for the scanner.",
+			"yes": {
+				"battery": -3,
+				"morale": 1,
+				"materials": 1
+			},
+			"no": {}
+		},
+		{
+			"crew": "carlo",
+			"text": "Can I go outside to fix the antenna? I need to walk out to the dish.",
+			"yes": {
+				"move": "comms_dish",
+				"materials": 1
+			},
+			"no": {}
+		},
+		{
+			"crew": "carlo",
+			"text": "Can I charge my suit batteries now? It uses power, but my next walk outside will be safer.",
+			"yes": {
+				"battery": -3,
+				"morale": 1
+			},
+			"no": {}
+		}
+	],
+	"sponsors": [
+		"COSMO CRUNCH CEREAL",
+		"ROVER RACER SNEAKERS",
+		"MOON MUNCH CHIPS",
+		"ORBIT JUICE BOX",
+		"STARDUST STICKERS",
+		"ZOOM ZOOM SCOOTERS",
+		"PLANET PUPPY TOYS"
+	]
+}

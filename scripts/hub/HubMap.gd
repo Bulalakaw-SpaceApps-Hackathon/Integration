@@ -40,11 +40,20 @@ var food_label: Label
 var card_layer: Control
 var fx: Sprite2D
 var fx_t := -1.0
+var pending := ""                   # tapped from far away: walk there, then go inside
+var plot_labels: Dictionary = {}
+var start_button: Button
+var lessons: Dictionary = {}
 
 
 func _ready() -> void:
 	Commander.ensure_input_actions()
 	cfg = SimState.load_night(Game.night)
+	var lf := FileAccess.open("res://data/building_lessons.json", FileAccess.READ)
+	if lf:
+		lessons = JSON.parse_string(lf.get_as_text())
+	if not Game.visited.has(Game.night):
+		Game.visited[Game.night] = []
 	_build_ground()
 	_build_bounds()
 	_build_habitat()
@@ -69,7 +78,10 @@ func _ready() -> void:
 	add_child(fx)
 	_build_hud()
 	Progression.changed.connect(_refresh_hud)
-	_show_briefing()
+	if not Progression.story_seen and not Progression.judge_mode:
+		_show_story()
+	else:
+		_show_briefing()
 
 
 # ============================================================================ world
@@ -145,6 +157,7 @@ func _build_plot(id: String) -> void:
 	plots[id] = s
 	_solid(PLOT_POS[id], Vector2(56, 52))
 	var l := Ui.label(PLOT_NAME[id], 8, true, Palette.HIGHLIGHT)
+	plot_labels[id] = l
 	l.position = PLOT_POS[id] + Vector2(-60, 36)
 	l.custom_minimum_size.x = 120
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -161,7 +174,7 @@ func _refresh_plot(id: String) -> void:
 
 
 func _build_decor() -> void:
-	var spots := {"rover": Vector2(472, 330), "flag": Vector2(760, 96), "antenna": Vector2(1180, 560), "crates": Vector2(400, 600), "rocks": Vector2(860, 620)}
+	var spots := {"rover": Vector2(472, 330), "flag": Vector2(760, 96), "antenna": Vector2(1180, 560), "crates": Vector2(400, 600), "rocks": Vector2(860, 620), "parol": Vector2(556, 112)}
 	for name in spots:
 		var s := Sprite2D.new()
 		s.texture = Assets.tex("deco_" + name)
@@ -185,6 +198,11 @@ func _physics_process(_delta: float) -> void:
 			best = id
 			best_d = d
 	near_target = best
+	if pending != "" and best == pending:
+		var go := pending
+		pending = ""
+		commander.auto_target = Vector2.INF
+		_interact(go)
 	if best == "" or card_layer != null:
 		highlight.visible = false
 		prompt.visible = false
@@ -214,25 +232,57 @@ func _unhandled_input(event: InputEvent) -> void:
 		_interact(near_target)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var p := get_global_mouse_position()
+		var p: Vector2 = get_canvas_transform().affine_inverse() * (event as InputEventMouseButton).position
 		if Rect2(HABITAT_POS - Vector2(64, 48), Vector2(128, 96)).has_point(p):
-			_interact("habitat")
+			_walk_or_interact("habitat", HABITAT_POS + Vector2(0, 66))
 			return
 		for id in PLOT_POS:
 			if Rect2(PLOT_POS[id] - Vector2(32, 32), Vector2(64, 64)).has_point(p):
-				_interact(id)
+				_walk_or_interact(id, PLOT_POS[id] + Vector2(0, 50))
 				return
+
+
+## Hands-on: the Commander really walks to each building. Tapping far away walks there first.
+func _walk_or_interact(target: String, stand_at: Vector2) -> void:
+	if near_target == target or Progression.judge_mode:
+		_interact(target)
+	else:
+		pending = target
+		commander.auto_target = stand_at
 
 
 func _interact(target: String) -> void:
 	Sfx.play("click")
 	if target == "habitat":
 		_start_night()
+	elif Progression.plot_unlocked(target, Game.night):
+		_show_building(target)
 	else:
 		_show_plot_card(target)
 
 
+func _required() -> Array[String]:
+	var out: Array[String] = []
+	for id in PLOT_POS:
+		if cfg and cfg.unlocked_plots.has(id):
+			out.append(id)
+	return out
+
+
+func _visited_count() -> int:
+	var n := 0
+	for id in _required():
+		if (Game.visited[Game.night] as Array).has(id):
+			n += 1
+	return n
+
+
+## The Control Room opens only after the Commander has been inside every building today.
 func _start_night() -> void:
+	var need := _required().size()
+	if _visited_count() < need and not Progression.judge_mode:
+		Game.toast("Visit every building first! Walk to each one and press E (%d/%d)." % [_visited_count(), need], "info", 4.0)
+		return
 	Game.goto("desk")
 
 
@@ -247,18 +297,34 @@ func _build_hud() -> void:
 	hud_root.theme = Game.theme
 	hud.add_child(hud_root)
 
+	# compact panel, top-left: tonight + resources + the big goal (small, so no building is covered)
 	var bar := PanelContainer.new()
-	bar.add_theme_stylebox_override("panel", Ui.nine("ui_panel", 12))
-	bar.position = Vector2(8, 8)
+	var bsb := Ui.nine("ui_panel", 8)
+	bsb.set_content_margin_all(6)
+	bar.add_theme_stylebox_override("panel", bsb)
+	bar.position = Vector2(6, 6)
 	hud_root.add_child(bar)
-	var row := Ui.row(bar, 18, BoxContainer.ALIGNMENT_BEGIN)
-	row.add_child(Ui.label("NIGHT %d · %s" % [Game.night, cfg.title.to_upper() if cfg else ""], Ui.BODY, true))
-	row.add_child(Ui.image("icon_materials"))
-	mat_label = Ui.label("", Ui.BIG, true)
-	row.add_child(mat_label)
-	row.add_child(Ui.image("ui_meter_food"))
-	food_label = Ui.label("", Ui.BIG, true)
-	row.add_child(food_label)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 2)
+	bar.add_child(col)
+	col.add_child(Ui.label("DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""], 8, true))
+	var res := Ui.row(col, 6, BoxContainer.ALIGNMENT_BEGIN)
+	for pair in [["icon_materials", "MATERIALS"], ["ui_meter_food", "FOOD"]]:
+		var ic := Ui.image(pair[0])
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.custom_minimum_size = Vector2(20, 20)
+		res.add_child(ic)
+		var val := Ui.label("", 16, true)
+		res.add_child(val)
+		if pair[1] == "MATERIALS":
+			mat_label = val
+		else:
+			food_label = val
+		res.add_child(Ui.label(pair[1], 8, true, Palette.BASE_PLUM))
+	var left := Progression.NIGHT_COUNT - Game.night + 1
+	col.add_child(Ui.label("SHIP LANDS IN %d NIGHT%s · DISCOVERIES %d/%d" % [left, "" if left == 1 else "S",
+		Progression.discoveries.size(), Progression.NIGHT_COUNT], 8, true, Palette.STATUS_OK_SHADE))
 
 	var tools := Ui.row(hud_root, 6)
 	tools.position = Vector2(860, 8)
@@ -267,13 +333,14 @@ func _build_hud() -> void:
 	tools.add_child(Ui.icon_button("icon_settings", func() -> void: Game.open_panel("pause"), "Pause"))
 	tools.add_child(Ui.icon_button("icon_mute_on" if Progression.muted else "icon_mute_off", Game.toggle_mute, "Mute (M)"))
 
-	var start := Ui.button("START NIGHT", _start_night, Vector2(260, 72))
-	start.position = Vector2(1004, 632)
-	hud_root.add_child(start)
+	start_button = Ui.button("START NIGHT", _start_night, Vector2(260, 72))
+	start_button.position = Vector2(1004, 632)
+	hud_root.add_child(start_button)
 	var help := Ui.label("WALK: WASD / ARROWS · BUILD: E OR TAP A PLOT · ESC: PAUSE", 8, true, Palette.HIGHLIGHT)
 	help.position = Vector2(16, 700)
 	hud_root.add_child(help)
 
+	_build_sponsor_panel()
 	if DisplayServer.is_touchscreen_available():
 		var joy := TouchStick.new()
 		joy.position = Vector2(24, 560)
@@ -292,9 +359,23 @@ func _refresh_hud() -> void:
 	food_label.text = str(food) if food >= 0 else "-"
 	for id in plots:
 		_refresh_plot(id)
+	var need := _required().size()
+	var done := _visited_count()
+	if start_button:
+		start_button.text = "START NIGHT" if done >= need or Progression.judge_mode else "VISIT BUILDINGS %d/%d" % [done, need]
+	for id in plot_labels:
+		var lab: Label = plot_labels[id]
+		var seen := (Game.visited[Game.night] as Array).has(id)
+		lab.text = PLOT_NAME[id] + (" (VISITED)" if seen else "")
+		lab.add_theme_color_override("font_color", Palette.STATUS_OK if seen else Palette.HIGHLIGHT)
 
 
 func _hint() -> void:
+	var need := _required()
+	for id in need:
+		if not (Game.visited[Game.night] as Array).has(id):
+			Game.toast("Go inside the %s next: walk to it and press E, or tap it." % PLOT_NAME[id], "info", 5.0)
+			return
 	var cheapest := ""
 	for id in PLOT_POS:
 		if Progression.plot_unlocked(id, Game.night) and Progression.can_upgrade(id):
@@ -321,6 +402,26 @@ func _new_card(width := 760.0, asset := "ui_panel") -> VBoxContainer:
 	return Ui.card(card_layer, asset, width)
 
 
+# ---------------------------------------------------------------- the mission (first time only)
+func _show_story() -> void:
+	var v := _new_card(900, "ui_briefing")
+	var top := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
+	top.add_child(Ui.image("portrait_mission_control"))
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 10)
+	top.add_child(col)
+	col.add_child(Ui.label("YOUR MISSION", Ui.BIG, true))
+	col.add_child(Ui.label(Strings.t("goal.story"), Ui.BODY, false, Palette.INK, 700))
+	col.add_child(Ui.label(Strings.t("goal.science"), Ui.BODY, false, Palette.INK, 700))
+	v.add_child(Ui.label("EVERY NIGHT: BALANCE POWER, AIR, FOOD AND RADIATION SHIELDING.", Ui.BODY, true, Palette.BASE_PLUM, 840))
+	v.add_child(Ui.label("BETWEEN NIGHTS: SPEND MATERIALS TO UPGRADE YOUR BASE.", Ui.BODY, true, Palette.BASE_PLUM, 840))
+	var btns := Ui.row(v)
+	btns.add_child(Ui.button("I'M READY!", func() -> void:
+		Progression.story_seen = true
+		Progression.save_game()
+		_show_briefing(), Vector2(260, 60)))
+
+
 # ---------------------------------------------------------------- D-07 Morning Briefing
 func _show_briefing() -> void:
 	if cfg == null:
@@ -343,12 +444,163 @@ func _show_briefing() -> void:
 	var sun := Ui.row(v, 10, BoxContainer.ALIGNMENT_BEGIN)
 	sun.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
 	sun.add_child(Ui.label("TONIGHT'S REAL SUN: " + DonkiService.summary(), 8, false, Palette.INK, 700))
-	v.add_child(Ui.label("GOAL: KEEP EVERYONE SAFE UNTIL 06:00", Ui.BODY, true))
-	for g in cfg.bonus_goals:
-		v.add_child(Ui.label("BONUS: " + Strings.t("bonus." + g), Ui.BODY, false, Palette.BASE_PLUM, 820))
+	# tonight's 3 stars (the same three every night)
+	var beat := SimState.story_beat(cfg.id)
+	v.add_child(Ui.label("TONIGHT'S 3 STARS", Ui.BODY, true))
+	var sl := [["SURVIVE", "Keep everyone safe until 06:00"], ["SCIENCE", Strings.t("science.goal")],
+		["CHALLENGE", Strings.t("challenge." + str(beat.get("challenge", "")))]]
+	for l in sl:
+		var r := Ui.row(v, 8, BoxContainer.ALIGNMENT_BEGIN)
+		var st := Ui.image("ui_star_full")
+		st.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		st.custom_minimum_size = Vector2(20, 20)
+		st.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		r.add_child(st)
+		r.add_child(Ui.label("%s: %s" % [l[0], l[1]], 8, true, Palette.INK, 780))
+	v.add_child(Ui.label("BEFORE THE NIGHT: GO INSIDE EVERY BUILDING (WALK UP + E) TO LEARN AND UPGRADE.", Ui.BODY, true, Palette.BASE_PLUM, 820))
 	var btns := Ui.row(v)
 	btns.add_child(Ui.button("LET'S BUILD", _close_card, Vector2(240, 60)))
 	btns.add_child(Ui.button("START NIGHT", _start_night, Vector2(240, 60)))
+
+
+## Sponsor deal (Night 2+): a clickable sponsor icon at the bottom-right, above START NIGHT.
+## Tapping it opens the sponsor's poster with ACCEPT / NO THANKS. No choice = no thanks.
+var sponsor_icon: TextureButton
+var sponsor_mark: Label
+var sponsor_brand := ""
+var sponsor_index := 1
+var sponsor_decided := false
+
+func _build_sponsor_panel() -> void:
+	if Game.night < 2:
+		return                                   # no sponsors during the guided first night
+	var brands: Array = []
+	var f := FileAccess.open("res://data/night_extras.json", FileAccess.READ)
+	if f:
+		var d: Variant = JSON.parse_string(f.get_as_text())
+		if d is Dictionary:
+			brands = d.get("sponsors", [])
+	if brands.is_empty():
+		return
+	sponsor_index = (Game.night - 1) % brands.size() + 1
+	sponsor_brand = brands[sponsor_index - 1]
+	sponsor_icon = TextureButton.new()
+	sponsor_icon.texture_normal = Assets.tex("sponsor_logo_%d" % sponsor_index)
+	sponsor_icon.position = Vector2(1184, 560)
+	sponsor_icon.focus_mode = Control.FOCUS_NONE
+	sponsor_icon.tooltip_text = "Sponsor offer"
+	sponsor_icon.pressed.connect(func() -> void:
+		Sfx.play("click")
+		_show_sponsor_poster())
+	hud_root.add_child(sponsor_icon)
+	sponsor_mark = Ui.label("OFFER!", 8, true, Palette.HIGHLIGHT)
+	sponsor_mark.position = Vector2(1236, 552)
+	hud_root.add_child(sponsor_mark)
+	_refresh_sponsor(false)
+
+
+func _show_sponsor_poster() -> void:
+	var v := _new_card(380, "ui_popup")
+	var poster := Ui.image("sponsor_poster_%d" % sponsor_index)
+	poster.custom_minimum_size = Vector2(300, 380)
+	poster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	v.add_child(poster)
+	# code writes all text over the poster art (SP-03)
+	var brand := Ui.label(sponsor_brand, 16, true, Palette.INK, 280)
+	brand.position = Vector2(10, 14)
+	brand.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	poster.add_child(brand)
+	var offer := Ui.label(Strings.t("sponsor.offer") % [sponsor_brand, Balance.config.sponsor_reward], 8, true, Palette.INK, 280)
+	offer.position = Vector2(10, 290)
+	poster.add_child(offer)
+	v.add_child(Ui.label(Strings.t("sponsor.warning"), 8, true, Palette.STATUS_DANGER_SHADE, 340))
+	var row := Ui.row(v, 10)
+	row.add_child(Ui.button("ACCEPT +%d" % Balance.config.sponsor_reward, func() -> void: _decide_sponsor(true), Vector2(170, 52)))
+	row.add_child(Ui.button("NO THANKS", func() -> void: _decide_sponsor(false), Vector2(150, 52)))
+
+
+func _decide_sponsor(accept: bool) -> void:
+	SimState.sponsor_tonight = accept
+	sponsor_decided = true
+	_close_card()
+	_refresh_sponsor(true)
+	Game.toast("Sponsor accepted: +%d materials if you survive. Pop-ups tonight!" % Balance.config.sponsor_reward if accept else "No sponsor tonight. No pop-ups!", "info")
+
+
+func _refresh_sponsor(_decided: bool) -> void:
+	if sponsor_mark == null:
+		return
+	if SimState.sponsor_tonight:
+		sponsor_mark.text = "ON"
+		sponsor_mark.add_theme_color_override("font_color", Palette.STATUS_OK)
+	elif sponsor_decided:
+		sponsor_mark.text = "NO"
+		sponsor_mark.add_theme_color_override("font_color", Palette.BASE_STONE)
+	else:
+		sponsor_mark.text = "OFFER!"
+
+
+# ---------------------------------------------------------------- inside a building: today's NASA lesson
+func _lesson(id: String) -> Dictionary:
+	var list: Array = lessons.get(id, [])
+	if list.is_empty():
+		return {}
+	var k := clampi(Game.night - _unlock_night(id), 0, list.size() - 1)
+	var d: Dictionary = list[k]
+	d["index"] = k
+	d["count"] = list.size()
+	return d
+
+
+func _show_building(id: String) -> void:
+	var visited: Array = Game.visited[Game.night]
+	if not visited.has(id):
+		visited.append(id)
+		Sfx.play("msg_received")
+	var v := _new_card(1200)
+	var lv := int(Progression.levels.get(id, 1))
+	var les := _lesson(id)
+	var head := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
+	head.add_child(Ui.image("plot_%s_l%d" % [id, lv]))
+	var hc := VBoxContainer.new()
+	head.add_child(hc)
+	hc.add_child(Ui.label("INSIDE: " + PLOT_NAME[id], Ui.BIG, true))
+	hc.add_child(Ui.label("LEVEL %d OF 3 · DAY %d LESSON (%d OF %d)" % [lv, Game.night, int(les.get("index", 0)) + 1, int(les.get("count", 1))], 8, true, Palette.BASE_PLUM))
+	var body := Ui.row(v, 20, BoxContainer.ALIGNMENT_BEGIN)
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", 6)
+	body.add_child(left)
+	if not les.is_empty():
+		var photo := Ui.image("nasa_%s_%d" % [id, int(les.index) + 1])
+		photo.custom_minimum_size = Vector2(320, 200)
+		left.add_child(photo)
+		left.add_child(Ui.label("PHOTO: " + str(les.image).to_upper() + " (CREDIT: NASA)", 8, false, Palette.BASE_PLUM, 420))
+		left.add_child(FigureChart.new(les.get("figure", {})))
+	var right := VBoxContainer.new()
+	right.add_theme_constant_override("separation", 10)
+	body.add_child(right)
+	if not les.is_empty():
+		var tr := Ui.row(right, 10, BoxContainer.ALIGNMENT_BEGIN)
+		tr.add_child(Ui.badge(str(les.get("badge", "real"))))
+		tr.add_child(Ui.label(str(les.title), Ui.BODY, true, Palette.INK, 560))
+		right.add_child(Ui.label(str(les.text), Ui.BODY, false, Palette.INK, 660))
+		right.add_child(Ui.label("SOURCE: " + str(les.source), 8, false, Palette.BASE_PLUM, 660))
+	right.add_child(Ui.label("IN YOUR BASE: " + PLOT_WHY[id], 8, true, Palette.INK, 660))
+	right.add_child(Ui.label("NOW: " + _effect(id, lv), Ui.BODY, true, Palette.INK, 660))
+	var btns := Ui.row(v)
+	if lv < 3:
+		var cost := Progression.upgrade_cost(id)
+		right.add_child(Ui.label("NEXT LEVEL: " + _effect(id, lv + 1), Ui.BODY, true, Palette.STATUS_OK_SHADE, 660))
+		var cr := Ui.row(right, 8, BoxContainer.ALIGNMENT_BEGIN)
+		cr.add_child(Ui.image("icon_materials"))
+		cr.add_child(Ui.label("COSTS %d · YOU HAVE %d" % [cost, Progression.materials], Ui.BODY, true))
+		var up := Ui.button("UPGRADE", func() -> void: _upgrade(id), Vector2(220, 60))
+		up.disabled = not Progression.can_upgrade(id)
+		btns.add_child(up)
+	else:
+		right.add_child(Ui.label("MAXED OUT!", Ui.BODY, true, Palette.STATUS_OK_SHADE))
+	btns.add_child(Ui.button("LEAVE BUILDING", _close_card, Vector2(260, 60)))
+	_refresh_hud()
 
 
 # ---------------------------------------------------------------- B-02 upgrade card
@@ -419,4 +671,4 @@ func _upgrade(id: String) -> void:
 		fx_t = 0.0
 		_refresh_plot(id)
 		Game.toast("%s is now level %d!" % [PLOT_NAME[id], int(Progression.levels[id])], "info")
-		_show_plot_card(id)
+		_show_building(id)

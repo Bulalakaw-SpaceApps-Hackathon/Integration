@@ -43,6 +43,7 @@ func _ready() -> void:
 	go_button = Ui.button("GO TO BASE", _go, Vector2(240, 64))
 	go_button.position = Vector2(980, 600)
 	add_child(go_button)
+	# Night Select is a Judge Mode tool; the campaign uses CONTINUE / NEW GAME on the title
 	var back := Ui.button("BACK", func() -> void: Game.goto("title"), Vector2(160, 56))
 	back.position = Vector2(64, 640)
 	add_child(back)

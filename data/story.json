@@ -1,0 +1,593 @@
+{
+ "_about": "PLACEHOLDER story beats. Replace with the writer's story (see docs/STORY_TEMPLATE.md). One section per night.",
+ "1": {
+  "challenge": "battery_20",
+  "open": "Mission Control: Mabuhay, Commander! Welcome to Bulalakaw Station. Tonight, learn the battery and keep an eye on the cameras.",
+  "close": "Mission Control: You found the leak like a real engineer. Salamat, see you tomorrow!",
+  "malfunction": {
+   "title": "WHY IS POWER LEAKING?",
+   "true": "cable",
+   "causes": [
+    {
+     "id": "cable",
+     "name": "LOOSE SOLAR CABLE",
+     "rooms": [
+      "solar_field"
+     ]
+    },
+    {
+     "id": "heater",
+     "name": "HEATER STUCK ON",
+     "rooms": [
+      "life_support"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 45,
+     "cam": "solar_field",
+     "text": "Sparks near the panel plug!",
+     "reliability": 5,
+     "points": "cable"
+    },
+    {
+     "at": 95,
+     "cam": "life_support",
+     "text": "The heater dial says MID, like it should.",
+     "reliability": 5,
+     "away": "heater"
+    }
+   ],
+   "why": "Loose connections turn electricity into heat and sparks instead of useful power."
+  },
+  "faults": [
+   [
+    "loose_cable",
+    30
+   ]
+  ],
+  "radio": [
+   [
+    15,
+    "A day on Mars is called a sol. It lasts 24 hours and 39 minutes."
+   ],
+   [
+    70,
+    "Sunlight on Mars is less than half as strong as on Earth."
+   ],
+   [
+    140,
+    "Rovers plan every sol around how much energy they have."
+   ]
+  ]
+ },
+ "2": {
+  "challenge": "food_grew",
+  "open": "Mission Control: Maya has joined you. Tonight: fresh air and food! New: tap ASK to send us a question. Light takes minutes to get here, so ask early!",
+  "close": "Mission Control: Good air, good food, happy crew. Ingat!",
+  "malfunction": {
+   "title": "WHY IS THE AIR GETTING STALE?",
+   "true": "filter",
+   "causes": [
+    {
+     "id": "filter",
+     "name": "CLOGGED CO2 FILTER",
+     "rooms": [
+      "life_support"
+     ]
+    },
+    {
+     "id": "seal",
+     "name": "LEAKY AIRLOCK SEAL",
+     "rooms": [
+      "airlock"
+     ]
+    },
+    {
+     "id": "plants",
+     "name": "SICK PLANTS",
+     "rooms": [
+      "greenhouse"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 40,
+     "cam": "life_support",
+     "text": "The CO2 gauge near the filter reads high.",
+     "reliability": 4,
+     "points": "filter"
+    },
+    {
+     "at": 85,
+     "cam": "airlock",
+     "text": "Airlock pressure gauge: steady.",
+     "reliability": 4,
+     "away": "seal"
+    },
+    {
+     "at": 125,
+     "cam": "greenhouse",
+     "text": "Maya: the plants look green and healthy!",
+     "reliability": 3,
+     "away": "plants"
+    }
+   ],
+   "why": "A clogged filter can't pull carbon dioxide out of the air, so the air gets stale."
+  },
+  "faults": [
+   [
+    "greenhouse_leak",
+    55
+   ],
+   [
+    "clogged_filter",
+    110
+   ]
+  ],
+  "radio": [
+   [
+    15,
+    "Mars air is about 95% carbon dioxide."
+   ],
+   [
+    75,
+    "NASA's MOXIE made oxygen from Mars air: 122 grams in total."
+   ],
+   [
+    150,
+    "Plants need light, water and warmth."
+   ]
+  ]
+ },
+ "3": {
+  "challenge": "shelter_fast",
+  "open": "Mission Control: Mateo is here. A small particle storm is coming: practise sheltering!",
+  "close": "Mission Control: Light first, particles later. You beat them!",
+  "malfunction": {
+   "title": "WHY DID THE SHELTER ALARM BEEP?",
+   "true": "seal",
+   "causes": [
+    {
+     "id": "seal",
+     "name": "CRACKED DOOR SEAL",
+     "rooms": [
+      "shelter"
+     ]
+    },
+    {
+     "id": "battery",
+     "name": "WEAK DOOR BATTERY",
+     "rooms": [
+      "solar_field"
+     ]
+    },
+    {
+     "id": "sensor",
+     "name": "FAULTY ALARM SENSOR",
+     "rooms": [
+      "sky_radar"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 30,
+     "cam": "shelter",
+     "text": "A thin line of light shows around the door.",
+     "reliability": 4,
+     "points": "seal"
+    },
+    {
+     "at": 70,
+     "cam": "sky_radar",
+     "text": "Sensor self-test: PASSED.",
+     "reliability": 4,
+     "away": "sensor"
+    },
+    {
+     "at": 115,
+     "cam": "solar_field",
+     "text": "Door battery meter: FULL.",
+     "reliability": 3,
+     "away": "battery"
+    }
+   ],
+   "why": "Even a thin crack lets particles through: shielding only works with no gaps."
+  },
+  "faults": [
+   [
+    "shelter_seal",
+    25
+   ],
+   [
+    "loose_cable",
+    100
+   ]
+  ],
+  "radio": [
+   [
+    15,
+    "Radiation is invisible, so we measure it with dosimeters."
+   ],
+   [
+    80,
+    "In September 2017, Curiosity measured radiation 2 to 3 times higher than normal."
+   ],
+   [
+    150,
+    "Water and plastic are good shielding because they contain lots of hydrogen."
+   ]
+  ]
+ },
+ "4": {
+  "challenge": "carlo_reply",
+  "open": "Mission Control: Carlo is on an EVA tonight. Talk to Earth: messages take minutes!",
+  "close": "Mission Control: Message received, Commander. Eleven minutes later!",
+  "malfunction": {
+   "title": "WHY ARE EARTH MESSAGES SLOW?",
+   "true": "dish",
+   "causes": [
+    {
+     "id": "dish",
+     "name": "DISH POINTING WRONG",
+     "rooms": [
+      "sky_radar"
+     ]
+    },
+    {
+     "id": "dust",
+     "name": "DUST ON THE DISH",
+     "rooms": [
+      "solar_field"
+     ]
+    },
+    {
+     "id": "radio",
+     "name": "WEAK RADIO BOX",
+     "rooms": [
+      "airlock"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 35,
+     "cam": "sky_radar",
+     "text": "Earth's signal shows up off to one side.",
+     "reliability": 4,
+     "points": "dish"
+    },
+    {
+     "at": 60,
+     "cam": "solar_field",
+     "text": "A dust devil passed by the dish!",
+     "reliability": 2,
+     "points": "dust"
+    },
+    {
+     "at": 95,
+     "cam": "airlock",
+     "text": "Radio box power meter: normal.",
+     "reliability": 4,
+     "away": "radio"
+    },
+    {
+     "at": 130,
+     "cam": "solar_field",
+     "text": "Carlo: the dish looks clean to me.",
+     "reliability": 4,
+     "away": "dust"
+    }
+   ],
+   "why": "A dish must point straight at Earth. Even a small turn makes the signal much weaker."
+  },
+  "faults": [
+   [
+    "dish_drift",
+    45
+   ],
+   [
+    "airlock_leak",
+    90
+   ],
+   [
+    "clogged_filter",
+    140
+   ]
+  ],
+  "radio": [
+   [
+    15,
+    "Radio signals take 3 to 22 minutes to travel between Mars and Earth."
+   ],
+   [
+    75,
+    "NASA's Deep Space Network listens from California, Spain and Australia."
+   ],
+   [
+    150,
+    "When Perseverance landed in 2021, its signal took 11 minutes 22 seconds."
+   ]
+  ]
+ },
+ "5": {
+  "challenge": "all_fixed",
+  "open": "Mission Control: A huge dust storm, like the real one in 2018. Keep everything running!",
+  "close": "Mission Control: The storm couldn't stop you. Kaya natin 'to!",
+  "malfunction": {
+   "title": "WHY IS THE BASE USING EXTRA POWER?",
+   "true": "fan",
+   "causes": [
+    {
+     "id": "fan",
+     "name": "DUST IN THE AIR FAN",
+     "rooms": [
+      "life_support"
+     ]
+    },
+    {
+     "id": "cell",
+     "name": "WORN BATTERY CELL",
+     "rooms": [
+      "airlock"
+     ]
+    },
+    {
+     "id": "lamp",
+     "name": "CROP LAMP SHORT",
+     "rooms": [
+      "greenhouse"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 30,
+     "cam": "life_support",
+     "text": "The fan sounds rough and slow.",
+     "reliability": 4,
+     "points": "fan"
+    },
+    {
+     "at": 70,
+     "cam": "greenhouse",
+     "text": "Lamp current: normal.",
+     "reliability": 4,
+     "away": "lamp"
+    },
+    {
+     "at": 105,
+     "cam": "airlock",
+     "text": "Battery cell temperatures look a bit warm.",
+     "reliability": 2,
+     "points": "cell"
+    },
+    {
+     "at": 140,
+     "cam": "life_support",
+     "text": "Grey dust on the fan blades!",
+     "reliability": 4,
+     "points": "fan"
+    }
+   ],
+   "why": "Dust makes fans work harder, and a harder-working fan uses more power."
+  },
+  "faults": [
+   [
+    "panel_dust",
+    25
+   ],
+   [
+    "loose_cable",
+    75
+   ],
+   [
+    "clogged_filter",
+    125
+   ]
+  ],
+  "radio": [
+   [
+    15,
+    "In 2018 a dust storm covered all of Mars."
+   ],
+   [
+    80,
+    "Dust devils sometimes cleaned rover solar panels!"
+   ],
+   [
+    150,
+    "The Opportunity rover worked for more than 5,000 sols."
+   ]
+  ]
+ },
+ "6": {
+  "challenge": "shelter_fast",
+  "open": "Mission Control: Tonight replays the real X12 solar flare of May 20, 2024. Be ready!",
+  "close": "Mission Control: Light is faster than particles, and so were you!",
+  "malfunction": {
+   "title": "WHY IS THE SKY RADAR GLITCHING?",
+   "true": "cable",
+   "causes": [
+    {
+     "id": "cable",
+     "name": "LOOSE RADAR CABLE",
+     "rooms": [
+      "airlock"
+     ]
+    },
+    {
+     "id": "hot",
+     "name": "OVERHEATED RADAR BOX",
+     "rooms": [
+      "life_support"
+     ]
+    },
+    {
+     "id": "dirt",
+     "name": "DUSTY RADAR DISH",
+     "rooms": [
+      "solar_field"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 20,
+     "cam": "airlock",
+     "text": "A cable by the airlock wall is hanging loose.",
+     "reliability": 4,
+     "points": "cable"
+    },
+    {
+     "at": 55,
+     "cam": "life_support",
+     "text": "Radar box temperature: cool.",
+     "reliability": 4,
+     "away": "hot"
+    },
+    {
+     "at": 130,
+     "cam": "solar_field",
+     "text": "The radar dish looks dusty.",
+     "reliability": 2,
+     "points": "dirt"
+    },
+    {
+     "at": 150,
+     "cam": "airlock",
+     "text": "Lani: I can see sparks on the radar cable!",
+     "reliability": 5,
+     "points": "cable"
+    }
+   ],
+   "why": "A loose cable makes signals flicker on and off, so the screen glitches."
+  },
+  "faults": [
+   [
+    "shelter_seal",
+    15
+   ],
+   [
+    "airlock_leak",
+    120
+   ],
+   [
+    "dish_drift",
+    155
+   ]
+  ],
+  "radio": [
+   [
+    10,
+    "This is a real event: an X12 flare hit Mars on May 20, 2024."
+   ],
+   [
+    60,
+    "Curiosity measured 8,100 microgray that day, about 30 chest X-rays."
+   ],
+   [
+    140,
+    "NASA's MAVEN saw auroras glow over Mars during that storm."
+   ]
+  ]
+ },
+ "7": {
+  "challenge": "discovery_sent",
+  "open": "Mission Control: The finale! Dust, a flare and a blackout. Send your discovery before the link goes dark!",
+  "close": "Mission Control: Discovery received! The supply ship is coming in. Mabuhay, Bulalakaw Station!",
+  "malfunction": {
+   "title": "WHY IS THE GREENHOUSE LOSING WATER?",
+   "true": "pipe",
+   "causes": [
+    {
+     "id": "pipe",
+     "name": "CRACKED WATER PIPE",
+     "rooms": [
+      "greenhouse"
+     ]
+    },
+    {
+     "id": "vent",
+     "name": "OPEN AIRLOCK VENT",
+     "rooms": [
+      "airlock"
+     ]
+    },
+    {
+     "id": "recycler",
+     "name": "SLOW WATER RECYCLER",
+     "rooms": [
+      "life_support"
+     ]
+    }
+   ],
+   "clues": [
+    {
+     "at": 25,
+     "cam": "greenhouse",
+     "text": "A puddle under the pipes!",
+     "reliability": 4,
+     "points": "pipe"
+    },
+    {
+     "at": 55,
+     "cam": "airlock",
+     "text": "Airlock vent: closed and locked.",
+     "reliability": 4,
+     "away": "vent"
+    },
+    {
+     "at": 95,
+     "cam": "life_support",
+     "text": "The recycler light blinks yellow.",
+     "reliability": 2,
+     "points": "recycler"
+    },
+    {
+     "at": 135,
+     "cam": "greenhouse",
+     "text": "Maya: I hear dripping behind the plants.",
+     "reliability": 4,
+     "points": "pipe"
+    }
+   ],
+   "why": "On Mars every drop counts: the space station recycles about 98% of its water."
+  },
+  "faults": [
+   [
+    "panel_dust",
+    20
+   ],
+   [
+    "greenhouse_leak",
+    60
+   ],
+   [
+    "shelter_seal",
+    30
+   ],
+   [
+    "dish_drift",
+    110
+   ]
+  ],
+  "radio": [
+   [
+    10,
+    "Tonight combines two real events: the 2018 dust storm and the 2024 flare."
+   ],
+   [
+    70,
+    "Space rocks hit Mars more often than Earth because its air is so thin."
+   ],
+   [
+    150,
+    "Send it now: a message takes minutes to reach Earth!"
+   ]
+  ]
+ }
+}

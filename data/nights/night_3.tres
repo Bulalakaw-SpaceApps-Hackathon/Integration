@@ -56,6 +56,7 @@ badge = "real"
 script = ExtResource("3_t6kr7")
 id = 3
 title = "Invisible Energy"
+comms_delay_real_min = 9.2
 theme = "Radiation and shielding"
 briefing_text = "Doctor Mateo is here. A real solar storm from September 2017 is coming. Our shelter has thick shielding!"
 debrief_why = "Light from a solar flare travels fastest, so it arrives before the particles. That gap is your warning time."

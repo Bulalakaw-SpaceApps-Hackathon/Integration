@@ -28,7 +28,7 @@ func _ready() -> void:
 	c.alignment = BoxContainer.ALIGNMENT_CENTER
 	c.add_theme_constant_override("separation", 12)
 	cert.add_child(c)
-	for l in [Ui.label("MISSION COMPLETE!", Ui.HUGE, true), Ui.label("MISSION PLANNER CERTIFICATE", Ui.BIG, true, Palette.BASE_PLUM),
+	for l in [Ui.label("THE SUPPLY SHIP HAS LANDED!", Ui.HUGE, true), Ui.label("MISSION PLANNER CERTIFICATE", Ui.BIG, true, Palette.BASE_PLUM),
 			Ui.label("This certifies that the Commander of Bulalakaw Station kept the whole crew safe through 7 Mars nights, balancing power, air, food and radiation shielding.", Ui.BODY, false, Palette.INK, 740)]:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		c.add_child(l)
@@ -36,6 +36,9 @@ func _ready() -> void:
 	var st := Ui.row(c, 8)
 	st.add_child(Ui.image("ui_star_full"))
 	st.add_child(Ui.label("%d / %d STARS" % [total, Progression.NIGHT_COUNT * 3], Ui.BIG, true))
+	var disc := Ui.label("SCIENCE DISCOVERIES: %d / %d" % [Progression.discoveries.size(), Progression.NIGHT_COUNT], Ui.BODY, true, Palette.STATUS_OK_SHADE)
+	disc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	c.add_child(disc)
 	var date := Ui.label(Time.get_date_string_from_system() + " · NASA SPACE APPS 2026", 8, false, Palette.BASE_PLUM)
 	date.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	c.add_child(date)

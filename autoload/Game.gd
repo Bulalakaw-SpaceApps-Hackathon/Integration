@@ -32,6 +32,7 @@ var overlay: CanvasLayer
 var overlay_root: Control
 var panels: Array[Control] = []
 var toast_box: VBoxContainer
+var visited: Dictionary = {}     # night -> Array of plot ids the Commander went inside today
 var theme: Theme                 # FD-02, also set on Controls under CanvasLayers (they don't inherit)
 
 
@@ -48,8 +49,14 @@ func _ready() -> void:
 	overlay_root.theme = theme
 	overlay.add_child(overlay_root)
 	toast_box = VBoxContainer.new()
-	toast_box.position = Vector2(340, 96)
-	toast_box.custom_minimum_size = Vector2(600, 0)
+	# bottom-left, growing upward
+	toast_box.anchor_top = 1.0
+	toast_box.anchor_bottom = 1.0
+	toast_box.offset_left = 10
+	toast_box.offset_bottom = -26
+	toast_box.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	toast_box.custom_minimum_size = Vector2(440, 0)
+	toast_box.alignment = BoxContainer.ALIGNMENT_END
 	toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_box.add_theme_constant_override("separation", 6)
 	toast_box.theme = theme
@@ -64,6 +71,8 @@ func attach(main: Control) -> void:
 
 
 func goto(name: String, night_id := -1) -> void:
+	if night_id > 0 and night_id != night:
+		SimState.sponsor_tonight = false         # sponsor deals are per night
 	if night_id > 0:
 		night = night_id
 	close_all_panels()
@@ -74,6 +83,7 @@ func goto(name: String, night_id := -1) -> void:
 		screen = null
 	screen_name = name
 	if name == "desk":
+		SimState.tutorial_tonight = night == 1 and not Progression.tutorial_done
 		screen = load("res://scenes/Desk.tscn").instantiate()
 	else:
 		var script: GDScript = load(SCREENS[name])
@@ -160,7 +170,7 @@ func toast(text: String, kind := "info", seconds := 4.0) -> void:
 	h.add_theme_constant_override("separation", 10)
 	p.add_child(h)
 	h.add_child(Ui.image("alert_" + kind))
-	var l := Ui.label(text, Ui.BODY, false, Palette.INK, 480)
+	var l := Ui.label(text, 8, true, Palette.INK, 360)
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
 	toast_box.add_child(p)

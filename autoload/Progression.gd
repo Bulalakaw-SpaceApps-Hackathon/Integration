@@ -20,6 +20,9 @@ var judge_mode: bool = false     # session only: Judge Mode flags are never save
 var unlock_all: bool = false
 var api_key: String = ""
 var seen_guides: Array[int] = []   # nights whose first-time guide popup was shown
+var tutorial_done: bool = false
+var story_seen: bool = false
+var discoveries: Dictionary = {}   # night id -> discovery title
 
 
 ## A plot can be built once any night up to `night_id` has unlocked it.
@@ -94,6 +97,8 @@ func apply_night_result(cfg: NightConfig, report: Dictionary) -> void:
 		stars[cfg.id] = maxi(int(stars.get(cfg.id, 0)), int(report.stars))
 		highest_unlocked = maxi(highest_unlocked, mini(cfg.id + 1, NIGHT_COUNT))
 		fails[cfg.id] = 0
+		if report.get("discovery_found", false):
+			discoveries[cfg.id] = report.discovery.title
 		for entry in cfg.codex_unlocks:
 			if not codex.has(entry):
 				codex.append(entry)
@@ -122,6 +127,9 @@ func save_game() -> void:
 	f.set_value("settings", "muted", muted)
 	f.set_value("settings", "api_key", api_key)
 	f.set_value("progress", "seen_guides", seen_guides)
+	f.set_value("progress", "tutorial_done", tutorial_done)
+	f.set_value("progress", "story_seen", story_seen)
+	f.set_value("progress", "discoveries", discoveries)
 	var err := f.save(SAVE_PATH)
 	if err != OK:
 		push_warning("Could not save progress (%s)" % error_string(err))
@@ -138,6 +146,7 @@ func leave_judge_mode() -> void:
 	highest_unlocked = 1
 	fails.clear()
 	codex.clear()
+	discoveries.clear()
 	load_game()
 	changed.emit()
 
@@ -157,6 +166,9 @@ func load_game() -> void:
 	muted = f.get_value("settings", "muted", false)
 	api_key = f.get_value("settings", "api_key", "")
 	seen_guides.assign(f.get_value("progress", "seen_guides", []))
+	tutorial_done = f.get_value("progress", "tutorial_done", false)
+	story_seen = f.get_value("progress", "story_seen", false)
+	discoveries = f.get_value("progress", "discoveries", {})
 
 
 func new_game() -> void:
@@ -168,5 +180,8 @@ func new_game() -> void:
 	fails.clear()
 	codex.clear()
 	seen_guides.clear()
+	tutorial_done = false
+	story_seen = false
+	discoveries.clear()
 	save_game()
 	changed.emit()
