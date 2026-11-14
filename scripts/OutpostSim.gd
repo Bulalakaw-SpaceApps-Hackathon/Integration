@@ -85,6 +85,7 @@ var sponsor := false                    # at least one sponsor deal is active to
 var sponsors: Array = []                # sponsor numbers (1..7) whose ads run tonight; each one pays
 var rough: Array[String] = []           # "oxygen" / "dose": the night went on, but it only earns the Survive star
 var _ad_turn := 0
+var meteor_until := -1.0                # Night 7: the Bulalakaw meteor shower is on screen until this time
 var sponsor_ads_closed := 0
 var extra_materials := 0                # from crew requests that pay off (only counts on a win)
 var ask_reply_received := false
@@ -521,9 +522,10 @@ func recall_crew() -> void:
 
 ## kind: "ask_earth" or "discovery". Returns false if there is no link.
 func send_message(kind: String) -> bool:
-	if not dish and config.comms_delay_real_min > 0.0 and battery > 0.0:
-		set_dish(true)
-		_tick_comms(0.0)
+	if config.comms_delay_real_min > 0.0 and battery > 0.0:
+		if not dish:
+			set_dish(true)
+		_tick_comms(0.0)                    # the link is up the moment the dish is on
 	if comms < balance.min_comms_to_send or config.comms_delay_real_min <= 0.0:
 		alert.emit(Strings.t("alert.no_link"), "comms")
 		return false
@@ -718,6 +720,22 @@ func _check_end() -> void:
 			finished = true
 			result = "won"
 			won.emit()
+
+
+## Night 7: shooting stars over the base. The director drops two impacts and the discovery during it.
+func start_meteor_shower(seconds: float) -> void:
+	meteor_until = clock_sec + seconds
+	alert.emit(Strings.t("alert.meteors"), "info")
+
+
+func meteors_active() -> bool:
+	return clock_sec < meteor_until
+
+
+## A meteor hit something: a hull thump plus a Problem to fix.
+func meteor_hit(kind: String) -> void:
+	alert.emit(Strings.t("alert.meteor_hit"), "thump")
+	add_fault(kind)
 
 
 func _rough(reason: String) -> void:

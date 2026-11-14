@@ -559,20 +559,12 @@
   },
   "faults": [
    [
-    "panel_dust",
-    20
-   ],
-   [
-    "greenhouse_leak",
-    60
-   ],
-   [
     "shelter_seal",
-    30
+    75
    ],
    [
     "dish_drift",
-    110
+    120
    ]
   ],
   "radio": [
@@ -588,6 +580,14 @@
     150,
     "Send it now: a message takes minutes to reach Earth!"
    ]
-  ]
+  ],
+  "meteors": {
+   "at": 36,
+   "seconds": 26,
+   "hits": [
+    "panel_dust",
+    "loose_cable"
+   ]
+  }
  }
 }

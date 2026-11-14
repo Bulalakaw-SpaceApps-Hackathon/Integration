@@ -76,6 +76,7 @@ var tut_box: PanelContainer
 var tut_label: Label
 var tut_next: Button
 var tut_step := 0
+var tut_recalled := false
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
 var hint_t := 0.0
 var tick_t := 0.0
@@ -449,7 +450,12 @@ func _tut_steps() -> Array:
 		["tut.10", Rect2(1058, 2, 212, 196), "next"],
 		["tut.11", scan_buttons[0].get_rect(), "scan"],
 		["tut.12", diagnose_btn.get_rect(), "diagnose"],
-		["tut.9", Rect2(1058, 2, 212, 196), "start"],
+		["tut.13", ctl["shelter"].get_rect(), "shelter"],
+		["tut.14", ctl["recall"].get_rect(), "recall"],
+		["tut.15", ctl["ask"].get_rect(), "ask"],
+		["tut.16", Rect2(feeds[0].position + Vector2(260, 0), Vector2(60, 40)), "ad"],
+		["tut.17", fan.get_rect(), "next"],
+		["tut.18", Rect2(1058, 2, 212, 196), "finish"],
 	]
 
 
@@ -491,8 +497,8 @@ func _start_tutorial() -> void:
 func _tut_show() -> void:
 	var st: Array = _tut_steps()[tut_step]
 	tut_label.text = Strings.t(st[0])
-	tut_next.visible = st[2] in ["next", "start"]
-	tut_next.text = "START!" if st[2] == "start" else "NEXT"
+	tut_next.visible = st[2] in ["next", "start", "finish"]
+	tut_next.text = "START!" if st[2] == "start" else ("FINISH!" if st[2] == "finish" else "NEXT")
 	_fit_tut_box.call_deferred()
 	_point_at(st[1])
 	var s := SimState.sim
@@ -506,6 +512,17 @@ func _tut_show() -> void:
 		"scan":
 			if not s.cameras_on.has("solar_field"):
 				s.toggle_camera("solar_field")
+		"recall":
+			tut_recalled = false
+		"ad":
+			s.sponsor = true
+			s.sponsors = [2]
+			s.sponsor_ads_closed = 0
+			_close_ad(0)
+			_close_ad(1)
+			s.show_sponsor_ad()
+			var m := 1 if ads[1] != null else 0
+			_point_at(Rect2(feeds[m].position + Vector2(260, 0), Vector2(60, 40)))
 		"discovery":
 			var d: Dictionary = SimState.night_extras(1).get("discovery", {})
 			if not s.cameras_on.has("solar_field"):
@@ -527,9 +544,7 @@ func _tut_advance() -> void:
 	if tut_step >= _tut_steps().size():
 		tut_box.visible = false
 		hint_arrow.visible = false
-		SimState.frozen = false
-		Progression.tutorial_done = true
-		Progression.save_game()
+		Game.finish_tutorial()            # practice over: back to the title with the Ready for duty badge
 		return
 	_tut_show()
 
@@ -547,6 +562,10 @@ func _tut_check(s: OutpostSim) -> void:
 		"discovery": done = s.discovery_found()
 		"scan": done = s.has_malfunction() and s.malf.clues[0].found
 		"diagnose": done = s.malfunction_solved()
+		"shelter": done = s.shelter_door_open
+		"recall": done = tut_recalled
+		"ask": done = s.ask_in_flight()
+		"ad": done = s.sponsor_ads_closed > 0
 	if done:
 		_tut_advance()
 
@@ -607,6 +626,7 @@ func _press_shelter() -> void:
 
 func _press_recall() -> void:
 	_hint_used("recall")
+	tut_recalled = true
 	var s := _live()
 	if s:
 		s.recall_crew()
@@ -753,7 +773,7 @@ func _start_night() -> void:
 func _on_night_started(cfg: NightConfig) -> void:
 	SimState.sim.alert.connect(_alert)
 	meter_panel.reset_page(cfg)
-	clock_night.text = "NIGHT %d · %s" % [cfg.id, _theme_short(cfg)]
+	clock_night.text = "PRACTICE NIGHT" if cfg.id == 0 else "NIGHT %d · %s" % [cfg.id, _theme_short(cfg)]
 	# the scroll fits 5 lines: 2 for the main goal, up to 3 bonus goals (+)
 	var s0 := SimState.sim
 	scroll_title.text = "MALFUNCTION" if s0.has_malfunction() else "TONIGHT"
@@ -1477,6 +1497,14 @@ class FeedView extends Control:
 			var total: float = s.balance.door_close_sec[clampi(int(s.levels.get("shelter", 1)) - 1, 0, 2)]
 			var k := clampi(int((1.0 - s.door_closing_left / total) * 4.0), 0, 3)
 			draw_texture(Assets.frame("cam_shelter_door_anim", k), Vector2(150, -10))
+		# Night 7: the Bulalakaw meteor shower streaks across the Sky Radar
+		if cam == "sky_radar" and s.meteors_active():
+			for k in 7:
+				var ph := fposmod(t * (0.9 + 0.13 * k) + k * 0.37, 1.0)
+				var head := Vector2(340.0 - ph * 420.0 + k * 22.0, -10.0 + ph * 150.0 + (k % 3) * 12.0)
+				for seg in 6:
+					draw_rect(Rect2(head + Vector2(seg * 5.0, -seg * 2.0), Vector2(4, 2)), Color(Palette.HIGHLIGHT if seg < 2 else Palette.STATUS_WARN, 1.0 - seg * 0.16))
+			draw_string(font, Vector2(8, 16), "METEOR SHOWER!", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
 		# radar blip for a crewmate on EVA (CF-10): "it's just Carlo!"
 		if cam == "sky_radar":
 			var i := 0

@@ -110,7 +110,9 @@ func _ready() -> void:
 	add_child(fx)
 	_build_hud()
 	Progression.changed.connect(_refresh_hud)
-	if not Progression.story_seen and not Progression.judge_mode:
+	if Game.tutorial:
+		_show_tutorial_card()
+	elif not Progression.story_seen and not Progression.judge_mode:
 		_show_story()
 	else:
 		_show_briefing()
@@ -488,7 +490,7 @@ func _build_hud() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 2)
 	bar.add_child(col)
-	col.add_child(Ui.label("DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""], 8, true))
+	col.add_child(Ui.label(("TUTORIAL · VISIT EVERY BUILDING, THEN START THE PRACTICE NIGHT" if Game.tutorial else "DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""]), 8, true))
 	var res := Ui.row(col, 6, BoxContainer.ALIGNMENT_BEGIN)
 	for pair in [["icon_materials", "MATERIALS"], ["ui_meter_food", "FOOD"]]:
 		var ic := Ui.image(pair[0])
@@ -581,6 +583,17 @@ func _new_card(width := 760.0, asset := "ui_panel") -> VBoxContainer:
 	hud_root.add_child(card_layer)
 	Ui.dim(card_layer, 0.45)
 	return Ui.card(card_layer, asset, width)
+
+
+# ---------------------------------------------------------------- Night 0: the tutorial day
+func _show_tutorial_card() -> void:
+	var v := _new_card(900, "ui_briefing")
+	v.add_child(Ui.label("TUTORIAL · PRACTICE DAY", Ui.BIG, true))
+	v.add_child(Ui.label(Strings.t("tut0.day1"), Ui.BODY, false, Palette.INK, 820))
+	v.add_child(Ui.label(Strings.t("tut0.day2"), Ui.BODY, false, Palette.INK, 820))
+	v.add_child(Ui.label(Strings.t("tut0.day3"), Ui.BODY, true, Palette.BASE_PLUM, 820))
+	var btns := Ui.row(v)
+	btns.add_child(Ui.button("LET'S LOOK AROUND", _close_card, Vector2(320, 60)))
 
 
 # ---------------------------------------------------------------- the mission (first time only)

@@ -124,7 +124,16 @@ func plan_extras(info: Dictionary, bal: BalanceConfig, scripted: bool, story: Di
 		var at := lerpf(40.0, 160.0, (i + 0.5) / maxf(rn, 1)) + rng.randf_range(-6.0, 6.0)
 		_extras.append({"at": at, "kind": "request", "data": r})
 	var disc: Dictionary = info.get("discovery", {})
-	if not disc.is_empty():
+	if story.has("meteors") and not disc.is_empty():
+		# the Bulalakaw Night: a meteor shower at a fixed time. Two meteors hit the base,
+		# one lands in view of the Sky Radar: that landing spot is tonight's discovery.
+		var m0 := float(story.meteors.get("at", 40.0))
+		_extras.append({"at": m0, "kind": "meteors", "data": {"seconds": float(story.meteors.get("seconds", 26.0))}})
+		var hits: Array = story.meteors.get("hits", [])
+		for i in hits.size():
+			_extras.append({"at": m0 + 6.0 + 8.0 * i, "kind": "meteor_hit", "data": {"fault": hits[i]}})
+		_extras.append({"at": m0 + 20.0, "kind": "discovery", "data": disc})
+	elif not disc.is_empty():
 		_extras.append({"at": float(disc.get("at", 60.0)), "kind": "discovery", "data": disc})
 	_extras.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.at < b.at)
 
@@ -135,6 +144,8 @@ func _fire_extra(e: Dictionary, bal: BalanceConfig) -> void:
 		"sponsor": sim.show_sponsor_ad()
 		"radio": sim.radio.emit(str(d.text))
 		"fault": sim.add_fault(d.fault)
+		"meteors": sim.start_meteor_shower(float(d.seconds))
+		"meteor_hit": sim.meteor_hit(d.fault)
 		"request": sim.add_request(d.crew, d.text, d.get("yes", {}), d.get("no", {}), bal.request_timeout_sec)
 		"discovery":
 			var p: Array = d.get("pos", [160, 90])

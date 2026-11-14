@@ -32,9 +32,28 @@ func _ready() -> void:
 	r2.add_child(Ui.button("SETTINGS", func() -> void: Game.open_panel("settings"), Vector2(145, 52)))
 	r2.add_child(Ui.button("CREDITS", func() -> void: Game.open_panel("credits"), Vector2(145, 52)))
 
-	# live / archived NASA data status, bottom-right
+	# Night 0: the tutorial, bottom-right. Never forced; new players get a nudge.
+	var tut := Ui.button("TUTORIAL", Game.start_tutorial, Vector2(220, 60))
+	tut.position = Vector2(1040, 612)
+	add_child(tut)
+	var note := Ui.label("READY FOR DUTY!" if Progression.ready_badge else "FIRST TIME? START HERE!", 8, true,
+		Palette.STATUS_OK if Progression.ready_badge else Palette.STATUS_WARN)
+	note.position = Vector2(1040, 594)
+	note.custom_minimum_size = Vector2(220, 0)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(note)
+	if Progression.ready_badge:
+		var badge := Ui.image("ui_star_full")
+		badge.position = Vector2(1010, 588)
+		badge.custom_minimum_size = Vector2(24, 24)
+		badge.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		badge.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		badge.size = Vector2(24, 24)
+		add_child(badge)
+
+	# live / archived NASA data status, bottom-left above the credit line
 	var status := Ui.row(self, 8)
-	status.position = Vector2(860, 672)
+	status.position = Vector2(20, 672)
 	_fill_status(status)
 	DonkiService.updated.connect(func() -> void:
 		for ch in status.get_children():

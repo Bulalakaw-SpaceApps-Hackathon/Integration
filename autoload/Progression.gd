@@ -137,8 +137,8 @@ func show_hint_arrow(night_id: int) -> bool:
 
 
 func save_game() -> void:
-	if judge_mode:
-		return          # Judge Mode is a sandbox: never written to the player's save
+	if judge_mode or Game.tutorial:
+		return          # Judge Mode and the tutorial are sandboxes: never written to the player's save
 	var f := ConfigFile.new()
 	f.set_value("progress", "materials", materials)
 	f.set_value("progress", "food", food)
