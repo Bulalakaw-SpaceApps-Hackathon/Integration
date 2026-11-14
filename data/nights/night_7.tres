@@ -27,7 +27,7 @@ script = ExtResource("2_nnqfm")
 type = "dust"
 intensity = 0.6
 real_date = "2018-06-10"
-source_name = "Composite: 2018 Global Dust Storm + May 20, 2024 X12 Flare"
+source_name = "Two real events combined: 2018 dust storm + 2024 flare"
 why_text = "Dust again! Less sunlight means a weaker battery tonight."
 
 [sub_resource type="Resource" id="Resource_1b0eo"]
@@ -35,8 +35,8 @@ script = ExtResource("2_nnqfm")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.6
-source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
-why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_jhkla"]
 script = ExtResource("2_nnqfm")
@@ -45,7 +45,7 @@ start_sec = 90.0
 peak_sec = 90.0
 end_sec = 110.0
 real_date = "2024-05-20"
-source_name = "Composite: 2018 Global Dust Storm + May 20, 2024 X12 Flare"
+source_name = "Two real events combined: 2018 dust storm + 2024 flare"
 
 [sub_resource type="Resource" id="Resource_exddv"]
 script = ExtResource("2_nnqfm")

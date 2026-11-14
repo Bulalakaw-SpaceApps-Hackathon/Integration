@@ -34,17 +34,17 @@ script = ExtResource("2_sb0tu")
 type = "dust"
 intensity = 0.8
 real_date = "2018-06-10"
-source_name = "NASA Mars Exploration (June 2018 Global Dust Storm, tau > 10.8)"
+source_name = "NASA Mars missions (2018 global dust storm)"
 badge = "real"
-why_text = "Global dust blocked over 99% of direct sunlight—just like the 2018 storm—so the battery starts lower tonight."
+why_text = "Dust in the sky blocked the sunlight, so the battery starts lower tonight."
 
 [sub_resource type="Resource" id="Resource_76pwf"]
 script = ExtResource("2_sb0tu")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.5
-source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
-why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_mgvxm"]
 script = ExtResource("2_sb0tu")

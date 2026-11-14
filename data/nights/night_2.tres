@@ -17,8 +17,8 @@ script = ExtResource("2_l5n6p")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.5
-source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
-why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
+source_name = "Based on Curiosity rover weather data (simplified)"
+why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_5bb1a"]
 script = ExtResource("2_l5n6p")
@@ -27,9 +27,7 @@ start_sec = 70.0
 peak_sec = 90.0
 end_sec = 130.0
 intensity = 0.8
-source_name = "NASA Mars 2020 MOXIE (Mars Oxygen ISRU)"
-badge = "real"
-why_text = "The fan is slowing and CO2 is building up! Turning up Life Support makes oxygen, just like NASA's MOXIE experiment."
+why_text = "The fan is slowing and the air feels heavy. The CO2 filter is clogging, so Life Support makes less fresh air."
 
 [resource]
 script = ExtResource("3_ho1md")
@@ -37,11 +35,11 @@ id = 2
 title = "Air and Food"
 comms_delay_real_min = 7.5
 theme = "Life support and food"
-briefing_text = "Maya has joined! Mars air is 95% CO2—use Life Support to make oxygen, and decide if the Crop Lamp is worth the power."
-debrief_why = "Just like NASA's MOXIE and CSA's space greenhouses, making oxygen and running plant lights both drain the shared battery."
+briefing_text = "Maya has joined! Keep the air fresh, and decide if the Crop Lamp is worth the power."
+debrief_why = "Making oxygen and growing food both need electricity, and the battery is shared."
 debrief_tip = "Turn Life Support up when the air feels heavy, and turn something else down to pay for it."
-did_you_know = "NASA's MOXIE on Perseverance used about 300 watts of electricity to turn Mars CO2 into 12 grams of fresh oxygen per hour."
-did_you_know_source = "NASA Mars 2020 (MOXIE) & CSA Food Production Toolkit"
+did_you_know = "NASA's MOXIE experiment on the Perseverance rover made oxygen from the Martian air, and it needed power to do it."
+did_you_know_source = "NASA Mars 2020 (MOXIE)"
 hazard_events = Array[ExtResource("2_l5n6p")]([SubResource("Resource_d568o"), SubResource("Resource_5bb1a")])
 crew_ids = Array[String](["lani", "maya"])
 crew_schedule = Array[ExtResource("1_fmegu")]([SubResource("Resource_wymbl"), SubResource("Resource_y5f04")])
