@@ -226,8 +226,8 @@
  "cam_shelter_door_anim": {
   "id": "CF-11",
   "path": "res://assets/sprites/cameras/cam_shelter_door_anim.png",
-  "w": 160,
-  "h": 200,
+  "w": 320,
+  "h": 180,
   "frames": 4,
   "kind": "image"
  },

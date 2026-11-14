@@ -795,10 +795,24 @@ func _show_building(id: String) -> void:
 	left.add_theme_constant_override("separation", 6)
 	body.add_child(left)
 	if not les.is_empty():
+		# real photos get a frame (dark outline + cream mat) so they read as "a real picture", not game art
+		var frame := PanelContainer.new()
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Palette.HIGHLIGHT
+		sb.border_color = Palette.INK
+		sb.set_border_width_all(3)
+		sb.set_content_margin_all(5)
+		sb.shadow_color = Color(Palette.INK, 0.35)
+		sb.shadow_offset = Vector2(4, 4)
+		frame.add_theme_stylebox_override("panel", sb)
+		frame.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		var photo := Ui.image("nasa_%s_%d" % [id, int(les.index) + 1])
 		photo.custom_minimum_size = Vector2(320, 200)
-		left.add_child(photo)
-		left.add_child(Ui.label("PHOTO: " + str(les.image).to_upper() + " (CREDIT: NASA)", 8, false, Palette.BASE_PLUM, 420))
+		frame.add_child(photo)
+		left.add_child(frame)
+		var cap := Ui.row(left, 6, BoxContainer.ALIGNMENT_BEGIN)
+		cap.add_child(Ui.badge("real"))
+		cap.add_child(Ui.label("REAL PHOTO: " + str(les.image).to_upper() + " · CREDIT: NASA", 8, true, Palette.BASE_PLUM, 360))
 		left.add_child(FigureChart.new(les.get("figure", {})))
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 10)
