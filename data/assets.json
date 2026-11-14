@@ -1799,6 +1799,62 @@
   "frames": 1,
   "kind": "image"
  },
+ "task_airlock_leak": {
+  "id": "TK-14",
+  "path": "res://assets/sprites/tasks/task_airlock_leak.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
+ "task_clogged_filter": {
+  "id": "TK-13",
+  "path": "res://assets/sprites/tasks/task_clogged_filter.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
+ "task_dish_drift": {
+  "id": "TK-17",
+  "path": "res://assets/sprites/tasks/task_dish_drift.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
+ "task_greenhouse_leak": {
+  "id": "TK-15",
+  "path": "res://assets/sprites/tasks/task_greenhouse_leak.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
+ "task_loose_cable": {
+  "id": "TK-11",
+  "path": "res://assets/sprites/tasks/task_loose_cable.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
+ "task_panel_dust": {
+  "id": "TK-12",
+  "path": "res://assets/sprites/tasks/task_panel_dust.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
+ "task_shelter_seal": {
+  "id": "TK-16",
+  "path": "res://assets/sprites/tasks/task_shelter_seal.png",
+  "w": 520,
+  "h": 230,
+  "frames": 1,
+  "kind": "image"
+ },
  "tiles_mars": {
   "id": "HM-01",
   "path": "res://assets/sprites/hub/tiles_mars.png",
