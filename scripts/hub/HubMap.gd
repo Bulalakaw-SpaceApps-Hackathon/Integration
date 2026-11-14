@@ -6,10 +6,10 @@ extends Node2D
 
 const TILE := 32
 const MAP := Vector2i(40, 23)
-const PLOT_POS := {
-	"solar": Vector2(176, 216), "battery": Vector2(336, 216), "life_support": Vector2(944, 216),
-	"greenhouse": Vector2(1104, 216), "shelter": Vector2(240, 456), "suit_bay": Vector2(640, 488),
-	"comms_dish": Vector2(1040, 456),
+const PLOT_POS := {        # buildings are drawn at 3x: spaced so none overlap or sit on a walkway
+	"solar": Vector2(130, 216), "battery": Vector2(330, 216), "life_support": Vector2(950, 216),
+	"greenhouse": Vector2(1150, 216), "shelter": Vector2(240, 526), "suit_bay": Vector2(640, 526),
+	"comms_dish": Vector2(1040, 526),
 }
 const PLOT_NAME := {
 	"solar": "SOLAR FIELD", "battery": "BATTERY BANK", "life_support": "LIFE SUPPORT", "greenhouse": "GREENHOUSE",
@@ -24,8 +24,9 @@ const PLOT_WHY := {
 	"suit_bay": "Good suits let the crew walk back faster and block a little radiation outside.",
 	"comms_dish": "A bigger dish gets messages to Earth faster and fights static.",
 }
-const HABITAT_POS := Vector2(640, 128)
-const INTERACT_DIST := 80.0
+const HABITAT_POS := Vector2(640, 194)
+const INTERACT_DIST := 130.0
+const BSCALE := 3.0                 # the artist sprites are 64 px (habitat 128x96): shown at 3x
 
 var cfg: NightConfig
 var commander: Commander
@@ -44,6 +45,17 @@ var pending := ""                   # tapped from far away: walk there, then go 
 var plot_labels: Dictionary = {}
 var start_button: Button
 var lessons: Dictionary = {}
+var anim_t := 0.0                   # building idle loops (lights, smoke, fans, waves...)
+var anim_f := -1
+var animated: Array[Sprite2D] = []
+const ANIM_FPS := 5.0
+var rover: Sprite2D                 # drives up and down the main street
+var rover_dir := 1.0
+var rover_wait := 0.0
+var rover_anim := 0.0
+const ROVER_Y := 350.0              # wheels on the main walkway (y 320-352)
+const ROVER_X := Vector2(110.0, 1170.0)
+const ROVER_SPEED := 42.0
 
 
 func _ready() -> void:
@@ -54,18 +66,37 @@ func _ready() -> void:
 		lessons = JSON.parse_string(lf.get_as_text())
 	if not Game.visited.has(Game.night):
 		Game.visited[Game.night] = []
+	y_sort_enabled = true                 # things lower on screen draw in front: walk behind buildings
+	var light := CanvasModulate.new()
+	light.color = Color(1.0, 0.95, 0.88)  # one warm, dusty Mars light over the whole map
+	add_child(light)
 	_build_ground()
+	var marks := GroundMarks.new()
+	marks.z_index = -10
+	marks.habitat = HABITAT_POS
+	marks.plots = PLOT_POS
+	add_child(marks)
+	var drift := DustDrift.new()
+	drift.z_index = 20
+	add_child(drift)
 	_build_bounds()
 	_build_habitat()
 	for id in PLOT_POS:
 		_build_plot(id)
 	_build_decor()
+	_build_debris()
+	_build_rover()
 	commander = Commander.new()
-	commander.position = HABITAT_POS + Vector2(0, 110)
+	commander.position = HABITAT_POS + Vector2(0, 150)
 	add_child(commander)
+	var blob := BlobShadow.new()
+	blob.show_behind_parent = true
+	commander.add_child(blob)
 	highlight = Sprite2D.new()
 	highlight.texture = Assets.tex("ui_plot_highlight")
 	highlight.visible = false
+	highlight.scale = Vector2(BSCALE, BSCALE)
+	highlight.z_index = 4
 	add_child(highlight)
 	prompt = Sprite2D.new()
 	prompt.texture = Assets.tex("ui_prompt_build")
@@ -75,6 +106,7 @@ func _ready() -> void:
 	fx = Sprite2D.new()
 	fx.visible = false
 	fx.z_index = 11
+	fx.scale = Vector2(BSCALE, BSCALE)
 	add_child(fx)
 	_build_hud()
 	Progression.changed.connect(_refresh_hud)
@@ -96,6 +128,7 @@ func _build_ground() -> void:
 			src.create_tile(Vector2i(x, y))
 	ts.add_source(src, 0)
 	var layer := TileMapLayer.new()
+	layer.z_index = -20
 	layer.tile_set = ts
 	add_child(layer)
 	var rng := RandomNumberGenerator.new()
@@ -109,9 +142,52 @@ func _build_ground() -> void:
 	# walkways: a main street under the habitat and paths to each plot row
 	for x in range(3, 37):
 		layer.set_cell(Vector2i(x, 10), 0, Vector2i(0, 2))
-	for y in range(5, 18):
+	for y in range(9, 10):                          # control-room door down to the main street only
 		layer.set_cell(Vector2i(20, y), 0, Vector2i(1, 2))
 	layer.set_cell(Vector2i(20, 10), 0, Vector2i(2, 2))
+	_scatter_decals(rng)
+
+
+## Craters, rocks, dunes and frost from the artist tileset, kept clear of buildings and paths.
+const DECALS := [Vector2i(2, 4), Vector2i(2, 5), Vector2i(2, 6), Vector2i(0, 5), Vector2i(2, 0), Vector2i(2, 1),
+	Vector2i(2, 3), Vector2i(3, 0), Vector2i(3, 1), Vector2i(3, 2), Vector2i(3, 3), Vector2i(0, 6), Vector2i(0, 7)]
+func _scatter_decals(rng: RandomNumberGenerator) -> void:
+	var sheet := Assets.tex("tiles_mars_decals")
+	var keep_out: Array[Rect2] = [Rect2(HABITAT_POS - Vector2(200, 200), Vector2(400, 320)), Rect2(40, 262, 1200, 124),
+		Rect2(616, 280, 48, 80), Rect2(0, 0, 270, 80), Rect2(860, 0, 420, 90), Rect2(990, 610, 290, 110), Rect2(0, 600, 480, 120)]
+	for id in PLOT_POS:
+		keep_out.append(Rect2(PLOT_POS[id] - Vector2(115, 140), Vector2(230, 230)))
+	keep_out.append_array(DECOR_CLEAR)
+	var placed := 0
+	var used: Array[Vector2] = []
+	var tries := 0
+	while placed < 36 and tries < 1200:
+		tries += 1
+		var p := Vector2(rng.randf_range(20, 1260), rng.randf_range(90, 700))
+		var bad := false
+		for r in keep_out:
+			if r.has_point(p):
+				bad = true
+				break
+		for q in used:                                    # spread out: no clumps of craters
+			if q.distance_to(p) < 70.0:
+				bad = true
+				break
+		if bad:
+			continue
+		used.append(p)
+		var c: Vector2i = DECALS[rng.randi() % DECALS.size()]
+		var a := AtlasTexture.new()
+		a.atlas = sheet
+		a.region = Rect2(c.y * 32, c.x * 32, 32, 32)
+		var d := Sprite2D.new()
+		d.texture = a
+		d.position = p
+		d.scale = Vector2.ONE * (2.0 if rng.randf() < 0.35 else 1.0)
+		d.flip_h = rng.randf() < 0.5
+		d.z_index = -15
+		add_child(d)
+		placed += 1
 
 
 func _build_bounds() -> void:
@@ -141,24 +217,26 @@ func _solid(pos: Vector2, size: Vector2) -> void:
 
 func _build_habitat() -> void:
 	var s := Sprite2D.new()
-	s.texture = Assets.tex("bld_habitat")
-	s.position = HABITAT_POS
-	add_child(s)
-	_solid(HABITAT_POS + Vector2(0, 10), Vector2(120, 70))
+	s.texture = Assets.frame("bld_habitat", 0)
+	_animate(s, "bld_habitat")
+	_stand(s, HABITAT_POS + Vector2(0, 96), BSCALE)
+	_solid(HABITAT_POS + Vector2(0, 66), Vector2(320, 60))   # footprint only: you can walk behind the roof
 	var l := Ui.label("CONTROL ROOM", 8, true, Palette.HIGHLIGHT)
-	l.position = HABITAT_POS + Vector2(-44, 52)
+	l.z_index = 5
+	l.position = HABITAT_POS + Vector2(-44, 98)
 	add_child(l)
 
 
 func _build_plot(id: String) -> void:
 	var s := Sprite2D.new()
-	s.position = PLOT_POS[id]
-	add_child(s)
 	plots[id] = s
-	_solid(PLOT_POS[id], Vector2(56, 52))
+	s.texture = Assets.tex("plot_locked")
+	_stand(s, PLOT_POS[id] + Vector2(0, 64), BSCALE)
+	_solid(PLOT_POS[id] + Vector2(0, 40), Vector2(150, 48))
 	var l := Ui.label(PLOT_NAME[id], 8, true, Palette.HIGHLIGHT)
+	l.z_index = 5
 	plot_labels[id] = l
-	l.position = PLOT_POS[id] + Vector2(-60, 36)
+	l.position = PLOT_POS[id] + Vector2(-60, 66)
 	l.custom_minimum_size.x = 120
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(l)
@@ -167,19 +245,119 @@ func _build_plot(id: String) -> void:
 
 func _refresh_plot(id: String) -> void:
 	var s: Sprite2D = plots[id]
-	if Progression.plot_unlocked(id, Game.night):
-		s.texture = Assets.tex("plot_%s_l%d" % [id, int(Progression.levels.get(id, 1))])
-	else:
-		s.texture = Assets.tex("plot_locked")
+	var built := Progression.plot_unlocked(id, Game.night)
+	var asset := "plot_%s_l%d" % [id, int(Progression.levels.get(id, 1))] if built else "plot_locked"
+	s.texture = Assets.frame(asset, 0)
+	_animate(s, asset)
+	# a locked pad is flat on the ground: under everything, no shadow
+	s.z_index = 0 if built else -8
+	var sh: ContactShadow = s.get_meta("shadow")
+	sh.fit(s.texture)
+	sh.visible = built
 
 
 func _build_decor() -> void:
-	var spots := {"rover": Vector2(472, 330), "flag": Vector2(760, 96), "antenna": Vector2(1180, 560), "crates": Vector2(400, 600), "rocks": Vector2(860, 620), "parol": Vector2(556, 112)}
+	var spots := {"flag": Vector2(840, 420), "antenna": Vector2(850, 600), "crates": Vector2(420, 620),
+		"rocks": Vector2(730, 628), "parol": Vector2(452, 120)}
 	for name in spots:
 		var s := Sprite2D.new()
 		s.texture = Assets.tex("deco_" + name)
-		s.position = spots[name]
-		add_child(s)
+		var k := 1.0 if name == "parol" else 2.0   # whole-number scale keeps pixels even
+		var base: Vector2 = spots[name] + Vector2(0, s.texture.get_height() * k / 2.0)
+		_stand(s, base, k)
+		if name != "parol":
+			_foot(s.texture, base, k, 0.8, 22.0)
+
+
+## Ground kept clear around each decoration (flag mound, antenna, sari-sari, big rocks),
+## sized so a 64 px rock or crater standing just outside still does not overlap it.
+const DECOR_CLEAR: Array[Rect2] = [Rect2(720, 330, 250, 240), Rect2(740, 500, 220, 220),
+	Rect2(330, 530, 190, 190), Rect2(640, 540, 190, 190)]
+## Hand-placed rocks along the top (x, base y, scale).
+const TOP_DEBRIS: Array[Vector3] = [Vector3(462, 276, 2.0), Vector3(852, 276, 1.0), Vector3(232, 300, 1.0),
+	Vector3(1052, 300, 1.0), Vector3(18, 284, 1.0), Vector3(1262, 284, 1.0), Vector3(478, 150, 1.0)]
+
+## Lots of small rocks and rubble standing on the ground (each with a contact shadow),
+## kept off the walkway, the buildings and the HUD corners.
+func _build_debris() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var keep_out: Array[Rect2] = [Rect2(HABITAT_POS - Vector2(210, 210), Vector2(420, 330)), Rect2(40, 286, 1200, 140),
+		Rect2(0, 0, 280, 90), Rect2(860, 0, 420, 95), Rect2(990, 600, 290, 120), Rect2(0, 690, 520, 30)]
+	for id in PLOT_POS:
+		keep_out.append(Rect2(PLOT_POS[id] - Vector2(120, 145), Vector2(240, 240)))
+	keep_out.append_array(DECOR_CLEAR)
+	var n := Assets.frame_count("deco_debris")
+	var placed := 0
+	var tries := 0
+	while placed < 14 and tries < 1500:
+		tries += 1
+		var p := Vector2(rng.randf_range(24, 1256), rng.randf_range(100, 712))
+		var bad := false
+		for r in keep_out:
+			if r.has_point(p):
+				bad = true
+				break
+		if bad:
+			continue
+		var s := Sprite2D.new()
+		s.texture = Assets.frame("deco_debris", rng.randi() % n)
+		s.flip_h = rng.randf() < 0.5
+		var dk := 2.0 if rng.randf() < 0.7 else 1.0
+		_stand(s, p, dk)
+		_foot(s.texture, p, dk, 0.75, 10.0 * dk)
+		placed += 1
+	# a few along the top, in the gaps beside the control room and at the map edges
+	for spot in TOP_DEBRIS:
+		var s := Sprite2D.new()
+		s.texture = Assets.frame("deco_debris", rng.randi() % n)
+		s.flip_h = rng.randf() < 0.5
+		_stand(s, Vector2(spot.x, spot.y), spot.z)
+		_foot(s.texture, Vector2(spot.x, spot.y), spot.z, 0.75, 10.0 * spot.z)
+
+
+## Register a sprite for the idle loop. Each gets its own phase so the base doesn't blink in unison.
+func _animate(s: Sprite2D, asset: String) -> void:
+	s.set_meta("asset", asset)
+	if not s.has_meta("phase"):
+		s.set_meta("phase", animated.size() * 3 % 4)
+	if not animated.has(s):
+		animated.append(s)
+
+
+func _tick_animation(delta: float) -> void:
+	anim_t += delta
+	var f := int(anim_t * ANIM_FPS)
+	if f == anim_f:
+		return
+	anim_f = f
+	for s in animated:
+		var asset: String = s.get_meta("asset")
+		var n := Assets.frame_count(asset)
+		if n > 1:
+			s.texture = Assets.frame(asset, (f + int(s.get_meta("phase"))) % n)
+
+
+func _build_rover() -> void:
+	rover = Sprite2D.new()
+	rover.texture = Assets.frame("hub_rover", 0)
+	_stand(rover, Vector2(ROVER_X.x + 200.0, ROVER_Y), 2.0)
+
+
+func _drive_rover(delta: float) -> void:
+	if rover == null:
+		return
+	if rover_wait > 0.0:                            # a short stop at each end of the street
+		rover_wait -= delta
+		return
+	rover.position.x += rover_dir * ROVER_SPEED * delta
+	if rover.position.x > ROVER_X.y or rover.position.x < ROVER_X.x:
+		rover.position.x = clampf(rover.position.x, ROVER_X.x, ROVER_X.y)
+		rover_dir = -rover_dir
+		rover_wait = 2.0
+	rover.flip_h = rover_dir < 0.0
+	rover_anim += delta
+	rover.texture = Assets.frame("hub_rover", int(rover_anim * 8.0) % Assets.frame_count("hub_rover"))
 
 
 # ============================================================================ play
@@ -188,7 +366,7 @@ func _physics_process(_delta: float) -> void:
 		return
 	var best := ""
 	var best_d := INTERACT_DIST
-	var hd := commander.position.distance_to(HABITAT_POS + Vector2(0, 50))
+	var hd := commander.position.distance_to(HABITAT_POS + Vector2(0, 100))
 	if hd < best_d:
 		best = "habitat"
 		best_d = hd
@@ -208,13 +386,16 @@ func _physics_process(_delta: float) -> void:
 		prompt.visible = false
 	else:
 		var p: Vector2 = HABITAT_POS if best == "habitat" else PLOT_POS[best]
-		highlight.visible = best != "habitat"
+		highlight.visible = false                     # no box around the chosen building; the E prompt is enough
 		highlight.position = p
 		prompt.visible = true
-		prompt.position = p + Vector2(0, -58)
+		# above the building, but never up under the top HUD; the control room's sits over its door
+		prompt.position = HABITAT_POS + Vector2(0, -24) if best == "habitat" else Vector2(p.x, maxf(p.y - 150.0, 118.0))
 
 
 func _process(delta: float) -> void:
+	_drive_rover(delta)
+	_tick_animation(delta)
 	if fx_t >= 0.0:
 		fx_t += delta
 		var f := int(fx_t * 12.0)
@@ -233,12 +414,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var p: Vector2 = get_canvas_transform().affine_inverse() * (event as InputEventMouseButton).position
-		if Rect2(HABITAT_POS - Vector2(64, 48), Vector2(128, 96)).has_point(p):
-			_walk_or_interact("habitat", HABITAT_POS + Vector2(0, 66))
+		if Rect2(HABITAT_POS - Vector2(192, 192), Vector2(384, 288)).has_point(p):
+			_walk_or_interact("habitat", HABITAT_POS + Vector2(0, 124))
 			return
 		for id in PLOT_POS:
-			if Rect2(PLOT_POS[id] - Vector2(32, 32), Vector2(64, 64)).has_point(p):
-				_walk_or_interact(id, PLOT_POS[id] + Vector2(0, 50))
+			if Rect2(PLOT_POS[id] - Vector2(96, 128), Vector2(192, 192)).has_point(p):
+				_walk_or_interact(id, PLOT_POS[id] + Vector2(0, 84))
 				return
 
 
@@ -505,13 +686,15 @@ func _show_sponsor_poster() -> void:
 	poster.custom_minimum_size = Vector2(300, 380)
 	poster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(poster)
-	# code writes all text over the poster art (SP-03)
-	var brand := Ui.label(sponsor_brand, 16, true, Palette.INK, 280)
-	brand.position = Vector2(10, 14)
-	brand.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	poster.add_child(brand)
-	var offer := Ui.label(Strings.t("sponsor.offer") % [sponsor_brand, Balance.config.sponsor_reward], 8, true, Palette.INK, 280)
-	offer.position = Vector2(10, 290)
+	# Option B: the artist letters the brand + slogan into the poster; code only writes the offer
+	var strip := ColorRect.new()
+	strip.color = Color(Palette.INK, 0.72)
+	strip.position = Vector2(10, 300)
+	strip.size = Vector2(280, 72)
+	poster.add_child(strip)
+	var offer := Ui.label(Strings.t("sponsor.offer") % [sponsor_brand, Balance.config.sponsor_reward], 8, true, Palette.HIGHLIGHT, 264)
+	offer.position = Vector2(18, 310)
+	offer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	poster.add_child(offer)
 	v.add_child(Ui.label(Strings.t("sponsor.warning"), 8, true, Palette.STATUS_DANGER_SHADE, 340))
 	var row := Ui.row(v, 10)
@@ -561,7 +744,7 @@ func _show_building(id: String) -> void:
 	var lv := int(Progression.levels.get(id, 1))
 	var les := _lesson(id)
 	var head := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
-	head.add_child(Ui.image("plot_%s_l%d" % [id, lv]))
+	head.add_child(Ui.image("plot_%s_l%d" % [id, lv], 0))
 	var hc := VBoxContainer.new()
 	head.add_child(hc)
 	hc.add_child(Ui.label("INSIDE: " + PLOT_NAME[id], Ui.BIG, true))
@@ -635,7 +818,7 @@ func _show_plot_card(id: String) -> void:
 	var lv := int(Progression.levels.get(id, 1))
 	var unlocked := Progression.plot_unlocked(id, Game.night)
 	var head := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
-	head.add_child(Ui.image("plot_%s_l%d" % [id, lv] if unlocked else "plot_locked"))
+	head.add_child(Ui.image("plot_%s_l%d" % [id, lv] if unlocked else "plot_locked", 0))
 	var col := VBoxContainer.new()
 	head.add_child(col)
 	col.add_child(Ui.label(PLOT_NAME[id], Ui.BIG, true))
@@ -672,3 +855,114 @@ func _upgrade(id: String) -> void:
 		_refresh_plot(id)
 		Game.toast("%s is now level %d!" % [PLOT_NAME[id], int(Progression.levels[id])], "info")
 		_show_building(id)
+
+
+## A solid footprint at the base of a standing object, sized to its art: the Commander walks
+## around it, and can still pass behind its top part (only the ground contact is solid).
+func _foot(tex: Texture2D, base: Vector2, k: float, width_frac: float, depth: float) -> void:
+	var img := tex.get_image()
+	var r := img.get_used_rect() if img else Rect2i(0, 0, tex.get_width(), tex.get_height())
+	var cx := (r.position.x + r.size.x / 2.0 - tex.get_width() / 2.0) * k
+	_solid(base + Vector2(cx, -depth / 2.0), Vector2(maxf(8.0, r.size.x * k * width_frac), depth))
+
+
+## Stand a sprite ON the ground: its foot is at `base` (so depth sorting works),
+## with a soft contact shadow hugging its footprint, so nothing looks like it floats.
+func _stand(s: Sprite2D, base: Vector2, k: float) -> void:
+	s.position = base
+	s.scale = Vector2(k, k)
+	s.offset = Vector2(0, -s.texture.get_height() / 2.0)
+	var sh := ContactShadow.new()
+	sh.fit(s.texture)
+	sh.show_behind_parent = true
+	s.add_child(sh)
+	s.set_meta("shadow", sh)
+	add_child(s)
+
+
+# ============================================================================ ground blending
+## Dug-in regolith around every building + dirt tracks to the metal walkway, so buildings sit IN the ground.
+class GroundMarks extends Node2D:
+	const GROUND_DARK := Color("#963E28")   # shade of the toned ground tiles
+	const GROUND_DEEP := Color("#6E2822")
+	var habitat := Vector2.ZERO
+	var plots: Dictionary = {}
+
+	func _apron(c: Vector2, sz: Vector2) -> void:
+		# soft oval of disturbed regolith: 3 fading rings, then scattered scuffs (no hard edge, no box)
+		for k in 3:
+			var f := 1.0 + k * 0.18
+			draw_set_transform(c, 0.0, Vector2(sz.x * f / 2.0, sz.y * f / 2.0))
+			draw_circle(Vector2.ZERO, 1.0, Color(GROUND_DARK, 0.20 - k * 0.06))
+		draw_set_transform(Vector2.ZERO)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = int(c.x * 7 + c.y)
+		for i in 70:
+			var a := rng.randf() * TAU
+			var rr := rng.randf_range(0.7, 1.35)
+			var p := c + Vector2(cos(a) * sz.x / 2.0 * rr, sin(a) * sz.y / 2.0 * rr)
+			draw_rect(Rect2(p, Vector2(2, 2)), Color(GROUND_DEEP, 0.30))
+
+	func _track(x: float, y0: float, y1: float) -> void:
+		var a := minf(y0, y1)
+		var b := maxf(y0, y1)
+		draw_rect(Rect2(x - 12, a, 24, b - a), Color(GROUND_DARK, 0.28))
+		var y := a
+		while y < b:                                      # rover-wheel treads
+			draw_rect(Rect2(x - 9, y, 5, 2), Color(GROUND_DEEP, 0.35))
+			draw_rect(Rect2(x + 4, y, 5, 2), Color(GROUND_DEEP, 0.35))
+			y += 6.0
+
+	func _draw() -> void:
+		_apron(habitat + Vector2(0, 92), Vector2(380, 70))
+		for id in plots:
+			var p: Vector2 = plots[id]
+			_apron(p + Vector2(0, 62), Vector2(210, 56))
+			if p.y < 320.0:                               # dirt tracks to the main walkway (y 320-352)
+				_track(p.x, p.y + 64.0, 320.0)
+			else:
+				_track(p.x, 352.0, p.y)
+
+
+## Soft contact shadow under a standing sprite, sized to the art's footprint
+## (sprite-local coordinates: the foot of the sprite is at 0,0).
+class ContactShadow extends Node2D:
+	var w := 48.0
+	var cx := 0.0
+	func fit(tex: Texture2D) -> void:
+		var img := tex.get_image()
+		var r := img.get_used_rect() if img else Rect2i(0, 0, tex.get_width(), tex.get_height())
+		w = r.size.x
+		cx = r.position.x + r.size.x / 2.0 - tex.get_width() / 2.0
+		queue_redraw()
+	func _draw() -> void:
+		for layer in [[1.0, 0.24], [0.8, 0.2], [0.6, 0.16]]:
+			var k: float = layer[0]
+			draw_set_transform(Vector2(cx, -1), 0.0, Vector2(w * 0.56 * k, maxf(3.0, w * 0.1) * k))
+			draw_circle(Vector2.ZERO, 1.0, Color(0.24, 0.07, 0.05, layer[1]))
+		draw_set_transform(Vector2.ZERO)
+
+
+## A small soft shadow under the Commander's feet.
+class BlobShadow extends Node2D:
+	func _draw() -> void:
+		draw_set_transform(Vector2(2, 16), 0.0, Vector2(1.0, 0.4))
+		draw_circle(Vector2.ZERO, 11.0, Color(0.3, 0.07, 0.02, 0.4))
+
+
+## Fine red dust blowing across the whole base.
+class DustDrift extends Node2D:
+	var specks: Array[Vector3] = []          # x, y, speed
+	func _ready() -> void:
+		for i in 60:
+			specks.append(Vector3(randf() * 1280.0, randf() * 720.0, randf_range(14.0, 40.0)))
+	func _process(delta: float) -> void:
+		for i in specks.size():
+			var v := specks[i]
+			v.x = fmod(v.x + v.z * delta, 1290.0)
+			v.y += sin(v.x * 0.02) * 0.1
+			specks[i] = v
+		queue_redraw()
+	func _draw() -> void:
+		for v in specks:
+			draw_rect(Rect2(v.x, v.y, 2, 1), Color(Palette.MARS_SAND, 0.35))

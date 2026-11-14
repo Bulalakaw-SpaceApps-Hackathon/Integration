@@ -140,7 +140,7 @@
   "path": "res://assets/sprites/hub/bld_habitat.png",
   "w": 128,
   "h": 96,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "boot_splash": {
@@ -410,7 +410,7 @@
  "deco_antenna": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_antenna.png",
-  "w": 32,
+  "w": 64,
   "h": 64,
   "frames": 1,
   "kind": "image"
@@ -418,16 +418,24 @@
  "deco_crates": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_crates.png",
-  "w": 72,
-  "h": 40,
+  "w": 64,
+  "h": 64,
   "frames": 1,
+  "kind": "image"
+ },
+ "deco_debris": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/deco_debris.png",
+  "w": 32,
+  "h": 32,
+  "frames": 12,
   "kind": "image"
  },
  "deco_flag": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_flag.png",
-  "w": 32,
-  "h": 48,
+  "w": 64,
+  "h": 64,
   "frames": 1,
   "kind": "image"
  },
@@ -442,8 +450,8 @@
  "deco_rocks": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_rocks.png",
-  "w": 48,
-  "h": 32,
+  "w": 64,
+  "h": 64,
   "frames": 1,
   "kind": "image"
  },
@@ -451,7 +459,7 @@
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_rover.png",
   "w": 64,
-  "h": 48,
+  "h": 64,
   "frames": 1,
   "kind": "image"
  },
@@ -596,7 +604,7 @@
   "path": "res://assets/sprites/hub/fx_upgrade.png",
   "w": 64,
   "h": 64,
-  "frames": 6,
+  "frames": 4,
   "kind": "image"
  },
  "head_carlo": {
@@ -629,6 +637,14 @@
   "w": 24,
   "h": 24,
   "frames": 1,
+  "kind": "image"
+ },
+ "hub_rover": {
+  "id": "HM-12",
+  "path": "res://assets/sprites/hub/hub_rover.png",
+  "w": 64,
+  "h": 40,
+  "frames": 4,
   "kind": "image"
  },
  "icon": {
@@ -1260,7 +1276,7 @@
   "path": "res://assets/sprites/hub/plot_battery_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_battery_l2": {
@@ -1268,7 +1284,7 @@
   "path": "res://assets/sprites/hub/plot_battery_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_battery_l3": {
@@ -1276,7 +1292,7 @@
   "path": "res://assets/sprites/hub/plot_battery_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_comms_dish_l1": {
@@ -1284,7 +1300,7 @@
   "path": "res://assets/sprites/hub/plot_comms_dish_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_comms_dish_l2": {
@@ -1292,7 +1308,7 @@
   "path": "res://assets/sprites/hub/plot_comms_dish_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_comms_dish_l3": {
@@ -1300,7 +1316,7 @@
   "path": "res://assets/sprites/hub/plot_comms_dish_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_empty": {
@@ -1316,7 +1332,7 @@
   "path": "res://assets/sprites/hub/plot_greenhouse_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_greenhouse_l2": {
@@ -1324,7 +1340,7 @@
   "path": "res://assets/sprites/hub/plot_greenhouse_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_greenhouse_l3": {
@@ -1332,7 +1348,7 @@
   "path": "res://assets/sprites/hub/plot_greenhouse_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_life_support_l1": {
@@ -1340,7 +1356,7 @@
   "path": "res://assets/sprites/hub/plot_life_support_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_life_support_l2": {
@@ -1348,7 +1364,7 @@
   "path": "res://assets/sprites/hub/plot_life_support_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_life_support_l3": {
@@ -1356,7 +1372,7 @@
   "path": "res://assets/sprites/hub/plot_life_support_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_locked": {
@@ -1372,7 +1388,7 @@
   "path": "res://assets/sprites/hub/plot_shelter_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_shelter_l2": {
@@ -1380,7 +1396,7 @@
   "path": "res://assets/sprites/hub/plot_shelter_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_shelter_l3": {
@@ -1388,7 +1404,7 @@
   "path": "res://assets/sprites/hub/plot_shelter_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_solar_l1": {
@@ -1396,7 +1412,7 @@
   "path": "res://assets/sprites/hub/plot_solar_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_solar_l2": {
@@ -1404,7 +1420,7 @@
   "path": "res://assets/sprites/hub/plot_solar_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_solar_l3": {
@@ -1412,7 +1428,7 @@
   "path": "res://assets/sprites/hub/plot_solar_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_suit_bay_l1": {
@@ -1420,7 +1436,7 @@
   "path": "res://assets/sprites/hub/plot_suit_bay_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_suit_bay_l2": {
@@ -1428,7 +1444,7 @@
   "path": "res://assets/sprites/hub/plot_suit_bay_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "plot_suit_bay_l3": {
@@ -1436,7 +1452,7 @@
   "path": "res://assets/sprites/hub/plot_suit_bay_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 1,
+  "frames": 4,
   "kind": "image"
  },
  "portrait_carlo": {
@@ -1672,7 +1688,7 @@
   "kind": "loop"
  },
  "sponsor_logo_1": {
-  "id": "SP-02",
+  "id": "SP-11",
   "path": "res://assets/sprites/ui/sponsor_logo_1.png",
   "w": 48,
   "h": 48,
@@ -1680,7 +1696,7 @@
   "kind": "image"
  },
  "sponsor_logo_2": {
-  "id": "SP-02",
+  "id": "SP-12",
   "path": "res://assets/sprites/ui/sponsor_logo_2.png",
   "w": 48,
   "h": 48,
@@ -1688,7 +1704,7 @@
   "kind": "image"
  },
  "sponsor_logo_3": {
-  "id": "SP-02",
+  "id": "SP-13",
   "path": "res://assets/sprites/ui/sponsor_logo_3.png",
   "w": 48,
   "h": 48,
@@ -1696,7 +1712,7 @@
   "kind": "image"
  },
  "sponsor_logo_4": {
-  "id": "SP-02",
+  "id": "SP-14",
   "path": "res://assets/sprites/ui/sponsor_logo_4.png",
   "w": 48,
   "h": 48,
@@ -1704,7 +1720,7 @@
   "kind": "image"
  },
  "sponsor_logo_5": {
-  "id": "SP-02",
+  "id": "SP-15",
   "path": "res://assets/sprites/ui/sponsor_logo_5.png",
   "w": 48,
   "h": 48,
@@ -1712,7 +1728,7 @@
   "kind": "image"
  },
  "sponsor_logo_6": {
-  "id": "SP-02",
+  "id": "SP-16",
   "path": "res://assets/sprites/ui/sponsor_logo_6.png",
   "w": 48,
   "h": 48,
@@ -1720,7 +1736,7 @@
   "kind": "image"
  },
  "sponsor_logo_7": {
-  "id": "SP-02",
+  "id": "SP-17",
   "path": "res://assets/sprites/ui/sponsor_logo_7.png",
   "w": 48,
   "h": 48,
@@ -1728,7 +1744,7 @@
   "kind": "image"
  },
  "sponsor_poster_1": {
-  "id": "SP-03",
+  "id": "SP-11",
   "path": "res://assets/sprites/ui/sponsor_poster_1.png",
   "w": 300,
   "h": 380,
@@ -1736,7 +1752,7 @@
   "kind": "image"
  },
  "sponsor_poster_2": {
-  "id": "SP-03",
+  "id": "SP-12",
   "path": "res://assets/sprites/ui/sponsor_poster_2.png",
   "w": 300,
   "h": 380,
@@ -1744,7 +1760,7 @@
   "kind": "image"
  },
  "sponsor_poster_3": {
-  "id": "SP-03",
+  "id": "SP-13",
   "path": "res://assets/sprites/ui/sponsor_poster_3.png",
   "w": 300,
   "h": 380,
@@ -1752,7 +1768,7 @@
   "kind": "image"
  },
  "sponsor_poster_4": {
-  "id": "SP-03",
+  "id": "SP-14",
   "path": "res://assets/sprites/ui/sponsor_poster_4.png",
   "w": 300,
   "h": 380,
@@ -1760,7 +1776,7 @@
   "kind": "image"
  },
  "sponsor_poster_5": {
-  "id": "SP-03",
+  "id": "SP-15",
   "path": "res://assets/sprites/ui/sponsor_poster_5.png",
   "w": 300,
   "h": 380,
@@ -1768,7 +1784,7 @@
   "kind": "image"
  },
  "sponsor_poster_6": {
-  "id": "SP-03",
+  "id": "SP-16",
   "path": "res://assets/sprites/ui/sponsor_poster_6.png",
   "w": 300,
   "h": 380,
@@ -1776,7 +1792,7 @@
   "kind": "image"
  },
  "sponsor_poster_7": {
-  "id": "SP-03",
+  "id": "SP-17",
   "path": "res://assets/sprites/ui/sponsor_poster_7.png",
   "w": 300,
   "h": 380,
@@ -1788,6 +1804,14 @@
   "path": "res://assets/sprites/hub/tiles_mars.png",
   "w": 128,
   "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "tiles_mars_decals": {
+  "id": "HM-01",
+  "path": "res://assets/sprites/hub/tiles_mars_decals.png",
+  "w": 256,
+  "h": 256,
   "frames": 1,
   "kind": "image"
  },
