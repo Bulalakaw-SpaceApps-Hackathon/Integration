@@ -1155,6 +1155,8 @@ func _show_ad() -> void:
 	ad.size = Vector2(320, 180)
 	ad.mouse_filter = Control.MOUSE_FILTER_STOP
 	_add_under_popups(ad)
+	if task != null and is_instance_valid(task):
+		move_child(ad, task.get_index())         # covers its monitor, never the open task card
 	var l := Ui.label(brand, 16, true, Palette.INK, 280)
 	l.position = Vector2(20, 96)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

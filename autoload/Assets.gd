@@ -58,10 +58,17 @@ func frame(asset: String, index: int) -> Texture2D:
 	var n := frame_count(asset)
 	if n <= 1:
 		return tex(asset)
+	var whole := tex(asset)
+	# Guard: if the PNG on disk has fewer frames than assets.json says (an older single-frame
+	# picture), use what is really there, so it shows whole instead of as a thin slice.
+	var fw_expected := int(info(asset).get("w", 0))
+	if fw_expected > 0:
+		n = mini(n, maxi(1, whole.get_width() / fw_expected))
+		if n <= 1:
+			return whole
 	var key := "%s#%d" % [asset, index % n]
 	if _frames.has(key):
 		return _frames[key]
-	var whole := tex(asset)
 	var fw := whole.get_width() / n
 	var a := AtlasTexture.new()
 	a.atlas = whole

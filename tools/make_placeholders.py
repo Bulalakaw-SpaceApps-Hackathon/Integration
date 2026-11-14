@@ -41,10 +41,17 @@ def register(aid, folder, name, w, h, frames=1, kind="image"):
     MANIFEST[stem] = {"id": aid, "path": rel, "w": w, "h": h, "frames": frames, "kind": kind}
 
 def save(img, aid, folder, name, frames=1):
-    register(aid, folder, name, img.width // frames, img.height, frames)
     p = path_for(folder, name)
     if os.path.exists(p) and not FORCE:
+        # a real (final) file is already there: record ITS size, so the manifest matches the art
+        real = Image.open(p)
+        fw = img.width // frames
+        if frames > 1 and real.width % fw == 0 and real.height == img.height:
+            register(aid, folder, name, fw, real.height, real.width // fw)
+        else:
+            register(aid, folder, name, real.width, real.height, 1 if frames == 1 else frames)
         return False
+    register(aid, folder, name, img.width // frames, img.height, frames)
     os.makedirs(os.path.dirname(p), exist_ok=True)
     img.save(p)
     return True
@@ -282,16 +289,22 @@ for k, brand in enumerate(brands, 1):
     ld.rounded_rectangle((1, 1, 46, 46), radius=12, fill=col, outline=INK, width=3)
     initials = "".join(w[0] for w in brand.split()[:2])
     ld.text((24 - ld.textlength(initials, font=font(16)) / 2, 14), initials, font=font(16), fill=INK)
-    S(lg, "SP-02", "sprites/ui", "sponsor_logo_%d.png" % k)
-# SP-03 sponsor posters (300x380): no words in the art, code writes brand (top) and offer (bottom)
+    S(lg, "SP-1%d" % k, "sprites/ui", "sponsor_logo_%d.png" % k)
+# SP-11..17 sponsor posters (300x380), Option B: brand name + slogan are lettered INTO the art.
+# Code only writes the offer line on a dark strip at y 300-372.
+slogans = json.load(open(ROOT + "/data/night_extras.json")).get("slogans", [""] * 7)
 for k, brand in enumerate(brands, 1):
     col = [SAND, HAZE, c("EF5DC0"), OK, WARN, ORANGE, c("A2E747")][(k - 1) % 7]
     po = Image.new("RGBA", (300, 380), col); pd = ImageDraw.Draw(po)
+    for r in range(0, 420, 28):                                             # FNAF-style sunburst stripes
+        pd.line((150, 170, 150 + 400 * math.cos(r / 66.0), 170 + 400 * math.sin(r / 66.0)), fill=tuple(min(255, v + 22) for v in col[:3]) + (255,), width=10)
     pd.rectangle((0, 0, 299, 379), outline=INK, width=6); pd.rectangle((10, 10, 289, 369), outline=HI, width=2)
-    pd.rectangle((10, 280, 289, 340), fill=HI)                               # offer text zone
-    pd.ellipse((90, 90, 210, 210), fill=HI, outline=INK, width=4)           # mascot / product spot
-    pd.text((112, 140), "SP-03", font=font(16), fill=INK)
-    S(po, "SP-03", "sprites/ui", "sponsor_poster_%d.png" % k)
+    pd.rounded_rectangle((18, 18, 281, 62), radius=10, fill=HI, outline=INK, width=3)   # lettered brand banner
+    text_fit(pd, (22, 22, 277, 58), brand, INK, 16)
+    pd.ellipse((95, 82, 205, 192), fill=HI, outline=INK, width=4)            # mascot / product spot
+    pd.text((118, 130), "SP-1%d" % k, font=font(16), fill=INK)
+    text_fit(pd, (24, 204, 276, 290), '"' + slogans[k - 1] + '"', INK, 16)   # lettered slogan
+    S(po, "SP-1%d" % k, "sprites/ui", "sponsor_poster_%d.png" % k)
 def att(k):
     f = Image.new("RGBA", (22, 22), CLEAR); fd = ImageDraw.Draw(f)
     fd.ellipse((1, 1, 20, 20), fill=DANGER if k == 0 else WARN, outline=INK, width=2)
@@ -367,6 +380,7 @@ for i in range(16):
     if i >= 4:
         td.text((x + 2, y + 22), str(i), font=font(8), fill=INK)
 S(tiles, "HM-01", HM, "tiles_mars.png")
+S(Image.new("RGBA", (256, 256), CLEAR), "HM-01", HM, "tiles_mars_decals.png")   # the artist tileset: craters, rocks, dunes (decals)
 def building(w, h, label, fill=CREAM):
     img = Image.new("RGBA", (w, h), CLEAR); d = ImageDraw.Draw(img)
     d.rounded_rectangle((2, h // 4, w - 3, h - 3), radius=10, fill=fill, outline=INK, width=2)

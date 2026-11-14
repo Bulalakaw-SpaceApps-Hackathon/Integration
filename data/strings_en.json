@@ -81,7 +81,7 @@
 	"discovery.found": "Discovery logged: %s! Ang galing! Read about it at sunrise.",
 	"goal.story": "A supply ship is flying from Earth and lands in 7 nights. Keep Lani, Maya, Mateo and Carlo safe every night until it arrives!",
 	"goal.science": "Each night, also find one science discovery on the cameras. Earth wants to learn about Mars!",
-	"sponsor.offer": "%s wants to send messages to your base tonight. They will pay %d materials if you survive.",
+	"sponsor.offer": "%s is offering to pay %d materials for showing ads at your base tonight.",
 	"sponsor.warning": "But their messages pop up over your camera monitors! You must tap them closed.",
 	"sponsor.closed": "Sponsor message closed.",
 	"help.battery": "This is your battery: the power for the whole base. The sun is down, so nothing refills it tonight.",
