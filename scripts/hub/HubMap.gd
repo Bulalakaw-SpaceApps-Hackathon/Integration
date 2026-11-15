@@ -386,6 +386,12 @@ func _physics_process(_delta: float) -> void:
 			best = id
 			best_d = d
 	near_target = best
+	var nearby_crew := _crew_near()
+	if nearby_crew != "" and card_layer == null:
+		highlight.visible = false
+		prompt.visible = true
+		prompt.position = crew_nodes[nearby_crew].position - Vector2(0, 112)
+		return
 	if best == "" or card_layer != null:
 		highlight.visible = false
 		prompt.visible = false

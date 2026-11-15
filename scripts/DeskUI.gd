@@ -548,11 +548,11 @@ func _start_tutorial() -> void:
 
 
 ## True when the player already reached this step's goal before the step came up.
-## Counts the goal, not the exact button: heater LOW or OFF both count.
+## Match the LOW setting requested by the tutorial.
 func _tut_already(kind: String, s: OutpostSim) -> bool:
 	match kind:
 		"camera": return s.cameras_on.has("solar_field")
-		"heater": return s.heater <= 0
+		"heater": return s.heater == 0
 		"discovery": return s.discovery_found()
 		"scan": return s.has_malfunction() and (s.malf.solved or s.malf.clues[0].found)
 		"diagnose": return s.malfunction_solved()
@@ -636,7 +636,7 @@ func _tut_check(s: OutpostSim) -> void:
 	var done := false
 	match st[2]:
 		"camera": done = s.cameras_on.has("solar_field")
-		"heater": done = s.heater <= 0
+		"heater": done = s.heater == 0
 		"fault": done = not s.fault_active("loose_cable")
 		"request": done = s.open_request_for("lani").is_empty()
 		"discovery": done = s.discovery_found()

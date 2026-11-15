@@ -100,8 +100,12 @@ func _save() -> void:
 		Game.toast("Certificate downloaded!", "info")
 	else:
 		var path := "user://bulalakaw_certificate.png"
-		img.save_png(path)
-		Game.toast("Saved: " + ProjectSettings.globalize_path(path), "info", 6.0)
+		var error := img.save_png(path)
+		if error != OK:
+			Game.toast("Could not save certificate: " + error_string(error), "info", 6.0)
+			return
+		OS.shell_show_in_file_manager(ProjectSettings.globalize_path(path))
+		Game.toast("Certificate saved. Its folder is now open.", "info", 6.0)
 
 
 ## The supply ship coming down on its engine flame, then resting on the ground.
