@@ -71,3 +71,4 @@ Agreed, not all built yet.
 | D57 | Crew and Commander keep the current 32x48 map-style conversions; only their size and collision are fixed on the 2x map. |
 | D58 | Pieces with no scratch art (night cards, badges, meters, stars, desk icons, …) are designed from scratch in the map or feed style and the game palette; anything with scratch art is redrawn from it. |
 | D59 | Tutorial steps skip themselves when their goal is already reached (goal counts, not the exact button: heater LOW or OFF). An early-solved malfunction turns SCAN + DIAGNOSE into one "already solved" line. tests/tutorial_early_playtest.gd checks it. |
+| D60 | Visual bug for the art pass: the COMMS buttons (DISH / ASK / SEND) are wider than their panel slot; SEND sticks out past the frame and its ? badge. Fix with the art remaster. Every art step uses the game-developer and pixel-art-sprites skills (one pixel size, locked palette, hard edges, integer scale). |
