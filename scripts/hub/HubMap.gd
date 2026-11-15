@@ -402,6 +402,12 @@ func _physics_process(_delta: float) -> void:
 			best = id
 			best_d = d
 	near_target = best
+	var nearby_crew := _crew_near()
+	if nearby_crew != "" and card_layer == null:
+		highlight.visible = false
+		prompt.visible = true
+		prompt.position = crew_nodes[nearby_crew].position - Vector2(0, 112)
+		return
 	if best == "" or card_layer != null:
 		highlight.visible = false
 		prompt.visible = false
@@ -515,21 +521,24 @@ func _build_hud() -> void:
 
 	# compact panel, top-left: tonight + resources + the big goal (small, so no building is covered)
 	var bar := PanelContainer.new()
-	var bsb := Ui.nine("ui_panel", 8)
-	bsb.set_content_margin_all(6)
+	var bsb := Ui.nine("ui_panel", 12)
+	bsb.content_margin_left = 18
+	bsb.content_margin_right = 18
+	bsb.content_margin_top = 12
+	bsb.content_margin_bottom = 12
 	bar.add_theme_stylebox_override("panel", bsb)
-	bar.position = Vector2(6, 6)
+	bar.position = Vector2(8, 8)
 	hud_root.add_child(bar)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 2)
+	col.add_theme_constant_override("separation", 4)
 	bar.add_child(col)
-	col.add_child(Ui.label(("TUTORIAL · VISIT EVERY BUILDING, THEN START THE PRACTICE NIGHT" if Game.tutorial else "DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""]), 8, true))
-	var res := Ui.row(col, 6, BoxContainer.ALIGNMENT_BEGIN)
+	col.add_child(Ui.label(("TUTORIAL · VISIT EVERY BUILDING, THEN START THE PRACTICE NIGHT" if Game.tutorial else "DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""]), 12, true))
+	var res := Ui.row(col, 8, BoxContainer.ALIGNMENT_BEGIN)
 	for pair in [["icon_materials", "MATERIALS"], ["ui_meter_food", "FOOD"]]:
 		var ic := Ui.image(pair[0])
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		ic.custom_minimum_size = Vector2(20, 20)
+		ic.custom_minimum_size = Vector2(22, 22)
 		res.add_child(ic)
 		var val := Ui.label("", 16, true)
 		res.add_child(val)
@@ -537,10 +546,10 @@ func _build_hud() -> void:
 			mat_label = val
 		else:
 			food_label = val
-		res.add_child(Ui.label(pair[1], 8, true, Palette.BASE_PLUM))
+		res.add_child(Ui.label(pair[1], 12, true, Palette.BASE_PLUM))
 	var left := Progression.NIGHT_COUNT - Game.night + 1
 	col.add_child(Ui.label("SHIP LANDS IN %d NIGHT%s · DISCOVERIES %d/%d" % [left, "" if left == 1 else "S",
-		Progression.discoveries.size(), Progression.NIGHT_COUNT], 8, true, Palette.STATUS_OK_SHADE))
+		Progression.discoveries.size(), Progression.NIGHT_COUNT], 12, true, Palette.STATUS_OK_SHADE))
 
 	var tools := Ui.row(hud_root, 6)
 	tools.position = Vector2(876, 8)

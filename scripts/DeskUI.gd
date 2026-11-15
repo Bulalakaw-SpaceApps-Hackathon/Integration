@@ -265,16 +265,16 @@ func _build_desk() -> void:
 	_build_panel_controls()
 
 	# top bar
-	var pb := _button("", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	var pb := _button("", Rect2(24, 22, 40, 40), 16, _toggle_pause)
 	pb.add_theme_constant_override("icon_max_width", 24)
 	pb.icon = Assets.tex("icon_pause"); pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER; pb.tooltip_text = "Pause (Esc)"
-	_button("2X", Rect2(72, 22, 48, 48), 16, _toggle_speed)
-	var hint := _button("?", Rect2(16, 78, 48, 48), 16, _show_hint)
+	_button("2X", Rect2(76, 22, 40, 40), 16, _toggle_speed)
+	var hint := _button("?", Rect2(24, 74, 40, 40), 16, _show_hint)
 	hint.icon = Assets.tex("icon_hint")
 	hint.text = ""
 	hint.add_theme_constant_override("icon_max_width", 24)
 	hint.tooltip_text = "Hint from Mission Control"
-	var mute_b := _button("", Rect2(72, 78, 48, 48), 16, Game.toggle_mute)
+	var mute_b := _button("", Rect2(76, 74, 40, 40), 16, Game.toggle_mute)
 	mute_b.tooltip_text = "Mute (M)"; mute_b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	mute_b.add_theme_constant_override("icon_max_width", 24)
 	mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
@@ -282,7 +282,7 @@ func _build_desk() -> void:
 		mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
 		mute_b.tooltip_text = "Unmute (M)" if Progression.muted else "Mute (M)")
 	_tex("desk_clock.png", Vector2(130, 10))
-	clock_time = _label("18:00", Vector2(141, 13), Vector2(214, 34), 32, Palette.SKY_HAZE, true,
+	clock_time = _label("18:00", Vector2(141, 12), Vector2(214, 44), 40, Palette.HIGHLIGHT, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	clock_time.add_theme_font_override("font", Ui.FONT_CLOCK)       # the team's DotGothic16 clock face (D63)
 	clock_night = _label("", Vector2(141, 59), Vector2(214, 18), 16, Palette.SKY_HAZE, false,
@@ -315,7 +315,7 @@ func _build_desk() -> void:
 	juice.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child.call_deferred(juice)        # added last, so it draws over the desk
 	signal_strip = SignalStrip.new()
-	signal_strip.position = Vector2(130, 116)
+	signal_strip.position = Vector2(130, 134)
 	signal_strip.size = Vector2(236, 30)
 	signal_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(signal_strip)
@@ -323,7 +323,7 @@ func _build_desk() -> void:
 	diagnose_btn.tooltip_text = "Pick the cause you think is right"
 	stars_strip = StarsStrip.new()
 	stars_strip.position = Vector2(130, 92)
-	stars_strip.size = Vector2(236, 22)
+	stars_strip.size = Vector2(236, 38)
 	stars_strip.mouse_filter = Control.MOUSE_FILTER_STOP
 	stars_strip.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed:
@@ -331,16 +331,18 @@ func _build_desk() -> void:
 	add_child(stars_strip)
 
 	# meter panel
-	_tex("desk_meter_panel.png", Vector2(16, 576))
+	var meter_back := _tex("desk_meter_panel.png", Vector2(8, 530))
+	meter_back.scale = Vector2(1.55, 1.5)
 	meter_panel = MeterPanel.new()
-	meter_panel.position = Vector2(16, 576)
+	meter_panel.position = Vector2(8, 530)
+	meter_panel.scale = Vector2(1.55, 1.5)
 	meter_panel.size = Vector2(192, 120)
 	meter_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	meter_panel.setup(FONT_R, FONT_B, load(S + "ui_meter_oxygen.png"), load(S + "ui_meter_dose.png"),
+	meter_panel.setup(Ui.FONT_BODY, Ui.FONT_BODY_B, load(S + "ui_meter_oxygen.png"), load(S + "ui_meter_dose.png"),
 		load(S + "ui_meter_comms.png"), load(S + "ui_meter_food.png"))
 	add_child(meter_panel)
-	_button("<", Rect2(140, 672, 26, 22), 8, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
-	_button(">", Rect2(170, 672, 26, 22), 8, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
+	_button("<", Rect2(214, 666, 36, 36), 16, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
+	_button(">", Rect2(258, 666, 36, 36), 16, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
 
 	# camera buttons (BT-02)
 	for k in 6:
@@ -384,7 +386,8 @@ func _build_desk() -> void:
 	alert_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	alert_box.add_theme_constant_override("separation", 4)
 	add_child(alert_box)
-	banner = _label("", Vector2(380, 470), Vector2(520, 40), 16, Palette.INK, true,
+	# A wide, central banner leaves its warning text and icon fully visible.
+	banner = _label("", Vector2(250, 480), Vector2(780, 44), 14, Palette.INK, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	banner.add_theme_stylebox_override("normal", Ui.nine("ui_warning_banner", 8))
 	banner.visible = false
@@ -444,7 +447,7 @@ func _build_desk() -> void:
 const HELP_SPOTS := {"battery": Vector2(812, 70), "forecast": Vector2(1030, 34), "clock": Vector2(338, 66),
 	"cameras": Vector2(962, 540), "monitors": Vector2(548, 262), "shelter": Vector2(152, 218), "recall": Vector2(152, 316),
 	"comms": Vector2(152, 414), "heater": Vector2(1218, 218), "life": Vector2(1218, 316), "lamp": Vector2(1218, 414),
-	"scroll": Vector2(1232, 170), "meters": Vector2(186, 580)}
+	"scroll": Vector2(1232, 170), "meters": Vector2(276, 538)}
 
 func _build_help_buttons() -> void:
 	for key in HELP_SPOTS:
@@ -596,11 +599,11 @@ func _start_tutorial() -> void:
 
 
 ## True when the player already reached this step's goal before the step came up.
-## Counts the goal, not the exact button: heater LOW or OFF both count.
+## Match the LOW setting requested by the tutorial.
 func _tut_already(kind: String, s: OutpostSim) -> bool:
 	match kind:
 		"camera": return s.cameras_on.has("solar_field")
-		"heater": return s.heater <= 0
+		"heater": return s.heater == 0
 		"discovery": return s.discovery_found()
 		"scan": return s.has_malfunction() and (s.malf.solved or s.malf.clues[0].found)
 		"diagnose": return s.malfunction_solved()
@@ -692,7 +695,7 @@ func _tut_check(s: OutpostSim) -> void:
 	var done := false
 	match st[2]:
 		"camera": done = s.cameras_on.has("solar_field")
-		"heater": done = s.heater <= 0
+		"heater": done = s.heater == 0
 		"fault": done = not s.fault_active("loose_cable")
 		"request": done = s.open_request_for("lani").is_empty()
 		"discovery": done = s.discovery_found()
@@ -1515,7 +1518,9 @@ func _alert(text: String, kind: String) -> void:
 	alert_box.add_child(l)
 	if icon != "crew":
 		Sfx.play(ALERT_SOUND.get(icon, "click"), -4.0)
-	while alert_box.get_child_count() > 3:          # radio line + never more than 2 alerts
+	# One urgent message at a time is enough; additional alerts are less useful than
+	# the camera feed the player needs to act on.
+	while alert_box.get_child_count() > 2:          # radio line + one active alert
 		alert_box.get_child(1).free()
 
 
@@ -1546,7 +1551,7 @@ func _process(delta: float) -> void:
 		shake_amt = maxf(0.0, shake_amt - delta * 30.0)
 		position = Vector2(randf_range(-shake_amt, shake_amt), randf_range(-shake_amt, shake_amt)) if shake_amt > 0.0 else Vector2.ZERO
 	# Keep the radio line below urgent alerts in priority and above the monitors in layout.
-	radio.visible = alert_box.get_child_count() < 3 and Time.get_ticks_msec() < radio_until
+	radio.visible = alert_box.get_child_count() < 2 and Time.get_ticks_msec() < radio_until
 	var s := SimState.sim
 	_update_windows(s)
 	pause_label.visible = SimState.paused and not Game.flow
@@ -1788,7 +1793,7 @@ class FeedView extends Control:
 			var room: String = w.room
 			if ROOMS[cam].has(room):
 				# EVA suit outside and in the airlock (they suit up there); indoor clothes elsewhere
-				var suited: bool = OUTSIDE.has(room) or room == "airlock" or (w.mode == "out" and OUTSIDE.has(str(c.target)))
+				var suited: bool = OUTSIDE.has(room) or room in ["airlock", "shelter"] or (w.mode == "out" and OUTSIDE.has(str(c.target)))
 				var sheet := "crew_%s_eva" % c.id if suited else "crew_%s" % c.id
 				# 16-frame sheets: DOWN 0-3, LEFT 4-7, RIGHT 8-11, UP 12-15.
 				# Standing faces us; leaving walks RIGHT out of frame; arriving walks LEFT in from the right.
@@ -1872,14 +1877,14 @@ class MeterPanel extends Control:
 		match PAGES[page]:
 			"AIR":
 				draw_texture(icons.oxygen, Vector2(12, 10))
-				draw_string(fr, Vector2(68, 16), "OXYGEN", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(68, 16), "OXYGEN", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				_bar(68, 20, 112, 14, s.oxygen / 100.0, Palette.SKY_HAZE)
 				draw_string(fr, Vector2(68, 54), "%d%%" % int(s.oxygen), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
 				var rate := s.oxygen_per_sec()
-				draw_string(fr, Vector2(12, 80), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(12, 80), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 			"CREW DOSE":
 				draw_texture(icons.dose, Vector2(12, 4))
-				draw_string(fr, Vector2(68, 14), "MAX %.1f / %d X-RAYS" % [s.max_dose(), int(s.balance.dose_limit_xrays)], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(68, 14), "MAX %.1f / %d X-RAYS" % [s.max_dose(), int(s.balance.dose_limit_xrays)], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				var i := 0
 				for c in s.crew:
 					var x := 68 + (i % 2) * 60
@@ -1887,7 +1892,7 @@ class MeterPanel extends Control:
 					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(x, y, 18, 18), false)
 					_bar(x + 20, y + 5, 36, 8, c.dose / s.balance.dose_limit_xrays, Palette.STATUS_WARN)
 					i += 1
-				draw_string(fr, Vector2(12, 80), "LIMIT %d PER CREWMATE" % int(s.balance.dose_limit_xrays), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(12, 80), "LIMIT %d PER CREWMATE" % int(s.balance.dose_limit_xrays), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 			"CREW WHERE":
 				var j := 0
 				for c in s.crew:
@@ -1896,13 +1901,13 @@ class MeterPanel extends Control:
 					var where: String = ROOM_SHORT.get(c.room, str(c.room).to_upper())
 					if c.walk_left > 0.0:
 						where = "> " + ROOM_SHORT.get(c.target, str(c.target).to_upper())
-					draw_string(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 					j += 1
 			"RADIO":
 				draw_texture(icons.comms, Vector2(12, 10))
-				draw_string(fr, Vector2(68, 16), "LINK TO EARTH", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(68, 16), "LINK TO EARTH", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				if s.config.comms_delay_real_min <= 0.0:
-					draw_string(fr, Vector2(68, 44), "NO DISH YET", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(68, 44), "NO DISH YET", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				else:
 					_bar(68, 20, 112, 14, s.comms / 100.0, Palette.SKY_INDIGO)
 					draw_string(fr, Vector2(68, 54), "%d%%" % int(s.comms), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
@@ -1910,11 +1915,11 @@ class MeterPanel extends Control:
 				draw_texture(icons.food, Vector2(12, 10))
 				if s.config.food_enabled:
 					draw_string(fr, Vector2(68, 32), "FOOD: %d" % s.food, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
-					draw_string(fr, Vector2(68, 50), "LAMP %d/%d S" % [int(s.crop_lamp_on_sec), int(s.balance.crop_min_sec)], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(68, 50), "LAMP %d/%d S" % [int(s.crop_lamp_on_sec), int(s.balance.crop_min_sec)], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				else:
-					draw_string(fr, Vector2(68, 32), "FROM NIGHT 2", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(68, 32), "FROM NIGHT 2", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 		# footer: page name + number (the < > buttons sit on the right)
-		draw_string(fb, Vector2(12, 112), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+		draw_string(fb, Vector2(12, 108), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 
 
 # ============================================================================
@@ -1967,8 +1972,8 @@ class StarsStrip extends Control:
 		var names := ["SURVIVE", "SCIENCE", "CHALLENGE"]
 		for i in 3:
 			var x := 4.0 + i * 78.0
-			draw_texture_rect(Assets.tex("ui_star_full" if lit[i] else "ui_star_empty"), Rect2(x, 3, 16, 16), false)
-			draw_string(Ui.FONT_R, Vector2(x + 19, 15), names[i], HORIZONTAL_ALIGNMENT_LEFT, 58, 8, Palette.STATUS_WARN if lit[i] else Palette.BASE_MAUVE)
+			draw_texture_rect(Assets.tex("ui_star_full" if lit[i] else "ui_star_empty"), Rect2(x + 28, 2, 20, 20), false)
+			draw_string(Ui.FONT_R, Vector2(x, 34), names[i], HORIZONTAL_ALIGNMENT_CENTER, 76, 10, Palette.STATUS_WARN if lit[i] else Palette.HIGHLIGHT)
 
 
 # ============================================================================

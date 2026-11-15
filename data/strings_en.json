@@ -127,7 +127,7 @@
 	"help.comms": "DISH turns the radio on (uses power). ASK sends a question to Earth. Light needs minutes to get there AND back, so ask early! Earth can rule out a malfunction cause or warn you what is coming. SEND sends your discovery.",
 	"help.heater": "Keeps the crew warm. OFF saves power but the crew get cold and plants stop growing.",
 	"help.life": "Makes oxygen for the crew to breathe. OFF saves power, but the air runs out!",
-	"help.lamp": "Grows food for tomorrow while it is on, but it uses power all night.",
+	"help.lamp": "Food is harvested after a successful night, then crew meals are deducted. Keep the lamp on long enough and the heater at MID or HIGH; the food counter updates at dawn.",
 	"help.scroll": "The malfunction board. Each bar shows how likely a cause is. Clues and scans change the bars. When you're sure, press DIAGNOSE.",
 	"help.meters": "Shows tonight's extra meter (air, radiation or radio) and your food.",
 	"tut0.day1": "Welcome to Bulalakaw Station! By day you walk around the base. Use WASD or the arrow keys, or tap where you want to go.",
