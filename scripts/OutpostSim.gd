@@ -866,7 +866,7 @@ func max_dose() -> float:
 
 
 func food_grew() -> bool:
-	return config.food_enabled and crop_lamp_on_sec >= balance.crop_min_sec and heater_low_sec < balance.heater_low_blocks_crops_sec
+	return config.food_enabled and crop_lamp_on_sec >= balance.crop_min_sec
 
 
 # ============================================================================
