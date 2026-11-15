@@ -260,16 +260,16 @@ func _build_desk() -> void:
 	_build_panel_controls()
 
 	# top bar
-	var pb := _button("", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	var pb := _button("", Rect2(24, 22, 40, 40), 16, _toggle_pause)
 	pb.add_theme_constant_override("icon_max_width", 24)
 	pb.icon = Assets.tex("icon_pause"); pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER; pb.tooltip_text = "Pause (Esc)"
-	_button("2X", Rect2(72, 22, 48, 48), 16, _toggle_speed)
-	var hint := _button("?", Rect2(16, 78, 48, 48), 16, _show_hint)
+	_button("2X", Rect2(76, 22, 40, 40), 16, _toggle_speed)
+	var hint := _button("?", Rect2(24, 74, 40, 40), 16, _show_hint)
 	hint.icon = Assets.tex("icon_hint")
 	hint.text = ""
 	hint.add_theme_constant_override("icon_max_width", 24)
 	hint.tooltip_text = "Hint from Mission Control"
-	var mute_b := _button("", Rect2(72, 78, 48, 48), 16, Game.toggle_mute)
+	var mute_b := _button("", Rect2(76, 74, 40, 40), 16, Game.toggle_mute)
 	mute_b.tooltip_text = "Mute (M)"; mute_b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	mute_b.add_theme_constant_override("icon_max_width", 24)
 	mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
@@ -277,7 +277,7 @@ func _build_desk() -> void:
 		mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
 		mute_b.tooltip_text = "Unmute (M)" if Progression.muted else "Mute (M)")
 	_tex("desk_clock.png", Vector2(130, 10))
-	clock_time = _label("18:00", Vector2(141, 13), Vector2(214, 34), 32, Palette.SKY_HAZE, true,
+	clock_time = _label("18:00", Vector2(141, 12), Vector2(214, 44), 40, Palette.HIGHLIGHT, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	clock_time.add_theme_font_override("font", Ui.FONT_CLOCK)       # the team's DotGothic16 clock face (D63)
 	clock_night = _label("", Vector2(141, 59), Vector2(214, 18), 16, Palette.SKY_HAZE, false,
@@ -310,7 +310,7 @@ func _build_desk() -> void:
 	juice.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child.call_deferred(juice)        # added last, so it draws over the desk
 	signal_strip = SignalStrip.new()
-	signal_strip.position = Vector2(130, 116)
+	signal_strip.position = Vector2(130, 134)
 	signal_strip.size = Vector2(236, 30)
 	signal_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(signal_strip)
@@ -318,7 +318,7 @@ func _build_desk() -> void:
 	diagnose_btn.tooltip_text = "Pick the cause you think is right"
 	stars_strip = StarsStrip.new()
 	stars_strip.position = Vector2(130, 92)
-	stars_strip.size = Vector2(236, 22)
+	stars_strip.size = Vector2(236, 38)
 	stars_strip.mouse_filter = Control.MOUSE_FILTER_STOP
 	stars_strip.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed:
@@ -336,8 +336,8 @@ func _build_desk() -> void:
 	meter_panel.setup(Ui.FONT_BODY, Ui.FONT_BODY_B, load(S + "ui_meter_oxygen.png"), load(S + "ui_meter_dose.png"),
 		load(S + "ui_meter_comms.png"), load(S + "ui_meter_food.png"))
 	add_child(meter_panel)
-	_button("<", Rect2(170, 650, 64, 60), 24, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
-	_button(">", Rect2(236, 650, 64, 60), 24, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
+	_button("<", Rect2(214, 666, 36, 36), 16, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
+	_button(">", Rect2(258, 666, 36, 36), 16, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
 
 	# camera buttons (BT-02)
 	for k in 6:
@@ -440,7 +440,7 @@ func _build_desk() -> void:
 const HELP_SPOTS := {"battery": Vector2(812, 70), "forecast": Vector2(1030, 34), "clock": Vector2(338, 66),
 	"cameras": Vector2(962, 540), "monitors": Vector2(548, 262), "shelter": Vector2(152, 218), "recall": Vector2(152, 316),
 	"comms": Vector2(152, 414), "heater": Vector2(1218, 218), "life": Vector2(1218, 316), "lamp": Vector2(1218, 414),
-	"scroll": Vector2(1232, 170), "meters": Vector2(186, 580)}
+	"scroll": Vector2(1232, 170), "meters": Vector2(276, 538)}
 
 func _build_help_buttons() -> void:
 	for key in HELP_SPOTS:
@@ -1899,8 +1899,8 @@ class StarsStrip extends Control:
 		var names := ["SURVIVE", "SCIENCE", "CHALLENGE"]
 		for i in 3:
 			var x := 4.0 + i * 78.0
-			draw_texture_rect(Assets.tex("ui_star_full" if lit[i] else "ui_star_empty"), Rect2(x, 3, 16, 16), false)
-			draw_string(Ui.FONT_R, Vector2(x + 19, 15), names[i], HORIZONTAL_ALIGNMENT_LEFT, 58, 8, Palette.STATUS_WARN if lit[i] else Palette.BASE_MAUVE)
+			draw_texture_rect(Assets.tex("ui_star_full" if lit[i] else "ui_star_empty"), Rect2(x + 28, 2, 20, 20), false)
+			draw_string(Ui.FONT_R, Vector2(x, 34), names[i], HORIZONTAL_ALIGNMENT_CENTER, 76, 10, Palette.STATUS_WARN if lit[i] else Palette.HIGHLIGHT)
 
 
 # ============================================================================
