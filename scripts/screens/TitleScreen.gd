@@ -53,7 +53,7 @@ func _ready() -> void:
 
 	# live / archived NASA data status, bottom-left above the credit line
 	var status := Ui.row(self, 8)
-	status.position = Vector2(20, 672)
+	status.position = Vector2(20, 654)          # badge (32 px) clear of the credit line below (D55)
 	_fill_status(status)
 	DonkiService.updated.connect(func() -> void:
 		for ch in status.get_children():
@@ -62,7 +62,7 @@ func _ready() -> void:
 	DonkiService.fetch()
 
 	var foot := Ui.label("A NASA SPACE APPS 2026 GAME BY TEAM ALT-F4", 8, false, Palette.HIGHLIGHT)
-	foot.position = Vector2(20, 696)
+	foot.position = Vector2(20, 700)
 	add_child(foot)
 
 
