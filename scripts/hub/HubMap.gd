@@ -40,6 +40,7 @@ var mat_label: Label
 var food_label: Label
 var card_layer: Control
 var briefing_sun: HBoxContainer
+var night_story_shown: bool = false
 var fx: Sprite2D
 var fx_t := -1.0
 var plot_labels: Dictionary = {}
@@ -241,6 +242,10 @@ func _build_plot(id: String) -> void:
 	plots[id] = s
 	s.texture = Assets.tex("plot_locked")
 	_stand(s, PLOT_POS[id] + Vector2(0, 64), BSCALE)
+	var post := Sprite2D.new()
+	post.texture = Assets.tex("plot_locked_post")
+	_stand(post, PLOT_POS[id] + Vector2(0, 12), BSCALE)
+	s.set_meta("post", post)
 	s.set_meta("body", _solid(PLOT_POS[id] + Vector2(0, 40), Vector2(150, 48)))
 	var l := Ui.label(PLOT_NAME[id], 8, true, Palette.HIGHLIGHT)
 	l.z_index = 5
@@ -258,11 +263,16 @@ func _refresh_plot(id: String) -> void:
 	var asset := "plot_%s_l%d" % [id, int(Progression.levels.get(id, 1))] if built else "plot_locked"
 	s.texture = Assets.frame(asset, 0)
 	_animate(s, asset)
-	s.z_index = 0
+	s.z_index = 0 if built else -8
+	var post: Sprite2D = s.get_meta("post")
+	post.visible = not built
 	var sh: ContactShadow = s.get_meta("shadow")
 	sh.fit(s.texture)
 	sh.visible = built
-	_fit_body(s.get_meta("body"), s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, true, 0.88 if not built else 0.92, 64.0 if not built else 40.0)
+	if built:
+		_fit_body(s.get_meta("body"), s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, true, 0.92, 40.0)
+	else:
+		_fit_body(s.get_meta("body"), post.texture, PLOT_POS[id] + Vector2(0, 12), BSCALE, true, 1.8, 16.0)
 
 
 func _build_decor() -> void:
@@ -640,6 +650,19 @@ func _show_tutorial_card() -> void:
 
 # ---------------------------------------------------------------- the mission (first time only)
 func _show_story() -> void:
+	commander.joystick = Vector2.ZERO
+	commander.velocity = Vector2.ZERO
+	commander.set_physics_process(false)
+	var story: CutsceneBeat = load("res://data/cutscenes/cs_00_opening.tres") as CutsceneBeat
+	var player: CutscenePlayer = preload("res://scenes/CutscenePlayer.tscn").instantiate() as CutscenePlayer
+	hud_root.add_child(player)
+	player.continued.connect(_show_mission_instructions)
+	player.skipped.connect(_show_mission_instructions)
+	player.play(story)
+
+
+func _show_mission_instructions(_next_route: String = "") -> void:
+	commander.set_physics_process(true)
 	var v := _new_card(900, "ui_briefing")
 	var top := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
 	top.add_child(Ui.image("portrait_mission_control"))
@@ -659,8 +682,20 @@ func _show_story() -> void:
 
 
 # ---------------------------------------------------------------- D-07 Morning Briefing
+func _on_night_story_done() -> void:
+	commander.set_physics_process(true)
+	_show_briefing()
+
+
 func _show_briefing() -> void:
 	if cfg == null:
+		return
+	if not night_story_shown and not Progression.judge_mode and not Game.tutorial:
+		night_story_shown = true
+		commander.joystick = Vector2.ZERO
+		commander.velocity = Vector2.ZERO
+		commander.set_physics_process(false)
+		Game.play_story(cfg.id * 2 - 1, _on_night_story_done)
 		return
 	var card := _new_card(980, "ui_briefing")
 	var v := _card_scroll(card, 482.0)

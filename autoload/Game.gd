@@ -14,6 +14,7 @@ const SCREENS := {
 	"night_select": "res://scripts/screens/NightSelect.gd",
 	"hub": "res://scripts/hub/HubMap.gd",
 	"complete": "res://scripts/screens/MissionComplete.gd",
+	"cutscene_gallery": "res://scripts/screens/CutsceneGallery.gd",
 }
 const PANELS := {
 	"pause": "res://scripts/screens/PausePanel.gd",
@@ -135,10 +136,29 @@ func finish_tutorial() -> void:
 func night_finished(won: bool) -> void:
 	if not won:
 		goto("desk")                        # Retry Night
-	elif night >= Progression.NIGHT_COUNT:
+		return
+	if won and not Progression.judge_mode and not tutorial:
+		play_story(night * 2, func() -> void:
+			if night >= Progression.NIGHT_COUNT:
+				play_story(15, func() -> void: goto("complete"))
+			else:
+				goto("hub", night + 1))
+		return
+	if night >= Progression.NIGHT_COUNT:
 		goto("complete")
 	else:
 		goto("hub", night + 1)
+
+
+func play_story(index: int, done: Callable) -> void:
+	var resource_path: String = "res://data/cutscenes/cs_%02d.tres" % index
+	var story: CutsceneBeat = load(resource_path) as CutsceneBeat
+	var player: CutscenePlayer = preload("res://scenes/CutscenePlayer.tscn").instantiate() as CutscenePlayer
+	overlay_root.add_child(player)
+	var finish: Callable = func(_route: String) -> void: done.call_deferred()
+	player.continued.connect(finish)
+	player.skipped.connect(finish)
+	player.play(story)
 
 
 # ---------------------------------------------------------------- panels (overlays)

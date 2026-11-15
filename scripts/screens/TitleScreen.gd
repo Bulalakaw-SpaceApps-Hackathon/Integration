@@ -14,6 +14,10 @@ func _ready() -> void:
 	logo.size = Vector2(600, 200)
 	add_child(logo)
 
+	var gallery_btn := Ui.button("CUTSCENE GALLERY", func() -> void: Game.goto("cutscene_gallery"), Vector2(320, 64))
+	gallery_btn.position = Vector2(24, 540)
+	add_child(gallery_btn)
+
 	var v := VBoxContainer.new()
 	v.position = Vector2(490, 300)
 	v.custom_minimum_size = Vector2(300, 0)

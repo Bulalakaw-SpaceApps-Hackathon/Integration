@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CutsceneBeat" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/CutsceneBeat.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "CS-03"
+title = "Roots in Red Soil"
+panel_assets = Array[String](["cam_greenhouse_on"])
+portrait_assets = Array[String](["portrait_maya"])
+captions = Array[String](["These little plants need light and warmth. Life Support needs power too, so we must share the battery."])
+panel_durations_sec = Array[float]([0.0])
+next_route = "continue"
+

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CutsceneBeat" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/CutsceneBeat.gd" id="1_cutscene_beat"]
+
+[resource]
+script = ExtResource("1_cutscene_beat")
+id = "CS-00"
+title = "BULALAKAW STATION"
+panel_assets = Array[String](["bld_habitat", "bld_habitat", "desk_bg", "desk_bg"])
+portrait_assets = Array[String](["", "portrait_commander", "portrait_lani", "portrait_lani"])
+fade_sec = 0.8
+portrait_slide_px = 18.0
+captions = Array[String](["Millions of miles from home, Bulalakaw Station keeps watch over Gale Crater.", "You are the Commander. Tonight, you begin the first watch with a small crew and a half-built home.", "Lani: Welcome to Bulalakaw Station! Let’s get ready for our first night.", "Lani: The cameras use battery power. Check the forecast to see if we have enough until sunrise."])
+panel_durations_sec = Array[float]([6.0, 6.0, 7.0, 8.0])
+next_route = "night_1_briefing"
+accessibility_note = "Captions contain all story information. Continue, Skip Intro, Enter, Space, Escape, mouse and touch are supported."
