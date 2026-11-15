@@ -44,6 +44,10 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	theme = Ui.make_theme()
 	get_tree().root.theme = theme
+	if Assets.has("ui_cursor"):
+		Input.set_custom_mouse_cursor(Assets.tex("ui_cursor"), Input.CURSOR_ARROW, Vector2(2, 2))
+	if Assets.has("ui_cursor_hand"):
+		Input.set_custom_mouse_cursor(Assets.tex("ui_cursor_hand"), Input.CURSOR_POINTING_HAND, Vector2(9, 2))
 	overlay = CanvasLayer.new()
 	overlay.layer = 20
 	add_child(overlay)
