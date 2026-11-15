@@ -49,6 +49,9 @@ const SpotlightOverlay := preload("res://scripts/SpotlightOverlay.gd")
 
 var mute_button: TextureButton
 var spotlight: Control
+var card_lock_btn: Button
+var card_lock_text := ""
+var card_lock_until := 0.0
 var lessons: Dictionary = {}
 var anim_t := 0.0                   # building idle loops (lights, smoke, fans, waves...)
 var anim_f := -1
@@ -412,6 +415,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	_tick_card_lock()
 	_drive_rover(delta)
 	_tick_animation(delta)
 	if fx_t >= 0.0:
@@ -426,6 +430,9 @@ func _process(delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if card_layer != null and Game.top_panel() == null and event.is_action_pressed("ui_cancel"):
+		if card_lock_until > Time.get_unix_time_from_system():
+			get_viewport().set_input_as_handled()
+			return
 		_close_card()
 		get_viewport().set_input_as_handled()
 
@@ -611,6 +618,9 @@ func _hint() -> void:
 
 
 func _close_card() -> void:
+	card_lock_btn = null
+	card_lock_text = ""
+	card_lock_until = 0.0
 	if card_layer:
 		card_layer.hide()
 		card_layer.queue_free()
@@ -618,6 +628,31 @@ func _close_card() -> void:
 		briefing_sun = null
 		commander.set_physics_process(true)
 	_refresh_night1_guide()
+
+
+func _lock_card_button(btn: Button, base_text: String, secs := 3.0) -> void:
+	if Progression.judge_mode or btn == null:
+		return
+	card_lock_btn = btn
+	card_lock_text = base_text
+	card_lock_until = Time.get_unix_time_from_system() + secs
+	_tick_card_lock()
+
+
+func _tick_card_lock() -> void:
+	if card_lock_btn == null or not is_instance_valid(card_lock_btn):
+		card_lock_btn = null
+		card_lock_until = 0.0
+		return
+	var rem := card_lock_until - Time.get_unix_time_from_system()
+	if rem > 0.0:
+		card_lock_btn.disabled = true
+		card_lock_btn.text = "%s (%d)" % [card_lock_text, int(ceil(rem))]
+	else:
+		card_lock_btn.disabled = false
+		card_lock_btn.text = card_lock_text
+		card_lock_btn = null
+		card_lock_until = 0.0
 
 
 func _refresh_night1_guide() -> void:
@@ -701,10 +736,12 @@ func _show_mission_instructions(_next_route: String = "") -> void:
 	v.add_child(Ui.label("EVERY NIGHT: BALANCE POWER, AIR, FOOD AND RADIATION SHIELDING.", Ui.BODY, true, Palette.BASE_PLUM, 840))
 	v.add_child(Ui.label("BETWEEN NIGHTS: SPEND MATERIALS TO UPGRADE YOUR BASE.", Ui.BODY, true, Palette.BASE_PLUM, 840))
 	var btns := Ui.row(v)
-	btns.add_child(Ui.button("I'M READY!", func() -> void:
+	var ready_btn := Ui.button("I'M READY!", func() -> void:
 		Progression.story_seen = true
 		Progression.save_game()
-		_show_briefing(), Vector2(260, 64)))
+		_show_briefing(), Vector2(260, 64))
+	btns.add_child(ready_btn)
+	_lock_card_button(ready_btn, "I'M READY!")
 
 
 # ---------------------------------------------------------------- D-07 Morning Briefing
@@ -756,7 +793,9 @@ func _show_briefing() -> void:
 		r.add_child(Ui.body("%s · %s" % [l[0], l[1]], 20, true, Palette.INK, 780))
 	v.add_child(Ui.body("Tap a building or walk up and press E. Visit each open building before starting.", 20, true, Palette.BASE_PLUM, 820))
 	var btns := Ui.row(card)
-	btns.add_child(Ui.button("LET'S BUILD", _close_card, Vector2(240, 64)))
+	var build_btn := Ui.button("LET'S BUILD", _close_card, Vector2(240, 64))
+	btns.add_child(build_btn)
+	_lock_card_button(build_btn, "LET'S BUILD")
 	var start := Ui.button("START NIGHT", _start_night, Vector2(240, 64))
 	start.disabled = _visited_count() < _required().size() and not Progression.judge_mode
 	btns.add_child(start)
@@ -952,7 +991,9 @@ func _show_building(id: String) -> void:
 		btns.add_child(up)
 	else:
 		right.add_child(Ui.label("MAXED OUT!", Ui.BODY, true, Palette.STATUS_OK_SHADE))
-	btns.add_child(Ui.button("LEAVE BUILDING", _close_card, Vector2(260, 64)))
+	var leave_btn := Ui.button("LEAVE BUILDING", _close_card, Vector2(260, 64))
+	btns.add_child(leave_btn)
+	_lock_card_button(leave_btn, "LEAVE BUILDING")
 	_refresh_hud()
 
 

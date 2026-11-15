@@ -559,6 +559,8 @@ func _start_night1_guide() -> void:
 	SimState.frozen = true
 	tut_box.visible = false
 	hint_arrow.visible = false
+	if alert_box:
+		alert_box.visible = false
 	_show_night1_spotlight()
 
 
@@ -706,7 +708,7 @@ func _tut_check(s: OutpostSim) -> void:
 
 func _point_at(r: Rect2) -> void:
 	if alert_box:
-		alert_box.visible = not (tut_box and tut_box.visible)   # the tutorial strip speaks for itself; the arrow never covers a message
+		alert_box.visible = not (tut_box and tut_box.visible) and not night1_guide   # the tutorial strip speaks for itself; the arrow never covers a message
 	hint_arrow.visible = true
 	hint_arrow.flip_v = r.position.y < 150          # top-of-screen targets: arrow below, pointing up
 	if hint_arrow.flip_v:
@@ -1479,11 +1481,17 @@ func _alert(text: String, kind: String) -> void:
 		icon = "crew"
 		icon_asset = "head_" + kind.substr(5)
 	var l := PanelContainer.new()
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.mouse_filter = Control.MOUSE_FILTER_STOP
+	l.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var sb := Ui.nine("ui_popup", 8)
 	sb.content_margin_top = 6
 	sb.content_margin_bottom = 6
 	l.add_theme_stylebox_override("panel", sb)
+	l.gui_input.connect(func(ev: InputEvent) -> void:
+		var mb := ev as InputEventMouseButton
+		if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+			Sfx.play("click")
+			l.queue_free())
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override("separation", 8)
@@ -1492,17 +1500,23 @@ func _alert(text: String, kind: String) -> void:
 	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	ic.custom_minimum_size = Vector2(28, 28)
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(ic)
 	# crew radio chatter is one small line; real alerts are big
-	var lab := Ui.body(text, 20, true, Palette.INK, 508)        # readable body font (D63)
+	var lab := Ui.body(text, 20, true, Palette.INK, 464)        # readable body font (D63)
 	lab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(lab)
+	var close_btn := _button("X", Rect2(0, 0, 32, 32), 14, func() -> void: l.queue_free())
+	close_btn.reparent(row)
+	close_btn.custom_minimum_size = Vector2(32, 32)
+	close_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	alert_box.add_child(l)
 	if icon != "crew":
 		Sfx.play(ALERT_SOUND.get(icon, "click"), -4.0)
 	while alert_box.get_child_count() > 3:          # radio line + never more than 2 alerts
 		alert_box.get_child(1).free()
-	l.set_meta("expires", Time.get_ticks_msec() + int(ALERT_SECONDS * 1000.0))
 
 
 func _update_windows(s: OutpostSim) -> void:
@@ -1518,19 +1532,14 @@ func _update_windows(s: OutpostSim) -> void:
 
 
 func _prune_alerts() -> void:
-	var now := Time.get_ticks_msec()
-	for c in alert_box.get_children():
-		if c == radio:
-			continue
-		if not c.is_queued_for_deletion() and now >= int(c.get_meta("expires", 0)):
-			c.queue_free()
+	pass
 
 
 # ============================================================================
 # Per-frame updates
 # ============================================================================
 func _process(delta: float) -> void:
-	if alert_box and tut_box and not tut_box.visible and not alert_box.visible:
+	if alert_box and tut_box and not tut_box.visible and not night1_guide and not alert_box.visible:
 		alert_box.visible = true                        # tutorial over: alerts come back
 	_prune_alerts()
 	if shake_amt > 0.0:
