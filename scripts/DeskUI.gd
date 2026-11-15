@@ -209,7 +209,7 @@ func _refresh_icons(s: OutpostSim) -> void:
 		var fr := 0
 		if count > 1 and int(speed.get(k, 0)) > 0:
 			fr = int(f * int(speed[k]) / 2) % count
-		(ctl[k] as Button).icon = Assets.frame(n, fr)
+		(ctl[k] as Button).icon = Assets.tex("icon_lock") if locked_text.has(k) else Assets.frame(n, fr)
 
 
 func _set_lit(b: Button, lit: bool) -> void:
@@ -750,7 +750,7 @@ func _build_panel_controls() -> void:
 	var plates := [[lx, 0, "SHELTER DOOR"], [lx, 1, "RECALL CREW"], [lx, 2, "COMMS"],
 		[rx, 0, "HEATER"], [rx, 1, "LIFE SUPPORT"], [rx, 2, "CROP LAMP"]]
 	for p in plates:
-		var pl := _label(p[2], Vector2(p[0] + 2, slot_y.call(p[1]) + 68), Vector2(108, 18), 10, Palette.INK, false,
+		var pl := _label(p[2], Vector2(p[0] + 2, slot_y.call(p[1]) + 68), Vector2(108, 18), 8 if str(p[2]).length() > 10 else 10, Palette.INK, false,   # long names step down so they are not cut
 			HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 		pl.clip_text = true
 
@@ -965,7 +965,8 @@ func _on_night_started(cfg: NightConfig) -> void:
 	locked_text.clear()
 	for k in ["shelter", "lamp", "dish", "ask", "send"]:
 		if ctl[k].disabled:
-			locked_text[k] = "LOCK" if k in ["dish", "ask", "send"] else "LOCKED\nNIGHT %d" % _unlock_night(k)
+			# a padlock and one short line; the three small COMMS buttons show the padlock only
+			locked_text[k] = "" if k in ["dish", "ask", "send"] else "NIGHT %d" % _unlock_night(k)
 	var s := SimState.sim
 	s.crew_said.connect(_crew_said)
 	s.request_started.connect(_request_started)
@@ -1873,6 +1874,13 @@ class MeterPanel extends Control:
 		if frac > 0.0:
 			draw_rect(Rect2(x + 2, y + 2, (w - 4) * clampf(frac, 0.0, 1.0), h - 4), col)
 
+	## Text that always fits: the size steps down until the line is no wider than max_w.
+	func _fit(font: Font, pos: Vector2, text: String, size: int, col: Color, max_w: float) -> void:
+		var sz := size
+		while sz > 8 and font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > max_w:
+			sz -= 1
+		draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, max_w, sz, col)
+
 	func _draw() -> void:
 		var s: OutpostSim = SimState.sim
 		if s == null:
@@ -1885,18 +1893,18 @@ class MeterPanel extends Control:
 				_bar(68, 20, 112, 14, s.oxygen / 100.0, Palette.SKY_HAZE)
 				draw_string(fr, Vector2(68, 54), "%d%%" % int(s.oxygen), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
 				var rate := s.oxygen_per_sec()
-				draw_string(fr, Vector2(12, 80), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
+				_fit(fr, Vector2(12, 82), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), 12, blue, 168.0)
 			"CREW DOSE":
 				draw_texture(icons.dose, Vector2(12, 4))
-				draw_string(fr, Vector2(68, 14), "MAX %.1f / %d X-RAYS" % [s.max_dose(), int(s.balance.dose_limit_xrays)], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
+				_fit(fr, Vector2(68, 19), "MAX %.1f / %d" % [s.max_dose(), int(s.balance.dose_limit_xrays)], 12, blue, 96.0)   # clear of the ? badge
 				var i := 0
 				for c in s.crew:
 					var x := 68 + (i % 2) * 60
-					var y := 22 + (i / 2) * 22
+					var y := 26 + (i / 2) * 22
 					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(x, y, 18, 18), false)
 					_bar(x + 20, y + 5, 36, 8, c.dose / s.balance.dose_limit_xrays, Palette.STATUS_WARN)
 					i += 1
-				draw_string(fr, Vector2(12, 80), "LIMIT %d PER CREWMATE" % int(s.balance.dose_limit_xrays), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
+				_fit(fr, Vector2(12, 82), "LIMIT %d X-RAYS EACH" % int(s.balance.dose_limit_xrays), 12, blue, 168.0)
 			"CREW WHERE":
 				var j := 0
 				for c in s.crew:
@@ -1905,7 +1913,7 @@ class MeterPanel extends Control:
 					var where: String = ROOM_SHORT.get(c.room, str(c.room).to_upper())
 					if c.walk_left > 0.0:
 						where = "> " + ROOM_SHORT.get(c.target, str(c.target).to_upper())
-					draw_string(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
+					_fit(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], 12, blue, 150.0 if j > 0 else 132.0)   # row 1 stops before the ? badge
 					j += 1
 			"RADIO":
 				draw_texture(icons.comms, Vector2(12, 10))
@@ -1923,7 +1931,7 @@ class MeterPanel extends Control:
 				else:
 					draw_string(fr, Vector2(68, 32), "FROM NIGHT 2", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 		# footer: page name + number (the < > buttons sit on the right)
-		draw_string(fb, Vector2(12, 108), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
+		_fit(fb, Vector2(12, 108), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], 12, Palette.HIGHLIGHT, 116.0)   # the < > buttons start at x 133
 
 
 # ============================================================================

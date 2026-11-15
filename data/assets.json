@@ -2262,5 +2262,13 @@
 		"h": 24,
 		"frames": 1,
 		"kind": "image"
+	},
+	"icon_lock": {
+		"id": "BT-12",
+		"path": "res://assets/sprites/ui/icon_lock.png",
+		"w": 24,
+		"h": 24,
+		"frames": 1,
+		"kind": "image"
 	}
 }
