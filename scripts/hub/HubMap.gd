@@ -262,14 +262,7 @@ func _refresh_plot(id: String) -> void:
 	var sh: ContactShadow = s.get_meta("shadow")
 	sh.fit(s.texture)
 	sh.visible = built
-	var body: StaticBody2D = s.get_meta("body")
-	if built:
-		_fit_body(body, s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, true)
-	else:
-		var cs: CollisionShape2D = body.get_child(0)
-		cs.disabled = false
-		body.position = PLOT_POS[id] + Vector2(0, 8)
-		(cs.shape as RectangleShape2D).size = Vector2(44.0, 28.0)
+	_fit_body(s.get_meta("body"), s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, true, 0.88 if not built else 0.92, 64.0 if not built else 40.0)
 
 
 func _build_decor() -> void:
