@@ -80,7 +80,8 @@ var tut_recalled := false
 var tut_asked := false
 var tut_skip := false                 # this step was already done before it came up: just show NEXT
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
-var night1_guide := false              # true during Night 1's 5-step interactive desk walkthrough
+var night1_guide := false              # true during Night 1's 3-step spotlight walkthrough
+var spotlight: SpotlightOverlay
 var _n1_heater_start := 0
 var hint_t := 0.0
 var tick_t := 0.0
@@ -433,6 +434,8 @@ func _build_desk() -> void:
 	overlay_body.add_theme_constant_override("separation", 12)
 	margin.add_child(overlay_body)
 	_build_tutorial_box()
+	spotlight = SpotlightOverlay.new()
+	add_child(spotlight)
 
 
 # ---------------------------------------------------------------- "?" help on every control
@@ -539,17 +542,11 @@ func _fit_tut_box() -> void:
 	tut_box.position.y = 716.0 - tut_box.size.y
 
 
-func _active_tut_steps() -> Array:
-	return _night1_tut_steps() if night1_guide else _tut_steps()
-
-
 func _night1_tut_steps() -> Array:
 	return [
-		["STEP 1/5 · BATTERY & FORECAST: Keep your Battery above 0% (aim for 20%+ for a bonus star!) until 06:00. Click NEXT to continue.", Rect2(378, 22, 456, 48), "next"],
-		["STEP 2/5 · CAMERAS: Cameras let you watch rooms and spot broken wires—but each active camera uses power. Try turning ON the Solar Field camera!", cam_buttons[2].get_rect(), "camera"],
-		["STEP 3/5 · HEATER: Mars nights drop to -80 °C! Use HEATER to keep the crew warm, or lower it to save power. Try clicking HEATER once!", ctl["heater"].get_rect(), "n1_heater"],
-		["STEP 4/5 · ALERTS & CREW: During the night, watch for flashing alerts! Click sparks on camera feeds to fix broken parts, and answer crew requests.", Rect2(feeds[0].position, Vector2(280, 120)), "next"],
-		["STEP 5/5 · READY! Your shift runs from 18:00 to 06:00. Watch the forecast, save power, and survive Night 1! Click START! when ready.", Rect2(1058, 2, 212, 196), "finish"],
+		[cam_buttons[2].get_rect(), "Tap SOLAR camera to watch outside (uses a bit of power)."],
+		[ctl["heater"].get_rect(), "Tap HEATER to adjust warmth & save battery!"],
+		[Rect2(378, 22, 456, 48), "Keep Battery above 0% until 06:00! Tap anywhere to start."],
 	]
 
 
@@ -558,10 +555,30 @@ func _start_night1_guide() -> void:
 	tut_step = 0
 	_n1_heater_start = SimState.sim.heater if SimState.sim else 0
 	SimState.frozen = true
-	tut_box.visible = true
-	tut_box.move_to_front()
-	_fit_tut_box.call_deferred()
-	_tut_show()
+	tut_box.visible = false
+	hint_arrow.visible = false
+	_show_night1_spotlight()
+
+
+func _show_night1_spotlight() -> void:
+	var steps := _night1_tut_steps()
+	if tut_step >= steps.size():
+		_finish_night1_guide()
+		return
+	var st: Array = steps[tut_step]
+	spotlight.point_at(st[0], st[1])
+
+
+func _finish_night1_guide() -> void:
+	night1_guide = false
+	if spotlight:
+		spotlight.visible = false
+	SimState.frozen = false
+	if alert_box:
+		alert_box.visible = true
+	if not Progression.seen_guides.has(1):
+		Progression.seen_guides.append(1)
+		Progression.save_game()
 
 
 func _start_tutorial() -> void:
@@ -590,9 +607,9 @@ func _tut_already(kind: String, s: OutpostSim) -> bool:
 
 
 func _tut_show() -> void:
-	var st: Array = _active_tut_steps()[tut_step]
+	var st: Array = _tut_steps()[tut_step]
 	var sim := SimState.sim
-	tut_skip = (not night1_guide) and sim != null and _tut_already(st[2], sim)
+	tut_skip = sim != null and _tut_already(st[2], sim)
 	if tut_skip:
 		var solved_early: bool = st[2] in ["scan", "diagnose"] and sim.malfunction_solved()
 		tut_label.text = Strings.t("tut.already_solved" if solved_early else "tut.already")
@@ -601,9 +618,9 @@ func _tut_show() -> void:
 		hint_arrow.visible = false
 		_fit_tut_box.call_deferred()
 		return
-	tut_label.text = st[0] if night1_guide else Strings.t(st[0])
+	tut_label.text = Strings.t(st[0])
 	tut_next.visible = st[2] in ["next", "start", "finish"]
-	tut_next.text = "START!" if st[2] in ["start", "finish"] and night1_guide else ("START!" if st[2] == "start" else ("FINISH!" if st[2] == "finish" else "NEXT"))
+	tut_next.text = "START!" if st[2] == "start" else ("FINISH!" if st[2] == "finish" else "NEXT")
 	_fit_tut_box.call_deferred()
 	_point_at(st[1])
 	var s := SimState.sim
@@ -644,36 +661,34 @@ func _tut_advance() -> void:
 		SimState.frozen = false
 		return
 	# solved the malfunction early: the SCAN and DIAGNOSE steps share one "already solved" line
-	if not night1_guide and tut_skip and _tut_steps()[tut_step][2] == "scan" and SimState.sim and SimState.sim.malfunction_solved():
+	if tut_skip and _tut_steps()[tut_step][2] == "scan" and SimState.sim and SimState.sim.malfunction_solved():
 		tut_step += 1
 	tut_skip = false
 	tut_step += 1
-	if tut_step >= _active_tut_steps().size():
+	if tut_step >= _tut_steps().size():
 		tut_box.visible = false
 		hint_arrow.visible = false
-		if night1_guide:
-			night1_guide = false
-			SimState.frozen = false
-			if alert_box:
-				alert_box.visible = true
-			if not Progression.seen_guides.has(1):
-				Progression.seen_guides.append(1)
-				Progression.save_game()
-			return
 		Game.finish_tutorial()            # practice over: back to the title with the Ready for duty badge
 		return
 	_tut_show()
 
 
 func _tut_check(s: OutpostSim) -> void:
+	if night1_guide:
+		if tut_step == 0 and s.cameras_on.has("solar_field"):
+			tut_step = 1
+			_show_night1_spotlight()
+		elif tut_step == 1 and s.heater != _n1_heater_start:
+			tut_step = 2
+			_show_night1_spotlight()
+		return
 	if not tut_box.visible or guide_mode > 0 or tut_skip:
 		return
-	var st: Array = _active_tut_steps()[tut_step]
+	var st: Array = _tut_steps()[tut_step]
 	var done := false
 	match st[2]:
 		"camera": done = s.cameras_on.has("solar_field")
 		"heater": done = s.heater <= 0
-		"n1_heater": done = s.heater != _n1_heater_start
 		"fault": done = not s.fault_active("loose_cable")
 		"request": done = s.open_request_for("lani").is_empty()
 		"discovery": done = s.discovery_found()
@@ -809,6 +824,13 @@ func _toggle_speed() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if night1_guide and tut_step == 2:
+		var mb := event as InputEventMouseButton
+		var k := event as InputEventKey
+		if (mb and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT) or (k and k.pressed and not k.echo and k.keycode in [KEY_SPACE, KEY_ENTER]):
+			_finish_night1_guide()
+			get_viewport().set_input_as_handled()
+			return
 	if help_box and help_box.visible and Game.top_panel() == null and event.is_action_pressed("ui_cancel"):
 		_close_help()
 		get_viewport().set_input_as_handled()
