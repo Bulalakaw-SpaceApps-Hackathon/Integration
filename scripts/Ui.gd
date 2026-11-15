@@ -7,8 +7,8 @@ const FONT_R := preload("res://assets/fonts/Silkscreen-Regular.ttf")
 const FONT_B := preload("res://assets/fonts/Silkscreen-Bold.ttf")
 ## Body text (lessons, radio lines, alerts, the tutorial) uses the team's Bulalakaw Readable,
 ## easier for 7-year-olds than the all-caps pixel font; titles and buttons stay Silkscreen (D63).
-const FONT_BODY := preload("res://assets/fonts/BulalakawReadable-Regular.ttf")
-const FONT_BODY_B := preload("res://assets/fonts/BulalakawReadable-Bold.ttf")
+const FONT_BODY := preload("res://assets/fonts/Silkscreen-Regular.ttf")
+const FONT_BODY_B := preload("res://assets/fonts/Silkscreen-Bold.ttf")
 const FONT_CLOCK := preload("res://assets/fonts/DotGothic16-Regular.ttf")
 const BODY := 16
 const BIG := 24
