@@ -3,8 +3,17 @@
 The **whole game is playable end to end**: Title → Night Select → Base map (Morning Briefing, build) →
 Camera Desk night → Debrief → next night … → Mission Complete, plus a Night 0 practice tutorial.
 
+<<<<<<< HEAD
+**Final draft status (Nov 15):** the gameplay is complete. Art was remastered into one look (D47-D66):
+camera feeds and night covers are painted pixel art matching the team's CF-03 Solar Field feed; the base map,
+crew and UI are flat pixel art with a 1 px ink outline; everything on the base map is drawn at one 2x pixel
+size; anything that should move is animated. The art tools are in `tools/` (rescale_map, animate_deco,
+paint_rooms, paint_night_cards, paint_title, draw_desk_icons, draw_alerts, draw_badges, draw_ui_small,
+remaster_portraits, draw_mission_control); the team's scratch art is in `assets/source/`. Sound: the team's Audio-Design
+=======
 **Final draft status (Nov 15):** the gameplay is complete. Art: the team's characters, camera feeds, base map,
 UI and sponsor art, with the base-map buildings redrawn to match their feeds. Sound: the team's Audio-Design
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 Set 1. Facts: checked against NASA in `docs/FACT_CHECK.md`. **Not done yet: the storyline** — `data/story.json`
 still has placeholder open/close/radio lines (fill `docs/STORY_TEMPLATE.md`). Decisions D1–D46 are in
 `docs/SUGGESTIONS.md`. Any file can still be swapped by overwriting it with the same name and size.
@@ -78,6 +87,12 @@ godot --headless --path . --export-release "Windows" build/windows/BulalakawStat
 ```
 godot --headless --path . -s res://tests/test_sim.gd          # sim + balance checks, ALL PASSED
 godot --headless --path . -s res://tests/audio_check.gd       # every sound loads
+<<<<<<< HEAD
+godot --headless --path . -s res://tests/asset_check.gd       # every image holds the frames assets.json lists
+godot --path . -s res://tests/map_collision_test.gd           # Commander never clips into buildings or rocks
+godot --path . -s res://tests/tutorial_early_playtest.gd      # tutorial still finishes when steps are done early
+=======
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 godot --path . -s res://tests/tutorial_playtest.gd            # Night 0 practice night, step by step
 godot --path . -s res://tests/stage_playtest.gd               # sponsors, rough nights, meteors, ending
 godot --path . -s res://tests/feeds_playtest.gd               # dynamic camera feeds + crew walking

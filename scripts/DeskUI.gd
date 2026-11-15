@@ -77,6 +77,11 @@ var tut_label: Label
 var tut_next: Button
 var tut_step := 0
 var tut_recalled := false
+<<<<<<< HEAD
+var tut_asked := false
+var tut_skip := false                 # this step was already done before it came up: just show NEXT
+=======
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
 var hint_t := 0.0
 var tick_t := 0.0
@@ -174,6 +179,37 @@ func _button(text: String, rect: Rect2, font_size: int, on_press: Callable) -> B
 	return b
 
 
+## Desk control icons follow the state, and the ones that should move do (D66):
+## the fan spins faster at higher air, the lamp glows, the dish sends waves while a question
+## is on its way, RECALL pulses while someone is outside.
+func _refresh_icons(s: OutpostSim) -> void:
+	var f := int(blink_t * 6.0)
+	var heat := 1 if s == null else s.heater
+	var air := 1 if s == null else s.life_support
+	var icons := {
+		"heater": ["icon_heater_low", "icon_heater_low", "icon_heater_mid", "icon_heater_high"][heat + 1],
+		"life": ["icon_life_support_low", "icon_life_support_low", "icon_life_support_normal", "icon_life_support_high"][air + 1],
+		"lamp": "icon_crop_lamp_on" if s != null and s.crop_lamp else "icon_crop_lamp_off",
+		"dish": "icon_dish_on" if s != null and s.dish else "icon_dish_off",
+		"ask": "icon_ask_earth", "send": "icon_send_discovery", "recall": "icon_recall",
+		"shelter": "icon_shelter_open" if s != null and s.shelter_door_open else "icon_shelter_closed",
+	}
+	var speed := {"life": 0 if s == null or s.battery <= 0.0 or air < 0 else (air + 1), "lamp": 1, "dish": 1 if s != null and s.ask_in_flight() else 0}
+	var outside := false
+	if s != null:
+		for c in s.crew:
+			if s.is_outside(c):
+				outside = true
+	speed["recall"] = 1 if outside else 0
+	for k in icons:
+		var n: String = icons[k]
+		var count := Assets.frame_count(n)
+		var fr := 0
+		if count > 1 and int(speed.get(k, 0)) > 0:
+			fr = int(f * int(speed[k]) / 2) % count
+		(ctl[k] as Button).icon = Assets.frame(n, fr)
+
+
 func _set_lit(b: Button, lit: bool) -> void:
 	## "On" controls get the yellow style, so their state is visible (plus their text says ON/OFF).
 	b.add_theme_stylebox_override("normal", _btn_sb(8 if b.size.x < 60 else 14, 1 if lit else 0))
@@ -227,17 +263,22 @@ func _build_desk() -> void:
 	_build_panel_controls()
 
 	# top bar
-	_button("II", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	var pb := _button("", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	pb.icon = Assets.tex("icon_pause"); pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER; pb.tooltip_text = "Pause (Esc)"
 	_button("2X", Rect2(72, 22, 48, 48), 16, _toggle_speed)
 	var hint := _button("?", Rect2(16, 78, 48, 48), 16, _show_hint)
 	hint.icon = Assets.tex("icon_hint")
 	hint.text = ""
 	hint.expand_icon = true
 	hint.tooltip_text = "Hint from Mission Control"
-	_button("M", Rect2(72, 78, 48, 48), 16, Game.toggle_mute).tooltip_text = "Mute (M)"
+	var mute_b := _button("", Rect2(72, 78, 48, 48), 16, Game.toggle_mute)
+	mute_b.tooltip_text = "Mute (M)"; mute_b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
+	mute_b.pressed.connect(func() -> void: mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off"))
 	_tex("desk_clock.png", Vector2(130, 10))
 	clock_time = _label("18:00", Vector2(141, 13), Vector2(214, 34), 32, Palette.SKY_HAZE, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
+	clock_time.add_theme_font_override("font", Ui.FONT_CLOCK)       # the team's DotGothic16 clock face (D63)
 	clock_night = _label("", Vector2(141, 59), Vector2(214, 18), 16, Palette.SKY_HAZE, false,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	_tex("ui_battery_frame.png", Vector2(378, 22))
@@ -470,7 +511,7 @@ func _build_tutorial_box() -> void:
 	h.add_theme_constant_override("separation", 12)
 	tut_box.add_child(h)
 	h.add_child(Ui.image("head_lani" if false else "alert_info"))
-	tut_label = Ui.label("", 16, false, Palette.INK, 640)
+	tut_label = Ui.body("", 18, false, Palette.INK, 640)
 	tut_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(tut_label)
 	tut_next = _button("NEXT", Rect2(0, 0, 120, 44), 16, _tut_advance)
@@ -494,8 +535,33 @@ func _start_tutorial() -> void:
 	_tut_show()
 
 
+## True when the player already reached this step's goal before the step came up.
+## Counts the goal, not the exact button: heater LOW or OFF both count.
+func _tut_already(kind: String, s: OutpostSim) -> bool:
+	match kind:
+		"camera": return s.cameras_on.has("solar_field")
+		"heater": return s.heater <= 0
+		"discovery": return s.discovery_found()
+		"scan": return s.has_malfunction() and (s.malf.solved or s.malf.clues[0].found)
+		"diagnose": return s.malfunction_solved()
+		"shelter": return s.shelter_door_open
+		"recall": return tut_recalled
+		"ask": return tut_asked or s.ask_in_flight()
+	return false
+
+
 func _tut_show() -> void:
 	var st: Array = _tut_steps()[tut_step]
+	var sim := SimState.sim
+	tut_skip = sim != null and _tut_already(st[2], sim)
+	if tut_skip:
+		var solved_early: bool = st[2] in ["scan", "diagnose"] and sim.malfunction_solved()
+		tut_label.text = Strings.t("tut.already_solved" if solved_early else "tut.already")
+		tut_next.visible = true
+		tut_next.text = "NEXT"
+		hint_arrow.visible = false
+		_fit_tut_box.call_deferred()
+		return
 	tut_label.text = Strings.t(st[0])
 	tut_next.visible = st[2] in ["next", "start", "finish"]
 	tut_next.text = "START!" if st[2] == "start" else ("FINISH!" if st[2] == "finish" else "NEXT")
@@ -512,8 +578,11 @@ func _tut_show() -> void:
 		"scan":
 			if not s.cameras_on.has("solar_field"):
 				s.toggle_camera("solar_field")
+<<<<<<< HEAD
+=======
 		"recall":
 			tut_recalled = false
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 		"ad":
 			s.sponsor = true
 			s.sponsors = [2]
@@ -540,6 +609,10 @@ func _tut_advance() -> void:
 		tut_box.visible = false
 		SimState.frozen = false
 		return
+	# solved the malfunction early: the SCAN and DIAGNOSE steps share one "already solved" line
+	if tut_skip and _tut_steps()[tut_step][2] == "scan" and SimState.sim and SimState.sim.malfunction_solved():
+		tut_step += 1
+	tut_skip = false
 	tut_step += 1
 	if tut_step >= _tut_steps().size():
 		tut_box.visible = false
@@ -550,13 +623,13 @@ func _tut_advance() -> void:
 
 
 func _tut_check(s: OutpostSim) -> void:
-	if not tut_box.visible or guide_mode > 0:
+	if not tut_box.visible or guide_mode > 0 or tut_skip:
 		return
 	var st: Array = _tut_steps()[tut_step]
 	var done := false
 	match st[2]:
 		"camera": done = s.cameras_on.has("solar_field")
-		"heater": done = s.heater == 0
+		"heater": done = s.heater <= 0
 		"fault": done = not s.fault_active("loose_cable")
 		"request": done = s.open_request_for("lani").is_empty()
 		"discovery": done = s.discovery_found()
@@ -564,13 +637,19 @@ func _tut_check(s: OutpostSim) -> void:
 		"diagnose": done = s.malfunction_solved()
 		"shelter": done = s.shelter_door_open
 		"recall": done = tut_recalled
+<<<<<<< HEAD
+		"ask": done = tut_asked or s.ask_in_flight()
+=======
 		"ask": done = s.ask_in_flight()
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 		"ad": done = s.sponsor_ads_closed > 0
 	if done:
 		_tut_advance()
 
 
 func _point_at(r: Rect2) -> void:
+	if alert_box:
+		alert_box.visible = not (tut_box and tut_box.visible)   # the tutorial strip speaks for itself; the arrow never covers a message
 	hint_arrow.visible = true
 	hint_arrow.flip_v = r.position.y < 150          # top-of-screen targets: arrow below, pointing up
 	if hint_arrow.flip_v:
@@ -587,12 +666,22 @@ func _build_panel_controls() -> void:
 	var slot_y := func(k: int) -> int: return 198 + 18 + 98 * k
 	ctl["shelter"] = _button("DOOR\nCLOSED", Rect2(lx + 20, slot_y.call(0) + 7, 72, 60), 8, _press_shelter)
 	ctl["recall"] = _button("RECALL", Rect2(lx + 20, slot_y.call(1) + 7, 72, 60), 8, _press_recall)
-	ctl["dish"] = _button("DISH", Rect2(lx + 4, slot_y.call(2) + 18, 32, 32), 8, _press_dish)
-	ctl["ask"] = _button("ASK", Rect2(lx + 40, slot_y.call(2) + 18, 32, 32), 8, _press_ask)
-	ctl["send"] = _button("SEND", Rect2(lx + 76, slot_y.call(2) + 18, 32, 32), 8, _press_send)
+	# COMMS: three 30 px buttons that fit inside the 100 px slot (D60)
+	ctl["dish"] = _button("DISH", Rect2(lx + 8, slot_y.call(2) + 10, 30, 54), 8, _press_dish)
+	ctl["ask"] = _button("ASK", Rect2(lx + 41, slot_y.call(2) + 10, 30, 54), 8, _press_ask)
+	ctl["send"] = _button("SEND", Rect2(lx + 74, slot_y.call(2) + 10, 30, 54), 8, _press_send)
 	ctl["heater"] = _button("HEAT\nMID", Rect2(rx + 20, slot_y.call(0) + 7, 72, 60), 8, _press_heater)
 	ctl["life"] = _button("AIR\nNORM", Rect2(rx + 20, slot_y.call(1) + 7, 72, 60), 8, _press_life)
 	ctl["lamp"] = _button("LAMP\nOFF", Rect2(rx + 20, slot_y.call(2) + 7, 72, 60), 8, _press_lamp)
+	for k in ["dish", "ask", "send"]:
+		(ctl[k] as Button).clip_text = true                   # never grow past the 30 px slot (D60)
+		(ctl[k] as Button).add_theme_constant_override("h_separation", 0)
+		(ctl[k] as Button).size = Vector2(30, 54)              # it grew to fit the text before clipping was on
+	for k in ["shelter", "recall", "dish", "ask", "send", "heater", "life", "lamp"]:
+		var b: Button = ctl[k]
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP      # icon on top, one short word under it
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_refresh_icons(null)
 	var plates := [[lx, 0, "SHELTER DOOR"], [lx, 1, "RECALL CREW"], [lx, 2, "COMMS"],
 		[rx, 0, "HEATER"], [rx, 1, "LIFE SUPPORT"], [rx, 2, "CROP LAMP"]]
 	for p in plates:
@@ -640,6 +729,7 @@ func _press_dish() -> void:
 func _press_ask() -> void:
 	var s := _live()
 	if s and s.send_message("ask_earth"):
+		tut_asked = true
 		_alert("Question sent! Light takes %d min to reach Earth, and %d min to come back." % [int(s.light_minutes()), int(s.light_minutes())], "comms")
 		Sfx.play("msg_sent")
 
@@ -871,15 +961,27 @@ func _on_night_ended(report: Dictionary) -> void:
 	if not rough.is_empty():
 		lines[1][2] = Strings.t("rough." + str(rough[0]))
 		lines[2][2] = Strings.t("rough.challenge")
+<<<<<<< HEAD
+	var star_i := 0
+=======
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 	for l in lines:
 		var r := HBoxContainer.new()
 		r.add_theme_constant_override("separation", 8)
 		stars_row.add_child(r)
 		var st := Ui.image("ui_star_full" if l[0] else "ui_star_empty")
 		st.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		st.custom_minimum_size = Vector2(24, 24)
+		st.custom_minimum_size = Vector2(32, 32)          # 64 px art at exactly half size (no uneven pixels)
 		st.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		r.add_child(st)
+		if l[0]:                                         # earned stars pop in one after another (D66)
+			st.pivot_offset = Vector2(16, 16)
+			st.scale = Vector2.ZERO
+			var tw := st.create_tween()
+			tw.tween_interval(0.35 + 0.3 * star_i)
+			tw.tween_property(st, "scale", Vector2(1.25, 1.25), 0.12)
+			tw.tween_property(st, "scale", Vector2.ONE, 0.1)
+		star_i += 1
 		r.add_child(Ui.label("%s: %s" % [l[1], l[2]], 8, true, Palette.INK, 560))
 	if won:
 		var m := HBoxContainer.new()
@@ -1322,7 +1424,7 @@ func _alert(text: String, kind: String) -> void:
 	ic.custom_minimum_size = Vector2(28, 28)
 	row.add_child(ic)
 	# crew radio chatter is one small line; real alerts are big
-	var lab := Ui.label(text, 8, true, Palette.INK, 400)
+	var lab := Ui.body(text, 14, true, Palette.INK, 400)        # readable body font (D63)
 	lab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(lab)
 	alert_box.add_child(l)
@@ -1358,6 +1460,8 @@ func _prune_alerts() -> void:
 # Per-frame updates
 # ============================================================================
 func _process(delta: float) -> void:
+	if alert_box and tut_box and not tut_box.visible and not alert_box.visible:
+		alert_box.visible = true                        # tutorial over: alerts come back
 	_prune_alerts()
 	if shake_amt > 0.0:
 		shake_amt = maxf(0.0, shake_amt - delta * 30.0)
@@ -1397,17 +1501,18 @@ func _process(delta: float) -> void:
 		nameplates[i].text = CAM_NAME.get(cam, "OFF")
 	for j in 6:
 		_set_lit(cam_buttons[j], s.cameras_on.has(CAMS[j]))
-	# control labels show their state in words too (not colour only)
-	ctl["heater"].text = "HEAT\n" + HEATER_TXT[s.heater + 1]
-	ctl["life"].text = "AIR\n" + LS_TXT[s.life_support + 1]
+	# control labels show their state in words too (not colour only), with an icon above (D53)
+	ctl["heater"].text = HEATER_TXT[s.heater + 1]
+	ctl["life"].text = LS_TXT[s.life_support + 1]
 	_set_lit(ctl["heater"], s.heater >= 0)
 	_set_lit(ctl["life"], s.life_support >= 0)
-	ctl["lamp"].text = "LAMP\n" + ("ON" if s.crop_lamp else "OFF")
+	ctl["lamp"].text = "ON" if s.crop_lamp else "OFF"
 	_set_lit(ctl["lamp"], s.crop_lamp)
 	ctl["dish"].text = "DISH" if not s.dish else "ON"
 	_set_lit(ctl["dish"], s.dish)
-	ctl["shelter"].text = "DOOR\n" + ("OPEN" if s.shelter_door_open else ("SHUT..." if s.door_closing_left > 0.0 else "CLOSED"))
+	ctl["shelter"].text = "OPEN" if s.shelter_door_open else ("SHUT..." if s.door_closing_left > 0.0 else "CLOSED")
 	_set_lit(ctl["shelter"], s.shelter_door_open)
+	_refresh_icons(s)
 	for lk in locked_text:
 		ctl[lk].text = locked_text[lk]
 	# camera buttons blink "!" when something on that camera needs you
@@ -1520,7 +1625,11 @@ class FeedView extends Control:
 		var s: OutpostSim = SimState.sim
 		if cam == "" or s == null or s.battery <= 0.0 and int(fmod(t, 4.0)) == 0 and cam != "shelter":
 			# no camera, or the battery is empty: cameras flicker out to NO SIGNAL
+<<<<<<< HEAD
+			draw_texture(Assets.frame("cam_off", int(t * 6.0) % Assets.frame_count("cam_off")), Vector2.ZERO)   # rolling static
+=======
 			draw_texture(Assets.tex("cam_off"), Vector2.ZERO)
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 			if s != null and s.battery <= 0.0:
 				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
 			return
@@ -1529,7 +1638,22 @@ class FeedView extends Control:
 		if cam == "airlock" and last_bg != "" and bg != last_bg:
 			Sfx.play("door_open" if bg == "cam_airlock_open" else "door_close", -12.0)
 		last_bg = bg
+<<<<<<< HEAD
+		draw_texture(Assets.frame(bg, int(t * 2.0) % Assets.frame_count(bg)), Vector2.ZERO)   # plants sway, static rolls (D66)
+		# outside feeds: a few stars twinkle; the Sky Radar sweep turns (D66)
+		if cam in ["sky_radar", "solar_field"]:
+			for k in 6:
+				if (int(t * 3.0) + k) % 4 != 0:
+					draw_rect(Rect2((k * 53 + 17) % 300 + 8, (k * 29 + 5) % 34 + 4, 1, 1), Color(1, 0.96, 0.92, 0.9))
+		if cam == "sky_radar":
+			var sweep := t * 1.2
+			var c0 := Vector2(160, 90)
+			for k in 4:
+				var a := sweep - k * 0.08
+				draw_line(c0, c0 + Vector2(cos(a), sin(a)) * 70.0, Color(0.64, 0.9, 0.62, 0.5 - k * 0.11), 1.0)
+=======
 		draw_texture(Assets.tex(bg), Vector2.ZERO)
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 		# Solar Field gets darker as the battery charge drops
 		if cam == "solar_field":
 			draw_rect(Rect2(0, 0, 320, 180), Color(0.05, 0.02, 0.12, clampf((60.0 - s.battery) / 100.0, 0.0, 0.45)))

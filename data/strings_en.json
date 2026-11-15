@@ -180,5 +180,7 @@
 	"task.airlock_leak.fact": "Air pushes out into Mars's thin air. Astronauts find leaks by watching dust drift.",
 	"task.greenhouse_leak.fact": "Water is precious on Mars. The space station recycles about 98% of its water!",
 	"task.shelter_seal.fact": "Piling Mars dirt (regolith) on a shelter blocks space radiation.",
-	"task.dish_drift.fact": "From Mars, Earth looks like a bright evening star. Curiosity took a photo of it!"
+	"task.dish_drift.fact": "From Mars, Earth looks like a bright evening star. Curiosity took a photo of it!",
+	"tut.already": "Already done, nice! You're a step ahead, Commander.",
+	"tut.already_solved": "You already solved it! Next time, SCAN the cameras for clues first, so you can be sure before you DIAGNOSE."
 }

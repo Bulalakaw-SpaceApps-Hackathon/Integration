@@ -6,6 +6,8 @@ var selected := 1
 var cards: Array[Control] = []
 var go_button: Button
 var info: Label
+var covers: Dictionary = {}       # night -> TextureButton showing its animated cover art (D52, D66)
+var cover_t := 0.0
 
 
 func _ready() -> void:
@@ -56,7 +58,8 @@ func _card(n: int) -> Control:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
 	var pic := TextureButton.new()
-	pic.texture_normal = Assets.tex("night_card_%d" % n)
+	pic.texture_normal = Assets.frame("night_card_%d" % n, 0)
+	covers[n] = pic
 	pic.focus_mode = Control.FOCUS_NONE
 	pic.pressed.connect(func() -> void:
 		Sfx.play("click")
@@ -76,6 +79,17 @@ func _card(n: int) -> Control:
 	box.add_child(Ui.stars(int(Progression.stars.get(n, 0)), 3, 24))
 	box.set_meta("night", n)
 	return box
+
+
+## Each cover loops its small animation (sunset shimmer, aurora, meteors...) at about 4 fps.
+func _process(delta: float) -> void:
+	cover_t += delta
+	var f := int(cover_t * 4.0)
+	for n in covers:
+		var key := "night_card_%d" % n
+		var count := Assets.frame_count(key)
+		if count > 1:
+			(covers[n] as TextureButton).texture_normal = Assets.frame(key, (f + n) % count)
 
 
 func _select(n: int) -> void:

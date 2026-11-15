@@ -216,9 +216,17 @@ def dish(d, cx, cy, r, face=1):
         d.line((px, py, fx, fy), fill=MAUVE)
     box(d, (fx - 2, fy - 2, fx + 2, fy + 2), ORANGE)
 
+<<<<<<< HEAD
+FRAME = 0                                    # animation frame, set by tools/rescale_map.py (D66)
+
+def waves(d, x, y, n=2, r0=4):
+    for k in range(n):
+        r = r0 + k * 4 + FRAME % 2 * 2         # signal rings pulse outwards
+=======
 def waves(d, x, y, n=2, r0=4):
     for k in range(n):
         r = r0 + k * 4
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
         d.arc((x - r, y - r, x + r, y + r), 290, 340, fill=ICE, width=1)
 
 def lattice(d, x, y0, y1, w=6):
@@ -280,6 +288,10 @@ def o2_tank(d, x, y0, y1, w=10):
     gauge(d, x + w // 2, y0 + 13)
 
 def puff(d, x, y):
+<<<<<<< HEAD
+    y -= FRAME % 2                            # steam rises and falls back
+=======
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
     for (ox, oy, r) in ((0, 0, 3), (4, -4, 2), (7, -8, 2)):
         d.ellipse((x + ox - r, y + oy - r, x + ox + r, y + oy + r), fill=WHITE)
         d.point((x + ox + r - 1, y + oy), fill=STONE)
@@ -435,7 +447,11 @@ def deco_flag():
     im, d = canvas()
     oval(d, (6, 52, 58, 66), R2); d.rectangle((0, 60, 63, 63), fill=CLEAR); d.line((12, 55, 24, 54), fill=R3)
     line(d, (18, 58), (18, 6), 3); d.line((18, 7, 18, 57), fill=STONE); oval(d, (16, 3, 20, 7), GOLD)
+<<<<<<< HEAD
+    fx0, fy0, fx1, fy1 = 19, 8, 54 - (1 if FRAME % 2 else 0), 30 + (1 if FRAME in (1, 2) else 0)   # the flag flaps (D66)
+=======
     fx0, fy0, fx1, fy1 = 19, 8, 54, 30
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
     d.rectangle((fx0, fy0, fx1, fy1), fill=INK)
     d.rectangle((fx0 + 1, fy0 + 1, fx1 - 1, (fy0 + fy1) // 2), fill=(0, 56, 168, 255))      # blue
     d.rectangle((fx0 + 1, (fy0 + fy1) // 2 + 1, fx1 - 1, fy1 - 1), fill=(206, 17, 38, 255))  # red
@@ -452,7 +468,11 @@ def deco_antenna():
     for k in range(6):
         x = 14 + k * 8; y = 15 - k * 1.4
         d.line((x, y - 5, x, y + 5), fill=INK, width=1)
+<<<<<<< HEAD
+    light(d, 56, 7, RED if FRAME % 2 == 0 else DPLUM)                  # tip light blinks (D66)
+=======
     light(d, 56, 7, RED)
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
     return im
 
 def deco_crates():

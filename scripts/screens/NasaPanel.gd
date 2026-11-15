@@ -3,7 +3,7 @@ extends BasePanel
 ## badge) plus the live DONKI status.
 
 const EVENTS := [
-	["2017-09-10", "SOLAR PARTICLE STORM REACHED MARS", "Curiosity RAD saw dose rates 2-3x above background", "Zeitlin et al. 2018, Geophysical Research Letters", "real", "NIGHT 3"],
+	["2017-09-10", "SOLAR PARTICLE STORM REACHED MARS", "Curiosity RAD measured more than double any earlier reading", "NASA JPL (2017); Zeitlin et al. 2018, GRL", "real", "NIGHT 3"],
 	["2018-06-10", "GLOBAL DUST STORM", "Radio delay Earth-Mars that day: 4.6 minutes (from planet positions)", "NASA JPL; delay computed from planet positions", "real", "NIGHT 5"],
 	["2021-02-18", "PERSEVERANCE LANDS ON MARS", "Its signal took 11 min 22 s to reach Earth", "NASA Mars 2020", "real", "NIGHT 4"],
 	["2024-05-20", "X12 SOLAR FLARE", "Curiosity RAD measured 8,100 microgray, about 30 chest X-rays", "NASA (June 2024)", "real", "NIGHT 6"],

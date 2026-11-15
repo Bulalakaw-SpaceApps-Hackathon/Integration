@@ -5,6 +5,11 @@ extends RefCounted
 
 const FONT_R := preload("res://assets/fonts/Silkscreen-Regular.ttf")
 const FONT_B := preload("res://assets/fonts/Silkscreen-Bold.ttf")
+## Body text (lessons, radio lines, alerts, the tutorial) uses the team's Bulalakaw Readable,
+## easier for 7-year-olds than the all-caps pixel font; titles and buttons stay Silkscreen (D63).
+const FONT_BODY := preload("res://assets/fonts/BulalakawReadable-Regular.ttf")
+const FONT_BODY_B := preload("res://assets/fonts/BulalakawReadable-Bold.ttf")
+const FONT_CLOCK := preload("res://assets/fonts/DotGothic16-Regular.ttf")
 const BODY := 16
 const BIG := 24
 const HUGE := 32
@@ -69,6 +74,13 @@ static func label(text: String, size := BODY, bold := false, color := Palette.IN
 	return l
 
 
+## A label in the readable body font. Pixel fonts shrink at 8 px, so body text is at least 14 px.
+static func body(text: String, size := BODY, bold := false, color := Palette.INK, wrap_width := 0.0) -> Label:
+	var l := label(text, maxi(size, 14), bold, color, wrap_width)
+	l.add_theme_font_override("font", FONT_BODY_B if bold else FONT_BODY)
+	return l
+
+
 static func button(text: String, on_press: Callable, min_size := Vector2(200, 64), icon := "") -> Button:
 	var b := Button.new()
 	b.text = text
@@ -85,9 +97,15 @@ static func icon_button(asset: String, on_press: Callable, tip := "") -> Texture
 	var b := TextureButton.new()
 	b.texture_normal = Assets.tex(asset)
 	b.tooltip_text = tip
+	# small pixel icons are shown at a whole-number scale (24 px art -> 48 px), never stretched
+	var k := maxi(1, int(56.0 / maxf(1.0, float(b.texture_normal.get_width())))) if b.texture_normal else 1
 	b.custom_minimum_size = Vector2(64, 64)
 	b.stretch_mode = TextureButton.STRETCH_KEEP_CENTERED
 	b.ignore_texture_size = true
+	b.scale = Vector2.ONE
+	if k > 1:
+		b.custom_minimum_size = b.texture_normal.get_size() * k
+		b.stretch_mode = TextureButton.STRETCH_SCALE
 	b.focus_mode = Control.FOCUS_NONE
 	b.pressed.connect(func() -> void: Sfx.play("click"))
 	b.pressed.connect(on_press)

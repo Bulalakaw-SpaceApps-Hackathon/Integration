@@ -24,3 +24,12 @@ _Rule_: failing a Task or a Diagnosis never loses the night by itself; it only c
 _Avoid_: "impostor", "sus", "vote against a crewmate". The crew are never the cause.
 **Materials**: the only currency; earned by winning nights, spent on building upgrades.
 **Supply ship**: the campaign goal: keep the crew safe for 7 nights until it lands.
+
+## Art
+**Scratch art**: any picture from the team's zips. A guide for composition and content, never shipped as-is (exceptions: NASA photos, sounds, the CF-01 and CF-03 feeds, files marked FINAL).
+**Remaster**: redrawing a piece of scratch art (or a placeholder) in the game's style and palette, at the game's pixel size.
+**Feed style**: painted pixel art like the CF-03 Solar Field feed. Used for camera feeds and night cover art.
+**Map style**: flat pixel art with a 1 px ink outline. Used for the base map, crew sprites and UI.
+**Game palette**: the locked set of about 32 team colours every remastered piece is limited to.
+**Cover art**: the picture on a night's card in Night Select and Judge Mode.
+_Avoid_: "final art" for anything not marked FINAL.

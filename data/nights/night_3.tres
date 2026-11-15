@@ -49,7 +49,7 @@ peak_sec = 110.0
 end_sec = 170.0
 intensity = 0.35
 real_date = "2017-09-10"
-source_name = "Curiosity RAD (NASA): dose rates rose 2-3x above normal"
+source_name = "Curiosity RAD (NASA JPL 2017): radiation more than doubled"
 badge = "real"
 
 [resource]
