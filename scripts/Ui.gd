@@ -97,9 +97,15 @@ static func icon_button(asset: String, on_press: Callable, tip := "") -> Texture
 	var b := TextureButton.new()
 	b.texture_normal = Assets.tex(asset)
 	b.tooltip_text = tip
+	# small pixel icons are shown at a whole-number scale (24 px art -> 48 px), never stretched
+	var k := maxi(1, int(56.0 / maxf(1.0, float(b.texture_normal.get_width())))) if b.texture_normal else 1
 	b.custom_minimum_size = Vector2(64, 64)
 	b.stretch_mode = TextureButton.STRETCH_KEEP_CENTERED
 	b.ignore_texture_size = true
+	b.scale = Vector2.ONE
+	if k > 1:
+		b.custom_minimum_size = b.texture_normal.get_size() * k
+		b.stretch_mode = TextureButton.STRETCH_SCALE
 	b.focus_mode = Control.FOCUS_NONE
 	b.pressed.connect(func() -> void: Sfx.play("click"))
 	b.pressed.connect(on_press)

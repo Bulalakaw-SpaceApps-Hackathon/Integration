@@ -1398,7 +1398,7 @@ func _alert(text: String, kind: String) -> void:
 	ic.custom_minimum_size = Vector2(28, 28)
 	row.add_child(ic)
 	# crew radio chatter is one small line; real alerts are big
-	var lab := Ui.label(text, 8, true, Palette.INK, 400)
+	var lab := Ui.body(text, 14, true, Palette.INK, 400)        # readable body font (D63)
 	lab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(lab)
 	alert_box.add_child(l)

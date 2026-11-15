@@ -26,80 +26,80 @@
 	"alert_battery": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_battery.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_co2": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_co2.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_cold": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_cold.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_comms": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_comms.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_dose": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_dose.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_dust": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_dust.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_flare": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_flare.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_hungry": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_hungry.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_info": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_info.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
 	"alert_thump": {
 		"id": "AL-01",
 		"path": "res://assets/sprites/ui/alert_thump.png",
-		"w": 48,
-		"h": 48,
+		"w": 28,
+		"h": 28,
 		"frames": 1,
 		"kind": "image"
 	},
