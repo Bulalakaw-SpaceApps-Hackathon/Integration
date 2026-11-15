@@ -418,8 +418,8 @@
 	"deco_crates": {
 		"id": "HM-12",
 		"path": "res://assets/sprites/hub/deco_crates.png",
-		"w": 64,
-		"h": 64,
+		"w": 72,
+		"h": 40,
 		"frames": 1,
 		"kind": "image"
 	},
@@ -450,8 +450,8 @@
 	"deco_rocks": {
 		"id": "HM-12",
 		"path": "res://assets/sprites/hub/deco_rocks.png",
-		"w": 64,
-		"h": 64,
+		"w": 48,
+		"h": 32,
 		"frames": 1,
 		"kind": "image"
 	},
@@ -459,7 +459,7 @@
 		"id": "HM-12",
 		"path": "res://assets/sprites/hub/deco_rover.png",
 		"w": 64,
-		"h": 64,
+		"h": 48,
 		"frames": 1,
 		"kind": "image"
 	},
