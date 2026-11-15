@@ -37,14 +37,14 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 - Godot also includes third-party code: portions of this software are copyright (c) The FreeType Project (www.freetype.org), all rights reserved. ENet (MIT) and Mbed TLS (Apache 2.0) are also included. Full list: Godot's COPYRIGHT.txt.
 
 # NASA lesson photos (NI-01..NI-07)
-- `nasa_battery_1.png`: NASA — "Mars Rover Concept Vehicle" (KSC-20170605-PH_KLS01_0135), https://images.nasa.gov/details/KSC-20170605-PH_KLS01_0135
+- `nasa_battery_1.png`: NASA — "P6 Truss, Photovoltaic (PV) Solar Array Wing (SAW)" (sts097-376-019), https://images.nasa.gov/details/sts097-376-019
 - `nasa_battery_2.png`: NASA — "Taking Mars Temperature" (PIA16081), https://images.nasa.gov/details/PIA16081
-- `nasa_battery_3.png`: NASA — "Mars 2020 Perseverance Rover Wheels" (KSC-20200402-PH-JPL01_0002), https://images.nasa.gov/details/KSC-20200402-PH-JPL01_0002
-- `nasa_battery_4.png`: NASA — "Testing New Techniques for Mars Rover Rock-Drilling" (PIA22061), https://images.nasa.gov/details/PIA22061
+- `nasa_battery_3.png`: NASA — "Mars Helicopter's Solar Array as Seen by Perseverance's Mastcam-Z" (PIA24545), https://images.nasa.gov/details/PIA24545
+- `nasa_battery_4.png`: NASA — "Mars InSight Pre-Landing" (NHQ201811260004), https://images.nasa.gov/details/NHQ201811260004
 - `nasa_battery_5.png`: NASA — "Shades of Martian Darkness" (PIA22521), https://images.nasa.gov/details/PIA22521
 - `nasa_battery_6.png`: NASA — "Mars 2020's MMRTG" (PIA23306), https://images.nasa.gov/details/PIA23306
 - `nasa_battery_7.png`: NASA — "Fission Surface Power" (GRC-2023-C-10425), https://images.nasa.gov/details/GRC-2023-C-10425
-- `nasa_comms_dish_1.png`: NASA — "MGS Mars Orbiter Laser Altimeter MOLA - Mars/Earth Relief Comparison" (PIA00960), https://images.nasa.gov/details/PIA00960
+- `nasa_comms_dish_1.png`: NASA — "The Earth and Moon As Seen by 2001 Mars Odyssey Thermal Emission Imaging System" (PIA00559), https://images.nasa.gov/details/PIA00559
 - `nasa_comms_dish_2.png`: NASA — "NASA's Deep Space Network Goldstone Complex" (PIA23214), https://images.nasa.gov/details/PIA23214
 - `nasa_comms_dish_3.png`: NASA — "Artist Concept of Mars Reconnaissance Orbiter" (PIA04758), https://images.nasa.gov/details/PIA04758
 - `nasa_comms_dish_4.png`: NASA — " Ingenuity's View of Sand Going Into Conjunction" (PIA26050), https://images.nasa.gov/details/PIA26050
@@ -56,15 +56,15 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 - `nasa_greenhouse_6.png`: NASA — "Aerogel Greenhouses for Mars?" (PIA23343), https://images.nasa.gov/details/PIA23343
 - `nasa_life_support_1.png`: NASA — "Rocks Here Sequester Some of Mars Early Atmosphere" (PIA19817), https://images.nasa.gov/details/PIA19817
 - `nasa_life_support_2.png`: NASA — "MOXIE All Tucked In" (PIA24203), https://images.nasa.gov/details/PIA24203
-- `nasa_life_support_3.png`: NASA — "International Space Station (ISS)" (0100909), https://images.nasa.gov/details/0100909
+- `nasa_life_support_3.png`: NASA — "OGS Water ORU R&R" (iss020e033496), https://images.nasa.gov/details/iss020e033496
 - `nasa_life_support_4.png`: NASA — "CDRA Valve RR" (iss037e021985), https://images.nasa.gov/details/iss037e021985
-- `nasa_life_support_5.png`: NASA — "International Space Station (ISS)" (0102168), https://images.nasa.gov/details/0102168
+- `nasa_life_support_5.png`: NASA — "JEM Water Recovery System (JWRS) Gas Trap and Bypass Line Installation" (iss065e333421), https://images.nasa.gov/details/iss065e333421
 - `nasa_life_support_6.png`: NASA — "Space Zinnias: Growing Seeds from Space" (KSC-20181127-PH_JBS01_0005), https://images.nasa.gov/details/KSC-20181127-PH_JBS01_0005
-- `nasa_shelter_1.png`: NASA — "iss053e238891" (iss053e238891), https://images.nasa.gov/details/iss053e238891
+- `nasa_shelter_1.png`: NASA — "Spacecraft Single Event Environments at High Shielding Mass (HiMassSEE)" (iss032e016954), https://images.nasa.gov/details/iss032e016954
 - `nasa_shelter_2.png`: NASA — "Sources of Ionizing Radiation in Interplanetary Space" (PIA16938), https://images.nasa.gov/details/PIA16938
 - `nasa_shelter_3.png`: NASA — "Plausible Martian Habitats" (PIA14471), https://images.nasa.gov/details/PIA14471
-- `nasa_shelter_4.png`: NASA — "Exploration Design Challenge 2014" (201404250020HQ), https://images.nasa.gov/details/201404250020HQ
-- `nasa_shelter_5.png`: NASA — "KSC-2013-3598" (KSC-2013-3598), https://images.nasa.gov/details/KSC-2013-3598
+- `nasa_shelter_4.png`: NASA — "Artemis II Orion Hardware" (KSC-20240223-PH-RNS01_0002), https://images.nasa.gov/details/KSC-20240223-PH-RNS01_0002
+- `nasa_shelter_5.png`: NASA — "MAVEN Artist Concept" (PIA18811), https://images.nasa.gov/details/PIA18811
 - `nasa_solar_1.png`: NASA — "Sunset in Mars Gale Crater" (PIA19400), https://images.nasa.gov/details/PIA19400
 - `nasa_solar_2.png`: NASA — "InSight's First Selfie" (PIA22876), https://images.nasa.gov/details/PIA22876
 - `nasa_solar_3.png`: NASA — "Mars Rover Opportunity at Rock Abrasion Target Potts" (PIA20285), https://images.nasa.gov/details/PIA20285
@@ -76,5 +76,5 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 - `nasa_solar_7.png`: NASA — "Orientation of Mars Helicopter Base Station Antenna for Flight 17" (PIA24966), https://images.nasa.gov/details/PIA24966
 - `nasa_suit_bay_1.png`: NASA — "NASA astronaut Scott Tingle wears a U.S. spacesuit" (iss054e022341), https://images.nasa.gov/details/iss054e022341
 - `nasa_suit_bay_2.png`: NASA — "Spacesuit Materials on Perseverance's SHERLOC Calibration Target" (PIA24033), https://images.nasa.gov/details/PIA24033
-- `nasa_suit_bay_3.png`: NASA — "Apollo 40th Anniversary Press Conference" (200907200100HQ), https://images.nasa.gov/details/200907200100HQ
-- `nasa_suit_bay_4.png`: NASA — "NASA astronaut Jonny Kim" (jsc2024e066574), https://images.nasa.gov/details/jsc2024e066574
+- `nasa_suit_bay_3.png`: NASA — "Apollo 17 Lunar Surface Experiment: Lunar Ejecta and Meteorites Experiment" (S72-37257), https://images.nasa.gov/details/S72-37257
+- `nasa_suit_bay_4.png`: NASA — "Astronaut Suni Williams during a spacewalk outside the International Space Station" (iss072e487421), https://images.nasa.gov/details/iss072e487421
