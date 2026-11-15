@@ -258,12 +258,18 @@ func _refresh_plot(id: String) -> void:
 	var asset := "plot_%s_l%d" % [id, int(Progression.levels.get(id, 1))] if built else "plot_locked"
 	s.texture = Assets.frame(asset, 0)
 	_animate(s, asset)
-	# a locked pad is flat on the ground: under everything, no shadow
-	s.z_index = 0 if built else -8
+	s.z_index = 0
 	var sh: ContactShadow = s.get_meta("shadow")
 	sh.fit(s.texture)
 	sh.visible = built
-	_fit_body(s.get_meta("body"), s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, built)
+	var body: StaticBody2D = s.get_meta("body")
+	if built:
+		_fit_body(body, s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, true)
+	else:
+		var cs: CollisionShape2D = body.get_child(0)
+		cs.disabled = false
+		body.position = PLOT_POS[id] + Vector2(0, 8)
+		(cs.shape as RectangleShape2D).size = Vector2(44.0, 28.0)
 
 
 func _build_decor() -> void:
