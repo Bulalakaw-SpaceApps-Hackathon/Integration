@@ -1,16 +1,15 @@
 # Bulalakaw Station
-A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of the Philippines).
+A NASA Space Apps Challenge 2026 game by Team Bulalakaw (Polytechnic University of the Philippines).
 
 # Game
-- Design, code and art direction: Team ALT-F4
-- Built with the help of Claude (Anthropic)
+- Design, code and art direction: Team Bulalakaw
 
 # Art and sound
-- SC screen and interface artwork: Team ALT-F4, from the root of the team Assets repository's SC- group. Resized and adapted where needed for the game layout.
-- CF-06 greenhouse camera: pixel-art redraw in tools/paint_rooms.py, based on Team ALT-F4's greenhouse camera sketches in the team Assets repository.
-- The Commander's outdoor EVA sprite adapts Team ALT-F4's Carlo EVA walk cycle with cream and blue suit panels.
-- BT-01 through BT-11 (29 button, control and attention PNGs): original Team ALT-F4 art from the team Assets repository, in the matching folders under `BT-/`. The game copies are in `assets/sprites/ui/`.
-- Art by Team ALT-F4: characters, camera feeds, base map, UI, alerts, sponsor ads and effects (sources in assets/source/).
+- SC screen and interface artwork: Team Bulalakaw, from the root of the team Assets repository's SC- group. Resized and adapted where needed for the game layout.
+- CF-06 greenhouse camera: pixel-art redraw in tools/paint_rooms.py, based on Team Bulalakaw's greenhouse camera sketches in the team Assets repository.
+- The Commander's outdoor EVA sprite adapts Team Bulalakaw's Carlo EVA walk cycle with cream and blue suit panels.
+- BT-01 through BT-11 (29 button, control and attention PNGs): original Team Bulalakaw art from the team Assets repository, in the matching folders under `BT-/`. The game copies are in `assets/sprites/ui/`.
+- Art by Team Bulalakaw: characters, camera feeds, base map, UI, alerts, sponsor ads and effects (sources in assets/source/).
 - The team's scratch art (assets/source/) was remastered into the game's style with the tools in tools/: base-map buildings, decorations and ground (draw_flat, draw_feed_buildings, rescale_map, animate_deco), indoor camera feeds and markers (paint_rooms), night covers and the title backdrop (paint_night_cards, paint_title), desk and alert icons, badges, stars (draw_desk_icons, draw_alerts, draw_badges, draw_ui_small), crew portraits (remaster_portraits) and Mission Control (draw_mission_control).
 - Used as made by the team: the CF-01 Sky Radar and CF-03 Solar Field feeds, the screen set (panel, codex page, NASA panel, certificate, toggles, joystick, ending backdrop), the task backgrounds, the sounds and the NASA photos.
 - A few small UI pieces (codex pictures, sponsor logos, meters, battery bar) are still made by tools/make_placeholders.py and tools/make_dk*.py in the team palette.
@@ -21,7 +20,7 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
   - Wind loop (sfx_wind_loop) and radio noise loop (sfx_static_loop): OpenGameArt, CC0, per the team's source workbook. The exact page links still need to be added here before shipping.
 - When a final asset or a CC0 download replaces a placeholder, add it here: asset ID, file name, author, source link, licence.
 
-- Asset pack imported from Team ALT-F4's Repo/Assets. It includes BT desk icons, CF camera art and effects, CH characters and portraits, HM map art, SP sponsor posters, and UI-20 radio planets. The NI lesson image credits are listed below.
+- Asset pack imported from Team Bulalakaw's Repo/Assets. It includes BT desk icons, CF camera art and effects, CH characters and portraits, HM map art, SP sponsor posters, and UI-20 radio planets. The NI lesson image credits are listed below.
 
 # Fonts
 - Silkscreen by Jason Kottke. SIL Open Font License 1.1 (assets/fonts/OFL.txt).

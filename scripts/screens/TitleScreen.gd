@@ -61,7 +61,7 @@ func _ready() -> void:
 		_fill_status(status))
 	DonkiService.fetch()
 
-	var foot := Ui.label("A NASA SPACE APPS 2026 GAME BY TEAM ALT-F4", 8, false, Palette.HIGHLIGHT)
+	var foot := Ui.label("A NASA SPACE APPS 2026 GAME BY TEAM BULALAKAW", 8, false, Palette.HIGHLIGHT)
 	foot.position = Vector2(20, 700)
 	add_child(foot)
 

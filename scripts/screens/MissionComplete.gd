@@ -59,7 +59,7 @@ func _ready() -> void:
 		h.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		r.add_child(h)
 		r.add_child(Ui.label(Strings.t("end." + id), Ui.BODY, false, Palette.INK, 780))
-	var date := Ui.label(Time.get_date_string_from_system() + " · NASA SPACE APPS 2026 · TEAM ALT-F4", 8, false, Palette.BASE_PLUM)
+	var date := Ui.label(Time.get_date_string_from_system() + " · NASA SPACE APPS 2026 · TEAM BULALAKAW", 8, false, Palette.BASE_PLUM)
 	date.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	c.add_child(date)
 
