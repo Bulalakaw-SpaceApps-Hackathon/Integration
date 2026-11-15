@@ -636,6 +636,8 @@ func _tut_check(s: OutpostSim) -> void:
 
 
 func _point_at(r: Rect2) -> void:
+	if alert_box:
+		alert_box.visible = not (tut_box and tut_box.visible)   # the tutorial strip speaks for itself; the arrow never covers a message
 	hint_arrow.visible = true
 	hint_arrow.flip_v = r.position.y < 150          # top-of-screen targets: arrow below, pointing up
 	if hint_arrow.flip_v:
@@ -947,15 +949,24 @@ func _on_night_ended(report: Dictionary) -> void:
 	if not rough.is_empty():
 		lines[1][2] = Strings.t("rough." + str(rough[0]))
 		lines[2][2] = Strings.t("rough.challenge")
+	var star_i := 0
 	for l in lines:
 		var r := HBoxContainer.new()
 		r.add_theme_constant_override("separation", 8)
 		stars_row.add_child(r)
 		var st := Ui.image("ui_star_full" if l[0] else "ui_star_empty")
 		st.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		st.custom_minimum_size = Vector2(24, 24)
+		st.custom_minimum_size = Vector2(32, 32)          # 64 px art at exactly half size (no uneven pixels)
 		st.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		r.add_child(st)
+		if l[0]:                                         # earned stars pop in one after another (D66)
+			st.pivot_offset = Vector2(16, 16)
+			st.scale = Vector2.ZERO
+			var tw := st.create_tween()
+			tw.tween_interval(0.35 + 0.3 * star_i)
+			tw.tween_property(st, "scale", Vector2(1.25, 1.25), 0.12)
+			tw.tween_property(st, "scale", Vector2.ONE, 0.1)
+		star_i += 1
 		r.add_child(Ui.label("%s: %s" % [l[1], l[2]], 8, true, Palette.INK, 560))
 	if won:
 		var m := HBoxContainer.new()
@@ -1434,6 +1445,8 @@ func _prune_alerts() -> void:
 # Per-frame updates
 # ============================================================================
 func _process(delta: float) -> void:
+	if alert_box and tut_box and not tut_box.visible and not alert_box.visible:
+		alert_box.visible = true                        # tutorial over: alerts come back
 	_prune_alerts()
 	if shake_amt > 0.0:
 		shake_amt = maxf(0.0, shake_amt - delta * 30.0)
