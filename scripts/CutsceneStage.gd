@@ -48,9 +48,9 @@ func _rect(bounds: Rect2, tint: Color) -> void:
 func _image(asset: String, bounds: Rect2) -> void:
 	var layer: TextureRect = TextureRect.new()
 	layer.texture = Assets.frame(asset, 0)
+	layer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE     # before size: otherwise the box grows to the picture's full size
 	layer.position = bounds.position
 	layer.size = bounds.size
-	layer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	layer.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	layer.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -61,9 +61,11 @@ func _image_scene(asset: String, bounds: Rect2) -> void:
 	_rect(bounds, Palette.INK)
 	var layer: TextureRect = TextureRect.new()
 	layer.texture = Assets.tex(asset)
+	# Set before size. With the default mode the box cannot be smaller than the picture
+	# (1672x941), so it grew past the 736x414 stage and only the top-left corner showed.
+	layer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	layer.position = bounds.position
 	layer.size = bounds.size
-	layer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	# Keep every supplied frame whole. COVERED crops the top or sides whenever the
 	# browser viewport and the logical stage differ by even a few pixels, which made
 	# the character and scenery edges disappear in the cutscene viewer.
