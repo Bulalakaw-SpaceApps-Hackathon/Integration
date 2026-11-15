@@ -26,7 +26,7 @@ const PLOT_WHY := {
 }
 const HABITAT_POS := Vector2(640, 194)
 const INTERACT_DIST := 130.0
-const BSCALE := 3.0                 # the artist sprites are 64 px (habitat 128x96): shown at 3x
+const BSCALE := 2.0                 # one pixel size on the map (D49): buildings are 96 px (habitat 192x144), shown at 2x
 
 var cfg: NightConfig
 var commander: Commander
@@ -207,7 +207,7 @@ func _build_bounds() -> void:
 		walls.add_child(cs)
 
 
-func _solid(pos: Vector2, size: Vector2) -> void:
+func _solid(pos: Vector2, size: Vector2) -> StaticBody2D:
 	var body := StaticBody2D.new()
 	body.position = pos
 	var cs := CollisionShape2D.new()
@@ -216,6 +216,8 @@ func _solid(pos: Vector2, size: Vector2) -> void:
 	cs.shape = r
 	body.add_child(cs)
 	add_child(body)
+	body.add_to_group("map_solid")
+	return body
 
 
 func _build_habitat() -> void:
@@ -223,7 +225,7 @@ func _build_habitat() -> void:
 	s.texture = Assets.frame("bld_habitat", 0)
 	_animate(s, "bld_habitat")
 	_stand(s, HABITAT_POS + Vector2(0, 96), BSCALE)
-	_solid(HABITAT_POS + Vector2(0, 66), Vector2(320, 60))   # footprint only: you can walk behind the roof
+	_foot(s.texture, HABITAT_POS + Vector2(0, 96), BSCALE, 0.92, 54.0)   # footprint only: you can walk behind the roof
 	var l := Ui.label("CONTROL ROOM", 8, true, Palette.HIGHLIGHT)
 	l.z_index = 5
 	l.position = HABITAT_POS + Vector2(-44, 98)
@@ -235,7 +237,7 @@ func _build_plot(id: String) -> void:
 	plots[id] = s
 	s.texture = Assets.tex("plot_locked")
 	_stand(s, PLOT_POS[id] + Vector2(0, 64), BSCALE)
-	_solid(PLOT_POS[id] + Vector2(0, 40), Vector2(150, 48))
+	s.set_meta("body", _solid(PLOT_POS[id] + Vector2(0, 40), Vector2(150, 48)))
 	var l := Ui.label(PLOT_NAME[id], 8, true, Palette.HIGHLIGHT)
 	l.z_index = 5
 	plot_labels[id] = l
@@ -257,6 +259,7 @@ func _refresh_plot(id: String) -> void:
 	var sh: ContactShadow = s.get_meta("shadow")
 	sh.fit(s.texture)
 	sh.visible = built
+	_fit_body(s.get_meta("body"), s.texture, PLOT_POS[id] + Vector2(0, 64), BSCALE, built)
 
 
 func _build_decor() -> void:
@@ -265,11 +268,10 @@ func _build_decor() -> void:
 	for name in spots:
 		var s := Sprite2D.new()
 		s.texture = Assets.tex("deco_" + name)
-		var k := 1.0 if name == "parol" else 2.0   # whole-number scale keeps pixels even
+		var k := 2.0                                 # one pixel size on the map (D49)
 		var base: Vector2 = spots[name] + Vector2(0, s.texture.get_height() * k / 2.0)
 		_stand(s, base, k)
-		if name != "parol":
-			_foot(s.texture, base, k, 0.8, 22.0)
+		_foot(s.texture, base, k, 0.96, 22.0 if name != "parol" else 14.0)
 
 
 ## Ground kept clear around each decoration (flag mound, antenna, sari-sari, big rocks),
@@ -306,17 +308,17 @@ func _build_debris() -> void:
 		var s := Sprite2D.new()
 		s.texture = Assets.frame("deco_debris", rng.randi() % n)
 		s.flip_h = rng.randf() < 0.5
-		var dk := 2.0 if rng.randf() < 0.7 else 1.0
+		var dk := 2.0                                # one pixel size on the map (D49)
 		_stand(s, p, dk)
-		_foot(s.texture, p, dk, 0.75, 10.0 * dk)
+		_foot(s.texture, p, dk, 0.96, 20.0)
 		placed += 1
 	# a few along the top, in the gaps beside the control room and at the map edges
 	for spot in TOP_DEBRIS:
 		var s := Sprite2D.new()
 		s.texture = Assets.frame("deco_debris", rng.randi() % n)
 		s.flip_h = rng.randf() < 0.5
-		_stand(s, Vector2(spot.x, spot.y), spot.z)
-		_foot(s.texture, Vector2(spot.x, spot.y), spot.z, 0.75, 10.0 * spot.z)
+		_stand(s, Vector2(spot.x, spot.y), 2.0)
+		_foot(s.texture, Vector2(spot.x, spot.y), 2.0, 0.96, 20.0)
 
 
 ## Register a sprite for the idle loop. Each gets its own phase so the base doesn't blink in unison.
@@ -915,10 +917,34 @@ func _upgrade(id: String) -> void:
 ## A solid footprint at the base of a standing object, sized to its art: the Commander walks
 ## around it, and can still pass behind its top part (only the ground contact is solid).
 func _foot(tex: Texture2D, base: Vector2, k: float, width_frac: float, depth: float) -> void:
+	var body := _solid(base, Vector2.ONE)
+	_fit_body(body, tex, base, k, true, width_frac, depth)
+
+
+## Size a collision box to the sprite's real base (D51): as wide as the bottom rows of its
+## opaque pixels, `depth` screen px deep, ending at the ground line. Upper parts stay walk-behind.
+func _fit_body(body: StaticBody2D, tex: Texture2D, base: Vector2, k: float, on: bool, width_frac := 0.92, depth := 40.0) -> void:
+	var cs: CollisionShape2D = body.get_child(0)
+	cs.disabled = not on
 	var img := tex.get_image()
-	var r := img.get_used_rect() if img else Rect2i(0, 0, tex.get_width(), tex.get_height())
-	var cx := (r.position.x + r.size.x / 2.0 - tex.get_width() / 2.0) * k
-	_solid(base + Vector2(cx, -depth / 2.0), Vector2(maxf(8.0, r.size.x * k * width_frac), depth))
+	var x0 := 0
+	var x1 := tex.get_width() - 1
+	if img:
+		var rows := int(ceil(depth / k))
+		x0 = img.get_width()
+		x1 = -1
+		for y in range(maxi(0, img.get_height() - rows), img.get_height()):
+			for x in img.get_width():
+				if img.get_pixel(x, y).a > 0.5:
+					x0 = mini(x0, x)
+					x1 = maxi(x1, x)
+		if x1 < x0:
+			x0 = 0
+			x1 = img.get_width() - 1
+	var w := (x1 - x0 + 1) * k
+	var cx := ((x0 + x1 + 1) / 2.0 - tex.get_width() / 2.0) * k
+	body.position = base + Vector2(cx, -depth / 2.0)
+	(cs.shape as RectangleShape2D).size = Vector2(maxf(8.0, w * width_frac), depth)
 
 
 ## Stand a sprite ON the ground: its foot is at `base` (so depth sorting works),
@@ -1001,7 +1027,7 @@ class ContactShadow extends Node2D:
 ## A small soft shadow under the Commander's feet.
 class BlobShadow extends Node2D:
 	func _draw() -> void:
-		draw_set_transform(Vector2(2, 16), 0.0, Vector2(1.0, 0.4))
+		draw_set_transform(Vector2(1, -2), 0.0, Vector2(1.0, 0.4))   # under the feet (the node position)
 		draw_circle(Vector2.ZERO, 11.0, Color(0.3, 0.07, 0.02, 0.4))
 
 

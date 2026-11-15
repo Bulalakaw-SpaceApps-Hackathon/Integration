@@ -138,8 +138,8 @@
  "bld_habitat": {
   "id": "HM-02",
   "path": "res://assets/sprites/hub/bld_habitat.png",
-  "w": 128,
-  "h": 96,
+  "w": 192,
+  "h": 144,
   "frames": 4,
   "kind": "image"
  },
@@ -1274,185 +1274,185 @@
  "plot_battery_l1": {
   "id": "HM-04",
   "path": "res://assets/sprites/hub/plot_battery_l1.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 4,
   "kind": "image"
  },
  "plot_battery_l2": {
   "id": "HM-04",
   "path": "res://assets/sprites/hub/plot_battery_l2.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 4,
   "kind": "image"
  },
  "plot_battery_l3": {
   "id": "HM-04",
   "path": "res://assets/sprites/hub/plot_battery_l3.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 4,
   "kind": "image"
  },
  "plot_comms_dish_l1": {
   "id": "HM-08",
   "path": "res://assets/sprites/hub/plot_comms_dish_l1.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 4,
   "kind": "image"
  },
  "plot_comms_dish_l2": {
   "id": "HM-08",
   "path": "res://assets/sprites/hub/plot_comms_dish_l2.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 4,
   "kind": "image"
  },
  "plot_comms_dish_l3": {
   "id": "HM-08",
   "path": "res://assets/sprites/hub/plot_comms_dish_l3.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 4,
   "kind": "image"
  },
  "plot_empty": {
   "id": "HM-10",
   "path": "res://assets/sprites/hub/plot_empty.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 1,
   "kind": "image"
  },
  "plot_greenhouse_l1": {
   "id": "HM-09",
   "path": "res://assets/sprites/hub/plot_greenhouse_l1.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_greenhouse_l2": {
   "id": "HM-09",
   "path": "res://assets/sprites/hub/plot_greenhouse_l2.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_greenhouse_l3": {
   "id": "HM-09",
   "path": "res://assets/sprites/hub/plot_greenhouse_l3.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_life_support_l1": {
   "id": "HM-05",
   "path": "res://assets/sprites/hub/plot_life_support_l1.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_life_support_l2": {
   "id": "HM-05",
   "path": "res://assets/sprites/hub/plot_life_support_l2.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_life_support_l3": {
   "id": "HM-05",
   "path": "res://assets/sprites/hub/plot_life_support_l3.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_locked": {
   "id": "HM-10",
   "path": "res://assets/sprites/hub/plot_locked.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 1,
   "kind": "image"
  },
  "plot_shelter_l1": {
   "id": "HM-06",
   "path": "res://assets/sprites/hub/plot_shelter_l1.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_shelter_l2": {
   "id": "HM-06",
   "path": "res://assets/sprites/hub/plot_shelter_l2.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_shelter_l3": {
   "id": "HM-06",
   "path": "res://assets/sprites/hub/plot_shelter_l3.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_solar_l1": {
   "id": "HM-03",
   "path": "res://assets/sprites/hub/plot_solar_l1.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_solar_l2": {
   "id": "HM-03",
   "path": "res://assets/sprites/hub/plot_solar_l2.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_solar_l3": {
   "id": "HM-03",
   "path": "res://assets/sprites/hub/plot_solar_l3.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_suit_bay_l1": {
   "id": "HM-07",
   "path": "res://assets/sprites/hub/plot_suit_bay_l1.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_suit_bay_l2": {
   "id": "HM-07",
   "path": "res://assets/sprites/hub/plot_suit_bay_l2.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "plot_suit_bay_l3": {
   "id": "HM-07",
   "path": "res://assets/sprites/hub/plot_suit_bay_l3.png",
-  "w": 64,
-  "h": 64,
-  "frames": 1,
+  "w": 96,
+  "h": 96,
+  "frames": 4,
   "kind": "image"
  },
  "portrait_carlo": {
@@ -2050,8 +2050,8 @@
  "ui_plot_highlight": {
   "id": "HM-11",
   "path": "res://assets/sprites/hub/ui_plot_highlight.png",
-  "w": 64,
-  "h": 64,
+  "w": 96,
+  "h": 96,
   "frames": 1,
   "kind": "image"
  },
