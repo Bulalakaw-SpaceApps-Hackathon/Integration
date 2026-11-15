@@ -16,6 +16,8 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
   - Wind loop (sfx_wind_loop) and radio noise loop (sfx_static_loop): OpenGameArt, CC0, per the team's source workbook. The exact page links still need to be added here before shipping.
 - When a final asset or a CC0 download replaces a placeholder, add it here: asset ID, file name, author, source link, licence.
 
+- Asset pack imported from Team ALT-F4's Repo/Assets. It includes BT desk icons, CF camera art and effects, CH characters and portraits, HM map art, SP sponsor posters, and UI-20 radio planets. The NI lesson image credits are listed below.
+
 # Fonts
 - Silkscreen by Jason Kottke. SIL Open Font License 1.1 (assets/fonts/OFL.txt).
 

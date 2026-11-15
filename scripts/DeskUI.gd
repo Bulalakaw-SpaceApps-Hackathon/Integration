@@ -1788,8 +1788,8 @@ class SignalStrip extends Control:
 		var x1 := size.x - 14.0
 		var y := 10.0
 		# Mars on the left, Earth on the right
-		draw_circle(Vector2(x0, y), 6.0, Palette.MARS_RUST)
-		draw_circle(Vector2(x1, y), 6.0, Palette.SKY_HAZE)
+		draw_texture(Assets.tex("ui_radio_mars"), Vector2(x0 - 6.0, y - 6.0))
+		draw_texture(Assets.tex("ui_radio_earth"), Vector2(x1 - 6.0, y - 6.0))
 		for k in range(int((x1 - x0 - 16) / 6.0)):
 			draw_rect(Rect2(x0 + 9 + k * 6.0, y - 0.5, 3, 1), Palette.BASE_MAUVE)
 		var m: Dictionary = s.messages[0]
