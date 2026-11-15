@@ -46,11 +46,6 @@ var fx_t := -1.0
 var plot_labels: Dictionary = {}
 var start_button: Button
 var mute_button: TextureButton
-var tut_strip: PanelContainer
-var tut_label: Label
-var tut_arrow: TextureRect
-var tut_arrow_t := 0.0
-var tut_dismissed := false
 var lessons: Dictionary = {}
 var anim_t := 0.0                   # building idle loops (lights, smoke, fans, waves...)
 var anim_f := -1
@@ -416,9 +411,6 @@ func _physics_process(_delta: float) -> void:
 func _process(delta: float) -> void:
 	_drive_rover(delta)
 	_tick_animation(delta)
-	if tut_arrow and tut_arrow.visible:
-		tut_arrow_t += delta
-		tut_arrow.texture = Assets.frame("ui_hint_arrow", int(tut_arrow_t * 3.0) % 2)
 	if fx_t >= 0.0:
 		fx_t += delta
 		var f := int(fx_t * 12.0)
@@ -559,31 +551,6 @@ func _build_hud() -> void:
 	help.position = Vector2(16, 700)
 	hud_root.add_child(help)
 
-	tut_strip = PanelContainer.new()
-	tut_strip.add_theme_stylebox_override("panel", Ui.nine("ui_popup", 12))
-	tut_strip.position = Vector2(214, 614)
-	tut_strip.custom_minimum_size = Vector2(760, 72)
-	tut_strip.visible = false
-	hud_root.add_child(tut_strip)
-	var th := HBoxContainer.new()
-	th.add_theme_constant_override("separation", 12)
-	tut_strip.add_child(th)
-	th.add_child(Ui.image("alert_info"))
-	tut_label = Ui.body("", 18, false, Palette.INK, 580)
-	tut_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	th.add_child(tut_label)
-	var hide_btn := Ui.button("HIDE", func() -> void:
-		tut_dismissed = true
-		_refresh_night1_guide(), Vector2(96, 44))
-	hide_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	th.add_child(hide_btn)
-
-	tut_arrow = Ui.image("ui_hint_arrow", 0)
-	tut_arrow.size = Vector2(64, 64)
-	tut_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tut_arrow.visible = false
-	hud_root.add_child(tut_arrow)
-
 	_build_sponsor_panel()
 	if DisplayServer.is_touchscreen_available():
 		var joy := TouchStick.new()
@@ -644,30 +611,6 @@ func _close_card() -> void:
 		card_layer = null
 		briefing_sun = null
 		commander.set_physics_process(true)
-	_refresh_night1_guide()
-
-
-func _refresh_night1_guide() -> void:
-	if tut_strip == null or tut_arrow == null:
-		return
-	if Game.night != 1 or Game.tutorial or Progression.judge_mode or tut_dismissed or card_layer != null:
-		tut_strip.visible = false
-		tut_arrow.visible = false
-		return
-	var visited: Array = Game.visited.get(1, [])
-	if not visited.has("solar"):
-		tut_label.text = "STEP 1/3 · BUILDINGS: Walk to the SOLAR FIELD (or click it) to see how Mars sunlight powers your base!"
-		tut_arrow.position = Vector2(PLOT_POS["solar"].x - 32.0, maxf(PLOT_POS["solar"].y - 165.0, 90.0))
-	elif not visited.has("battery"):
-		tut_label.text = "STEP 2/3 · UPGRADES: Next, check the BATTERY BANK! Win nights to earn Materials (coins) to upgrade buildings so your base survives harder storms."
-		tut_arrow.position = Vector2(PLOT_POS["battery"].x - 32.0, maxf(PLOT_POS["battery"].y - 165.0, 90.0))
-	else:
-		tut_label.text = "STEP 3/3 · CONTROL DESK: All buildings checked! Click START NIGHT (or walk to the Habitat door) to begin Night 1."
-		tut_arrow.position = Vector2(start_button.position.x + start_button.size.x * 0.5 - 32.0, start_button.position.y - 68.0)
-	tut_strip.visible = true
-	tut_arrow.visible = true
-	tut_strip.reset_size()
-	tut_strip.position.y = 696.0 - tut_strip.size.y
 
 
 func _new_card(width := 760.0, asset := "ui_panel") -> VBoxContainer:
@@ -678,7 +621,6 @@ func _new_card(width := 760.0, asset := "ui_panel") -> VBoxContainer:
 	card_layer = Control.new()
 	card_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	hud_root.add_child(card_layer)
-	_refresh_night1_guide()
 	Ui.dim(card_layer, 0.45)
 	return Ui.card(card_layer, asset, width)
 

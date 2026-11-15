@@ -21,7 +21,7 @@ func _init() -> void:
 		_check(beat.id == "CS-00", "CS-00 has the expected id")
 		_check(beat.panel_count() == 4, "CS-00 has four complete panels")
 		_check(beat.next_route == "night_1_briefing", "CS-00 routes to the Night 1 briefing")
-		_check(beat.duration_for(0) >= 0.0, "CS-00 panel timing is data-driven")
+		_check(beat.duration_for(0) > 0.0, "CS-00 panel timing is data-driven")
 	quit(failed)
 
 
