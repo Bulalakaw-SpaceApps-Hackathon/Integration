@@ -77,6 +77,8 @@ var tut_label: Label
 var tut_next: Button
 var tut_step := 0
 var tut_recalled := false
+var tut_asked := false
+var tut_skip := false                 # this step was already done before it came up: just show NEXT
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
 var hint_t := 0.0
 var tick_t := 0.0
@@ -494,8 +496,33 @@ func _start_tutorial() -> void:
 	_tut_show()
 
 
+## True when the player already reached this step's goal before the step came up.
+## Counts the goal, not the exact button: heater LOW or OFF both count.
+func _tut_already(kind: String, s: OutpostSim) -> bool:
+	match kind:
+		"camera": return s.cameras_on.has("solar_field")
+		"heater": return s.heater <= 0
+		"discovery": return s.discovery_found()
+		"scan": return s.has_malfunction() and (s.malf.solved or s.malf.clues[0].found)
+		"diagnose": return s.malfunction_solved()
+		"shelter": return s.shelter_door_open
+		"recall": return tut_recalled
+		"ask": return tut_asked or s.ask_in_flight()
+	return false
+
+
 func _tut_show() -> void:
 	var st: Array = _tut_steps()[tut_step]
+	var sim := SimState.sim
+	tut_skip = sim != null and _tut_already(st[2], sim)
+	if tut_skip:
+		var solved_early: bool = st[2] in ["scan", "diagnose"] and sim.malfunction_solved()
+		tut_label.text = Strings.t("tut.already_solved" if solved_early else "tut.already")
+		tut_next.visible = true
+		tut_next.text = "NEXT"
+		hint_arrow.visible = false
+		_fit_tut_box.call_deferred()
+		return
 	tut_label.text = Strings.t(st[0])
 	tut_next.visible = st[2] in ["next", "start", "finish"]
 	tut_next.text = "START!" if st[2] == "start" else ("FINISH!" if st[2] == "finish" else "NEXT")
@@ -512,8 +539,6 @@ func _tut_show() -> void:
 		"scan":
 			if not s.cameras_on.has("solar_field"):
 				s.toggle_camera("solar_field")
-		"recall":
-			tut_recalled = false
 		"ad":
 			s.sponsor = true
 			s.sponsors = [2]
@@ -540,6 +565,10 @@ func _tut_advance() -> void:
 		tut_box.visible = false
 		SimState.frozen = false
 		return
+	# solved the malfunction early: the SCAN and DIAGNOSE steps share one "already solved" line
+	if tut_skip and _tut_steps()[tut_step][2] == "scan" and SimState.sim and SimState.sim.malfunction_solved():
+		tut_step += 1
+	tut_skip = false
 	tut_step += 1
 	if tut_step >= _tut_steps().size():
 		tut_box.visible = false
@@ -550,13 +579,13 @@ func _tut_advance() -> void:
 
 
 func _tut_check(s: OutpostSim) -> void:
-	if not tut_box.visible or guide_mode > 0:
+	if not tut_box.visible or guide_mode > 0 or tut_skip:
 		return
 	var st: Array = _tut_steps()[tut_step]
 	var done := false
 	match st[2]:
 		"camera": done = s.cameras_on.has("solar_field")
-		"heater": done = s.heater == 0
+		"heater": done = s.heater <= 0
 		"fault": done = not s.fault_active("loose_cable")
 		"request": done = s.open_request_for("lani").is_empty()
 		"discovery": done = s.discovery_found()
@@ -564,7 +593,7 @@ func _tut_check(s: OutpostSim) -> void:
 		"diagnose": done = s.malfunction_solved()
 		"shelter": done = s.shelter_door_open
 		"recall": done = tut_recalled
-		"ask": done = s.ask_in_flight()
+		"ask": done = tut_asked or s.ask_in_flight()
 		"ad": done = s.sponsor_ads_closed > 0
 	if done:
 		_tut_advance()
@@ -640,6 +669,7 @@ func _press_dish() -> void:
 func _press_ask() -> void:
 	var s := _live()
 	if s and s.send_message("ask_earth"):
+		tut_asked = true
 		_alert("Question sent! Light takes %d min to reach Earth, and %d min to come back." % [int(s.light_minutes()), int(s.light_minutes())], "comms")
 		Sfx.play("msg_sent")
 
