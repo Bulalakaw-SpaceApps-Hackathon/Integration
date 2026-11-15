@@ -658,8 +658,8 @@
 	"icon_ask_earth": {
 		"id": "BT-08",
 		"path": "res://assets/sprites/ui/icon_ask_earth.png",
-		"w": 32,
-		"h": 32,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
@@ -714,56 +714,56 @@
 	"icon_crop_lamp_off": {
 		"id": "BT-07",
 		"path": "res://assets/sprites/ui/icon_crop_lamp_off.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_crop_lamp_on": {
 		"id": "BT-07",
 		"path": "res://assets/sprites/ui/icon_crop_lamp_on.png",
-		"w": 48,
-		"h": 48,
-		"frames": 1,
+		"w": 24,
+		"h": 24,
+		"frames": 2,
 		"kind": "image"
 	},
 	"icon_dish_off": {
 		"id": "BT-08",
 		"path": "res://assets/sprites/ui/icon_dish_off.png",
-		"w": 32,
-		"h": 32,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_dish_on": {
 		"id": "BT-08",
 		"path": "res://assets/sprites/ui/icon_dish_on.png",
-		"w": 32,
-		"h": 32,
-		"frames": 1,
+		"w": 24,
+		"h": 24,
+		"frames": 2,
 		"kind": "image"
 	},
 	"icon_heater_high": {
 		"id": "BT-03",
 		"path": "res://assets/sprites/ui/icon_heater_high.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_heater_low": {
 		"id": "BT-03",
 		"path": "res://assets/sprites/ui/icon_heater_low.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_heater_mid": {
 		"id": "BT-03",
 		"path": "res://assets/sprites/ui/icon_heater_mid.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
@@ -778,33 +778,33 @@
 	"icon_hint": {
 		"id": "BT-09",
 		"path": "res://assets/sprites/ui/icon_hint.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_life_support_high": {
 		"id": "BT-04",
 		"path": "res://assets/sprites/ui/icon_life_support_high.png",
-		"w": 48,
-		"h": 48,
-		"frames": 1,
+		"w": 24,
+		"h": 24,
+		"frames": 4,
 		"kind": "image"
 	},
 	"icon_life_support_low": {
 		"id": "BT-04",
 		"path": "res://assets/sprites/ui/icon_life_support_low.png",
-		"w": 48,
-		"h": 48,
-		"frames": 1,
+		"w": 24,
+		"h": 24,
+		"frames": 4,
 		"kind": "image"
 	},
 	"icon_life_support_normal": {
 		"id": "BT-04",
 		"path": "res://assets/sprites/ui/icon_life_support_normal.png",
-		"w": 48,
-		"h": 48,
-		"frames": 1,
+		"w": 24,
+		"h": 24,
+		"frames": 4,
 		"kind": "image"
 	},
 	"icon_materials": {
@@ -818,64 +818,64 @@
 	"icon_mute_off": {
 		"id": "BT-09",
 		"path": "res://assets/sprites/ui/icon_mute_off.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_mute_on": {
 		"id": "BT-09",
 		"path": "res://assets/sprites/ui/icon_mute_on.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_pause": {
 		"id": "BT-09",
 		"path": "res://assets/sprites/ui/icon_pause.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_recall": {
 		"id": "BT-06",
 		"path": "res://assets/sprites/ui/icon_recall.png",
-		"w": 48,
-		"h": 48,
-		"frames": 1,
+		"w": 24,
+		"h": 24,
+		"frames": 2,
 		"kind": "image"
 	},
 	"icon_send_discovery": {
 		"id": "BT-08",
 		"path": "res://assets/sprites/ui/icon_send_discovery.png",
-		"w": 32,
-		"h": 32,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_settings": {
 		"id": "BT-09",
 		"path": "res://assets/sprites/ui/icon_settings.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_shelter_closed": {
 		"id": "BT-05",
 		"path": "res://assets/sprites/ui/icon_shelter_closed.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},
 	"icon_shelter_open": {
 		"id": "BT-05",
 		"path": "res://assets/sprites/ui/icon_shelter_open.png",
-		"w": 48,
-		"h": 48,
+		"w": 24,
+		"h": 24,
 		"frames": 1,
 		"kind": "image"
 	},

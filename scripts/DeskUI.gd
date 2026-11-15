@@ -176,6 +176,37 @@ func _button(text: String, rect: Rect2, font_size: int, on_press: Callable) -> B
 	return b
 
 
+## Desk control icons follow the state, and the ones that should move do (D66):
+## the fan spins faster at higher air, the lamp glows, the dish sends waves while a question
+## is on its way, RECALL pulses while someone is outside.
+func _refresh_icons(s: OutpostSim) -> void:
+	var f := int(blink_t * 6.0)
+	var heat := 1 if s == null else s.heater
+	var air := 1 if s == null else s.life_support
+	var icons := {
+		"heater": ["icon_heater_low", "icon_heater_low", "icon_heater_mid", "icon_heater_high"][heat + 1],
+		"life": ["icon_life_support_low", "icon_life_support_low", "icon_life_support_normal", "icon_life_support_high"][air + 1],
+		"lamp": "icon_crop_lamp_on" if s != null and s.crop_lamp else "icon_crop_lamp_off",
+		"dish": "icon_dish_on" if s != null and s.dish else "icon_dish_off",
+		"ask": "icon_ask_earth", "send": "icon_send_discovery", "recall": "icon_recall",
+		"shelter": "icon_shelter_open" if s != null and s.shelter_door_open else "icon_shelter_closed",
+	}
+	var speed := {"life": 0 if s == null or s.battery <= 0.0 or air < 0 else (air + 1), "lamp": 1, "dish": 1 if s != null and s.ask_in_flight() else 0}
+	var outside := false
+	if s != null:
+		for c in s.crew:
+			if s.is_outside(c):
+				outside = true
+	speed["recall"] = 1 if outside else 0
+	for k in icons:
+		var n: String = icons[k]
+		var count := Assets.frame_count(n)
+		var fr := 0
+		if count > 1 and int(speed.get(k, 0)) > 0:
+			fr = int(f * int(speed[k]) / 2) % count
+		(ctl[k] as Button).icon = Assets.frame(n, fr)
+
+
 func _set_lit(b: Button, lit: bool) -> void:
 	## "On" controls get the yellow style, so their state is visible (plus their text says ON/OFF).
 	b.add_theme_stylebox_override("normal", _btn_sb(8 if b.size.x < 60 else 14, 1 if lit else 0))
@@ -229,17 +260,22 @@ func _build_desk() -> void:
 	_build_panel_controls()
 
 	# top bar
-	_button("II", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	var pb := _button("", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	pb.icon = Assets.tex("icon_pause"); pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER; pb.tooltip_text = "Pause (Esc)"
 	_button("2X", Rect2(72, 22, 48, 48), 16, _toggle_speed)
 	var hint := _button("?", Rect2(16, 78, 48, 48), 16, _show_hint)
 	hint.icon = Assets.tex("icon_hint")
 	hint.text = ""
 	hint.expand_icon = true
 	hint.tooltip_text = "Hint from Mission Control"
-	_button("M", Rect2(72, 78, 48, 48), 16, Game.toggle_mute).tooltip_text = "Mute (M)"
+	var mute_b := _button("", Rect2(72, 78, 48, 48), 16, Game.toggle_mute)
+	mute_b.tooltip_text = "Mute (M)"; mute_b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
+	mute_b.pressed.connect(func() -> void: mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off"))
 	_tex("desk_clock.png", Vector2(130, 10))
 	clock_time = _label("18:00", Vector2(141, 13), Vector2(214, 34), 32, Palette.SKY_HAZE, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
+	clock_time.add_theme_font_override("font", Ui.FONT_CLOCK)       # the team's DotGothic16 clock face (D63)
 	clock_night = _label("", Vector2(141, 59), Vector2(214, 18), 16, Palette.SKY_HAZE, false,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	_tex("ui_battery_frame.png", Vector2(378, 22))
@@ -472,7 +508,7 @@ func _build_tutorial_box() -> void:
 	h.add_theme_constant_override("separation", 12)
 	tut_box.add_child(h)
 	h.add_child(Ui.image("head_lani" if false else "alert_info"))
-	tut_label = Ui.label("", 16, false, Palette.INK, 640)
+	tut_label = Ui.body("", 18, false, Palette.INK, 640)
 	tut_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(tut_label)
 	tut_next = _button("NEXT", Rect2(0, 0, 120, 44), 16, _tut_advance)
@@ -616,12 +652,22 @@ func _build_panel_controls() -> void:
 	var slot_y := func(k: int) -> int: return 198 + 18 + 98 * k
 	ctl["shelter"] = _button("DOOR\nCLOSED", Rect2(lx + 20, slot_y.call(0) + 7, 72, 60), 8, _press_shelter)
 	ctl["recall"] = _button("RECALL", Rect2(lx + 20, slot_y.call(1) + 7, 72, 60), 8, _press_recall)
-	ctl["dish"] = _button("DISH", Rect2(lx + 4, slot_y.call(2) + 18, 32, 32), 8, _press_dish)
-	ctl["ask"] = _button("ASK", Rect2(lx + 40, slot_y.call(2) + 18, 32, 32), 8, _press_ask)
-	ctl["send"] = _button("SEND", Rect2(lx + 76, slot_y.call(2) + 18, 32, 32), 8, _press_send)
+	# COMMS: three 30 px buttons that fit inside the 100 px slot (D60)
+	ctl["dish"] = _button("DISH", Rect2(lx + 8, slot_y.call(2) + 10, 30, 54), 8, _press_dish)
+	ctl["ask"] = _button("ASK", Rect2(lx + 41, slot_y.call(2) + 10, 30, 54), 8, _press_ask)
+	ctl["send"] = _button("SEND", Rect2(lx + 74, slot_y.call(2) + 10, 30, 54), 8, _press_send)
 	ctl["heater"] = _button("HEAT\nMID", Rect2(rx + 20, slot_y.call(0) + 7, 72, 60), 8, _press_heater)
 	ctl["life"] = _button("AIR\nNORM", Rect2(rx + 20, slot_y.call(1) + 7, 72, 60), 8, _press_life)
 	ctl["lamp"] = _button("LAMP\nOFF", Rect2(rx + 20, slot_y.call(2) + 7, 72, 60), 8, _press_lamp)
+	for k in ["dish", "ask", "send"]:
+		(ctl[k] as Button).clip_text = true                   # never grow past the 30 px slot (D60)
+		(ctl[k] as Button).add_theme_constant_override("h_separation", 0)
+		(ctl[k] as Button).size = Vector2(30, 54)              # it grew to fit the text before clipping was on
+	for k in ["shelter", "recall", "dish", "ask", "send", "heater", "life", "lamp"]:
+		var b: Button = ctl[k]
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP      # icon on top, one short word under it
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_refresh_icons(null)
 	var plates := [[lx, 0, "SHELTER DOOR"], [lx, 1, "RECALL CREW"], [lx, 2, "COMMS"],
 		[rx, 0, "HEATER"], [rx, 1, "LIFE SUPPORT"], [rx, 2, "CROP LAMP"]]
 	for p in plates:
@@ -1427,17 +1473,18 @@ func _process(delta: float) -> void:
 		nameplates[i].text = CAM_NAME.get(cam, "OFF")
 	for j in 6:
 		_set_lit(cam_buttons[j], s.cameras_on.has(CAMS[j]))
-	# control labels show their state in words too (not colour only)
-	ctl["heater"].text = "HEAT\n" + HEATER_TXT[s.heater + 1]
-	ctl["life"].text = "AIR\n" + LS_TXT[s.life_support + 1]
+	# control labels show their state in words too (not colour only), with an icon above (D53)
+	ctl["heater"].text = HEATER_TXT[s.heater + 1]
+	ctl["life"].text = LS_TXT[s.life_support + 1]
 	_set_lit(ctl["heater"], s.heater >= 0)
 	_set_lit(ctl["life"], s.life_support >= 0)
-	ctl["lamp"].text = "LAMP\n" + ("ON" if s.crop_lamp else "OFF")
+	ctl["lamp"].text = "ON" if s.crop_lamp else "OFF"
 	_set_lit(ctl["lamp"], s.crop_lamp)
 	ctl["dish"].text = "DISH" if not s.dish else "ON"
 	_set_lit(ctl["dish"], s.dish)
-	ctl["shelter"].text = "DOOR\n" + ("OPEN" if s.shelter_door_open else ("SHUT..." if s.door_closing_left > 0.0 else "CLOSED"))
+	ctl["shelter"].text = "OPEN" if s.shelter_door_open else ("SHUT..." if s.door_closing_left > 0.0 else "CLOSED")
 	_set_lit(ctl["shelter"], s.shelter_door_open)
+	_refresh_icons(s)
 	for lk in locked_text:
 		ctl[lk].text = locked_text[lk]
 	# camera buttons blink "!" when something on that camera needs you

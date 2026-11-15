@@ -18,6 +18,8 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 
 # Fonts
 - Silkscreen by Jason Kottke. SIL Open Font License 1.1 (assets/fonts/OFL.txt).
+- Bulalakaw Readable (body text): derived by the team from Atkinson Hyperlegible Next (Braille Institute). SIL Open Font License 1.1 (assets/fonts/OFL-Atkinson.txt).
+- DotGothic16 (clock) by Fontworks Inc. SIL Open Font License 1.1 (assets/fonts/OFL-DotGothic16.txt).
 
 # NASA data
 - NASA, "NASA Watches Mars Light Up During Epic Solar Storm" (June 2024): X12 flare on 2024-05-20, Curiosity RAD measured 8,100 microgray (about 30 chest X-rays).

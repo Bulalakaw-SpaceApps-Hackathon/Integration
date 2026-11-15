@@ -5,6 +5,11 @@ extends RefCounted
 
 const FONT_R := preload("res://assets/fonts/Silkscreen-Regular.ttf")
 const FONT_B := preload("res://assets/fonts/Silkscreen-Bold.ttf")
+## Body text (lessons, radio lines, alerts, the tutorial) uses the team's Bulalakaw Readable,
+## easier for 7-year-olds than the all-caps pixel font; titles and buttons stay Silkscreen (D63).
+const FONT_BODY := preload("res://assets/fonts/BulalakawReadable-Regular.ttf")
+const FONT_BODY_B := preload("res://assets/fonts/BulalakawReadable-Bold.ttf")
+const FONT_CLOCK := preload("res://assets/fonts/DotGothic16-Regular.ttf")
 const BODY := 16
 const BIG := 24
 const HUGE := 32
@@ -66,6 +71,13 @@ static func label(text: String, size := BODY, bold := false, color := Palette.IN
 	if wrap_width > 0.0:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = wrap_width
+	return l
+
+
+## A label in the readable body font. Pixel fonts shrink at 8 px, so body text is at least 14 px.
+static func body(text: String, size := BODY, bold := false, color := Palette.INK, wrap_width := 0.0) -> Label:
+	var l := label(text, maxi(size, 14), bold, color, wrap_width)
+	l.add_theme_font_override("font", FONT_BODY_B if bold else FONT_BODY)
 	return l
 
 

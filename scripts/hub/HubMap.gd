@@ -826,7 +826,7 @@ func _show_building(id: String) -> void:
 		var tr := Ui.row(right, 10, BoxContainer.ALIGNMENT_BEGIN)
 		tr.add_child(Ui.badge(str(les.get("badge", "real"))))
 		tr.add_child(Ui.label(str(les.title), Ui.BODY, true, Palette.INK, 560))
-		right.add_child(Ui.label(str(les.text), Ui.BODY, false, Palette.INK, 660))
+		right.add_child(Ui.body(str(les.text), 18, false, Palette.INK, 660))
 		right.add_child(Ui.label("SOURCE: " + str(les.source), 8, false, Palette.BASE_PLUM, 660))
 	right.add_child(Ui.label("IN YOUR BASE: " + PLOT_WHY[id], 8, true, Palette.INK, 660))
 	right.add_child(Ui.label("NOW: " + _effect(id, lv), Ui.BODY, true, Palette.INK, 660))
