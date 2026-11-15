@@ -76,7 +76,6 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 - `nasa_solar_4.png`: NASA — "Ingenuity Mars Helicopter's Record-Breaking Flight" (PIA25321), https://images.nasa.gov/details/PIA25321
 - `nasa_solar_5.png`: NASA — "InSight's Power Generation: After Landing and Spring 2022" (PIA25284), https://images.nasa.gov/details/PIA25284
 - `nasa_solar_6.png`: NASA — "Mars Climate Sounder Studies 2018 Dust Storm" (PIA22737), https://images.nasa.gov/details/PIA22737
-- `nasa_solar_7.png`: NASA — "Orientation of Mars Helicopter Base Station Antenna for Flight 17" (PIA24966), https://images.nasa.gov/details/PIA24966
 - `nasa_suit_bay_1.png`: NASA — "NASA astronaut Scott Tingle wears a U.S. spacesuit" (iss054e022341), https://images.nasa.gov/details/iss054e022341
 - `nasa_suit_bay_2.png`: NASA — "Spacesuit Materials on Perseverance's SHERLOC Calibration Target" (PIA24033), https://images.nasa.gov/details/PIA24033
 - `nasa_suit_bay_3.png`: NASA — "Apollo 17 Lunar Surface Experiment: Lunar Ejecta and Meteorites Experiment" (S72-37257), https://images.nasa.gov/details/S72-37257
