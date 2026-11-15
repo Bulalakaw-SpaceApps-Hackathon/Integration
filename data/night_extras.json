@@ -67,14 +67,14 @@
 			"source": "NASA MAVEN (2024)"
 		},
 		"7": {
-			"cam": "solar_field",
+			"cam": "sky_radar",
 			"pos": [
-				60,
-				40
+				96,
+				128
 			],
-			"at": 40,
-			"title": "A BULALAKAW!",
-			"text": "Space rocks hit Mars more often than Earth because its air is so thin. NASA's InSight lander even felt meteoroid impacts as marsquakes.",
+			"at": 56,
+			"title": "A BULALAKAW LANDED!",
+			"text": "Space rocks reach the ground on Mars more easily than on Earth because the air is so thin. NASA's InSight lander felt meteoroid impacts as marsquakes, and orbiters found the fresh craters.",
 			"source": "NASA InSight (2022)"
 		}
 	},
@@ -168,5 +168,13 @@
 		"PLANET PUPPY TOYS"
 	],
 	"_slogans": "Lettered INTO the poster art by the artist (Option B). Same order as sponsors.",
-	"slogans": ["Breakfast that's out of this world!", "Zoom past every crater!", "Crunchy as a crater!", "The juice that goes round and round!", "Stick a star on everything!", "Ride the red planet!", "Every astronaut needs a best friend!"]
+	"slogans": [
+		"Breakfast that's out of this world!",
+		"Zoom past every crater!",
+		"Crunchy as a crater!",
+		"The juice that goes round and round!",
+		"Stick a star on everything!",
+		"Ride the red planet!",
+		"Every astronaut needs a best friend!"
+	]
 }

@@ -19,7 +19,18 @@ func _build() -> void:
 		mat_label.text = "MATERIALS: %d" % Progression.materials, Vector2(260, 56)))
 	mat_label = Ui.label("MATERIALS: %d" % Progression.materials, Ui.BODY, true)
 	r.add_child(mat_label)
-	close_row([Ui.button("CHOOSE NIGHT", func() -> void: Game.goto("night_select"), Vector2(260, 56))])
+	body.add_child(Ui.label("Short on time? BEST OF starts the last night (the Bulalakaw meteor shower) with a fully upgraded base.", 8, true, Palette.BASE_PLUM, 580))
+	close_row([Ui.button("BEST OF: NIGHT 7", _best_of, Vector2(280, 56)), Ui.button("CHOOSE NIGHT", func() -> void: Game.goto("night_select"), Vector2(240, 56))])
+
+
+## Judges have minutes: jump straight to the best night with everything built.
+func _best_of() -> void:
+	Progression.unlock_all = true
+	for id in OutpostSim.PLOTS:
+		Progression.levels[id] = 3
+	Progression.food = 8
+	Progression.seen_guides.erase(7)
+	Game.goto("desk", 7)
 
 
 func _check(text: String, on: bool, changed: Callable) -> HBoxContainer:

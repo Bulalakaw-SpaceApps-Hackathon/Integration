@@ -21,10 +21,12 @@ const PANELS := {
 	"nasa": "res://scripts/screens/NasaPanel.gd",
 	"credits": "res://scripts/screens/CreditsPanel.gd",
 	"judge": "res://scripts/screens/JudgePanel.gd",
+	"real": "res://scripts/screens/RealPanel.gd",
 }
 
 var flow := false              # true when the game runs from Main.tscn (false: Desk.tscn on its own)
 var night := 1
+var tutorial := false          # Night 0: the practice run. Nothing is saved, nothing can fail.
 var screen_name := ""
 var screen: Node
 var holder: Control
@@ -33,6 +35,7 @@ var overlay_root: Control
 var panels: Array[Control] = []
 var toast_box: VBoxContainer
 var visited: Dictionary = {}     # night -> Array of plot ids the Commander went inside today
+var talked: Dictionary = {}      # night -> Array of crew ids the Commander talked to today
 var theme: Theme                 # FD-02, also set on Controls under CanvasLayers (they don't inherit)
 
 
@@ -75,6 +78,8 @@ func goto(name: String, night_id := -1) -> void:
 		SimState.sponsor_tonight = false         # sponsor deals are per night
 	if night_id > 0:
 		night = night_id
+	if tutorial and name not in ["hub", "desk"]:
+		_end_tutorial(false)
 	close_all_panels()
 	SimState.stop_night()
 	Sfx.stop_all_loops()
@@ -83,7 +88,7 @@ func goto(name: String, night_id := -1) -> void:
 		screen = null
 	screen_name = name
 	if name == "desk":
-		SimState.tutorial_tonight = night == 1 and not Progression.tutorial_done
+		SimState.tutorial_tonight = tutorial
 		screen = load("res://scenes/Desk.tscn").instantiate()
 	else:
 		var script: GDScript = load(SCREENS[name])
@@ -91,6 +96,34 @@ func goto(name: String, night_id := -1) -> void:
 	holder.add_child(screen)
 	Sfx.music(name in ["title", "night_select", "hub", "complete"])
 	screen_changed.emit(name)
+
+
+## Night 0 (TUTORIAL on the title screen): every building unlocked, then a guided practice night.
+func start_tutorial() -> void:
+	if Progression.judge_mode:
+		Progression.leave_judge_mode()
+	tutorial = true
+	Progression.unlock_all = true
+	Progression.resting.clear()
+	visited.erase(0)
+	night = 0
+	goto("hub")
+
+
+## Put the real save back. `done` = the practice night was finished: "Ready for duty!" badge.
+func _end_tutorial(done: bool) -> void:
+	tutorial = false
+	Progression.leave_judge_mode()        # throws away everything the practice run changed
+	visited.erase(0)
+	if done:
+		Progression.ready_badge = true
+		Progression.save_game()
+
+
+func finish_tutorial() -> void:
+	_end_tutorial(true)
+	goto("title")
+	toast("Ready for duty, Commander! Press NEW GAME to start Night 1.", "info", 6.0)
 
 
 ## Desk asks for this when the player presses the debrief button.
