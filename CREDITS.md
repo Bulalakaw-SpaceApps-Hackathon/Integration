@@ -4,6 +4,12 @@ A NASA Space Apps Challenge 2026 game by Team Bulalakaw (Polytechnic University 
 # Game
 - Design, code and art direction: Team Bulalakaw
 
+# Super Intelligence (SI) Disclosure
+- SI/AI tools were used to assist with ideation/brainstorming, space-weather research, GDScript coding/debugging/troubleshooting, in-game writing/editing, and visual asset generation/remastering (title logo, cutscene artwork, and sprite/UI asset polishing).
+- Visuals generated or assisted with SI are marked with an in-game "SI-GENERATED VISUALS" watermark.
+- Audio files in Set 1 (assets/sfx/) are CC0 human-created recordings from Kenney, Freesound, and OpenGameArt (detailed below).
+- Official NASA photos (NI-01..NI-07) and NASA DONKI/RAD data are cited below; no NASA logos or branding were generated with SI.
+
 # Art and sound
 - The Commander's outdoor EVA sprite adapts Team Bulalakaw's Carlo EVA walk cycle with cream and blue suit panels.
 - BT-01 through BT-11 (29 button, control and attention PNGs): original Team Bulalakaw art from the team Assets repository, in the matching folders under `BT-/`. The game copies are in `assets/sprites/ui/`.

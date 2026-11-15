@@ -70,6 +70,18 @@ func _ready() -> void:
 	toast_box.add_theme_constant_override("separation", 6)
 	toast_box.theme = theme
 	overlay.add_child(toast_box)
+	var wm := Ui.label("SI-GENERATED VISUALS", 11, true, Color(1.0, 1.0, 1.0, 0.55))
+	wm.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wm.anchor_left = 1.0
+	wm.anchor_top = 1.0
+	wm.anchor_right = 1.0
+	wm.anchor_bottom = 1.0
+	wm.offset_left = -220
+	wm.offset_top = -22
+	wm.offset_right = -10
+	wm.offset_bottom = -4
+	wm.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	overlay_root.add_child(wm)
 
 
 ## Called by Main.tscn. Everything after this is driven by Game.
