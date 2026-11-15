@@ -1063,16 +1063,18 @@ class GroundMarks extends Node2D:
 class ContactShadow extends Node2D:
 	var w := 48.0
 	var cx := 0.0
+	var foot_y := -1.0
 	func fit(tex: Texture2D) -> void:
 		var img := tex.get_image()
 		var r := img.get_used_rect() if img else Rect2i(0, 0, tex.get_width(), tex.get_height())
 		w = r.size.x
 		cx = r.position.x + r.size.x / 2.0 - tex.get_width() / 2.0
+		foot_y = float(r.end.y - tex.get_height()) - 1.0
 		queue_redraw()
 	func _draw() -> void:
 		for layer in [[1.0, 0.24], [0.8, 0.2], [0.6, 0.16]]:
 			var k: float = layer[0]
-			draw_set_transform(Vector2(cx, -1), 0.0, Vector2(w * 0.56 * k, maxf(3.0, w * 0.1) * k))
+			draw_set_transform(Vector2(cx, foot_y), 0.0, Vector2(w * 0.56 * k, maxf(3.0, w * 0.1) * k))
 			draw_circle(Vector2.ZERO, 1.0, Color(0.24, 0.07, 0.05, layer[1]))
 		draw_set_transform(Vector2.ZERO)
 
