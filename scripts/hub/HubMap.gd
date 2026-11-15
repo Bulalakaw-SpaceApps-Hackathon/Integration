@@ -122,16 +122,17 @@ func _ready() -> void:
 # ============================================================================ world
 func _build_ground() -> void:
 	var ts := TileSet.new()
-	ts.tile_size = Vector2i(TILE, TILE)
+	ts.tile_size = Vector2i(TILE / 2, TILE / 2)     # 16 px ground art shown at 2x (D49)
 	var src := TileSetAtlasSource.new()
 	src.texture = Assets.tex("tiles_mars")
-	src.texture_region_size = Vector2i(TILE, TILE)
+	src.texture_region_size = Vector2i(TILE / 2, TILE / 2)
 	for y in 4:
 		for x in 4:
 			src.create_tile(Vector2i(x, y))
 	ts.add_source(src, 0)
 	var layer := TileMapLayer.new()
 	layer.z_index = -20
+	layer.scale = Vector2(2, 2)
 	layer.tile_set = ts
 	add_child(layer)
 	var rng := RandomNumberGenerator.new()
@@ -182,11 +183,11 @@ func _scatter_decals(rng: RandomNumberGenerator) -> void:
 		var c: Vector2i = DECALS[rng.randi() % DECALS.size()]
 		var a := AtlasTexture.new()
 		a.atlas = sheet
-		a.region = Rect2(c.y * 32, c.x * 32, 32, 32)
+		a.region = Rect2(c.y * 16, c.x * 16, 16, 16)
 		var d := Sprite2D.new()
 		d.texture = a
 		d.position = p
-		d.scale = Vector2.ONE * (2.0 if rng.randf() < 0.35 else 1.0)
+		d.scale = Vector2.ONE * 2.0                  # one pixel size on the map (D49)
 		d.flip_h = rng.randf() < 0.5
 		d.z_index = -15
 		add_child(d)
@@ -267,7 +268,9 @@ func _build_decor() -> void:
 		"rocks": Vector2(730, 628), "parol": Vector2(452, 120)}
 	for name in spots:
 		var s := Sprite2D.new()
-		s.texture = Assets.tex("deco_" + name)
+		s.texture = Assets.frame("deco_" + name, 0)
+		if Assets.frame_count("deco_" + name) > 1:
+			_animate(s, "deco_" + name)              # flag flaps, antenna blinks, parol sways (D66)
 		var k := 2.0                                 # one pixel size on the map (D49)
 		var base: Vector2 = spots[name] + Vector2(0, s.texture.get_height() * k / 2.0)
 		_stand(s, base, k)
@@ -1072,7 +1075,7 @@ func _build_crew() -> void:
 			Game.toast("%s was caught in last night's storm and is resting today." % str(id).to_upper(), "info", 6.0)
 			continue
 		var spot: String = CREW_SPOT.get(id, "")
-		var at: Vector2 = PLOT_POS[spot] + Vector2(100 if id == "lani" else 84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
+		var at: Vector2 = PLOT_POS[spot] + Vector2(124 if id == "lani" else 84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
 		var s := Sprite2D.new()
 		s.texture = Assets.frame("crew_" + str(id), 0)
 		_stand(s, at, 2.0)

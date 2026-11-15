@@ -135,6 +135,7 @@ def strip(fn, *args):
     global FRAME
     frames = []
     for FRAME in range(FRAMES):
+        F.FRAME = B.FRAME = FRAME
         frames.append(F.floor(fn(*args)))
     w, h = frames[0].size
     out = Image.new("RGBA", (w * FRAMES, h), F.CLEAR)
