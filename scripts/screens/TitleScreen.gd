@@ -14,13 +14,6 @@ func _ready() -> void:
 	logo.size = Vector2(600, 200)
 	add_child(logo)
 
-	# The supplied title art includes a mock menu. Cover it with the real menu surface.
-	var menu_back := Panel.new()
-	menu_back.position = Vector2(466, 279)
-	menu_back.size = Vector2(350, 361)
-	menu_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	menu_back.add_theme_stylebox_override("panel", Ui.nine("ui_panel", 14))
-	add_child(menu_back)
 	var v := VBoxContainer.new()
 	v.position = Vector2(490, 300)
 	v.custom_minimum_size = Vector2(300, 0)
@@ -61,12 +54,12 @@ func _ready() -> void:
 	# live / archived NASA data status, bottom-left above the credit line
 	var status := Ui.row(self, 8)
 	status.position = Vector2(20, 654)          # badge (32 px) clear of the credit line below (D55)
-	DonkiService.fetch()
 	_fill_status(status)
 	DonkiService.updated.connect(func() -> void:
 		for ch in status.get_children():
 			ch.queue_free()
 		_fill_status(status))
+	DonkiService.fetch()
 
 	var foot := Ui.label("A NASA SPACE APPS 2026 GAME BY TEAM ALT-F4", 8, false, Palette.HIGHLIGHT)
 	foot.position = Vector2(20, 700)
@@ -74,8 +67,7 @@ func _ready() -> void:
 
 
 func _fill_status(row: HBoxContainer) -> void:
-	if DonkiService.state != "loading":
-		row.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
+	row.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
 	row.add_child(Ui.label(DonkiService.short_status(), 8, false, Palette.HIGHLIGHT))
 
 
