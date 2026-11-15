@@ -1,4 +1,5 @@
-extends Node## Game flow: which screen is showing, plus the overlay layer (pause menu, panels, toasts)
+extends Node
+## Game flow: which screen is showing, plus the overlay layer (pause menu, panels, toasts)
 ## that sits above every screen.
 ##
 ##   Title -> Night Select -> Hub (Briefing card, Build) -> Desk (Night) -> Debrief

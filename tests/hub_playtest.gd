@@ -1,5 +1,5 @@
 extends SceneTree
-## Base-map rules: tap a far building -> the Commander walks there -> goes inside (lesson + chart + photo);
+## Base-map rules: tap a far building -> opens its info (lesson + chart + photo);
 ## the Control Room stays shut until every unlocked building was visited.
 ##   xvfb-run godot --path . --rendering-driver opengl3 -s res://tests/hub_playtest.gd
 var step := 0
@@ -9,8 +9,6 @@ var prog
 var n := 0
 
 func _initialize() -> void:
-	var f := FileAccess.open("user://save.cfg", FileAccess.WRITE)
-	if f: f.store_string("")
 	change_scene_to_file("res://scenes/Main.tscn")
 
 func shot(name: String) -> void:
@@ -48,7 +46,7 @@ func _process(_d: float) -> bool:
 			shot("start_blocked")
 			print("screen after blocked start: ", game.screen_name)
 			click(Vector2(944, 216))             # Life Support plot, far away
-			wait = 150
+			wait = 12
 		6:
 			print("inside open: ", game.screen.card_layer != null)
 			shot("inside_life_support")

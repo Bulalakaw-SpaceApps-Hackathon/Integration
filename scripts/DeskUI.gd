@@ -340,7 +340,7 @@ func _build_desk() -> void:
 	# camera buttons (BT-02)
 	for k in 6:
 		var cam: String = CAMS[k]
-		var b := _button("%d %s" % [k + 1, CAM_SHORT[cam]], Rect2(322 + k * 108, 538, 96, 96), 8,
+		var b := _button("%d %s" % [k + 1, CAM_SHORT[cam]], Rect2(322 + k * 108, 538, 96, 96), 14,
 			func() -> void: _press_camera(cam))
 		b.icon = Assets.tex("icon_cam_" + cam)
 		var badge := TextureRect.new()
@@ -352,6 +352,7 @@ func _build_desk() -> void:
 		cam_badges.append(badge)
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.add_theme_font_override("font", Ui.FONT_BODY_B)
 		cam_buttons.append(b)
 
 	# props (fan drawn last, it is closest to the player)
@@ -373,8 +374,8 @@ func _build_desk() -> void:
 
 	# alerts, particle banner, pause label
 	alert_box = VBoxContainer.new()
-	alert_box.position = Vector2(412, 78)    # under the battery, over the windows: never over the monitors
-	alert_box.size = Vector2(480, 0)
+	alert_box.position = Vector2(352, 88)    # under the battery, over the windows: never over the monitors
+	alert_box.size = Vector2(576, 0)
 	alert_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	alert_box.add_theme_constant_override("separation", 4)
 	add_child(alert_box)
@@ -398,7 +399,7 @@ func _build_desk() -> void:
 	radio = PanelContainer.new()
 	radio.add_theme_stylebox_override("panel", Ui.nine("ui_popup", 8))
 	# the radio line is the first row of the alert column, so they stack and never overlap
-	radio.custom_minimum_size = Vector2(456, 0)
+	radio.custom_minimum_size = Vector2(576, 0)
 	radio.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	radio.visible = false
 	alert_box.add_child(radio)
@@ -413,7 +414,7 @@ func _build_desk() -> void:
 	radio_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	radio_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rh.add_child(radio_icon)
-	radio_label = Ui.body("", 20, true, Palette.INK, 400)
+	radio_label = Ui.body("", 20, true, Palette.INK, 510)
 	rh.add_child(radio_label)
 
 	# briefing / debrief overlay
@@ -1144,7 +1145,6 @@ func _radio(text: String) -> void:
 	if SimState.sim:
 		stamp = " " + Strings.t("signal.stamp") % int(round(SimState.sim.light_minutes()))
 	radio_label.text = (text if text.begins_with("Mission Control") else "MISSION CONTROL: " + text) + stamp
-	radio.visible = true
 	radio_until = Time.get_ticks_msec() + 7000
 	Sfx.play("msg_received", -8.0)
 
@@ -1216,7 +1216,6 @@ func _crew_said(crew_id: String, text: String) -> void:
 	# worried portrait when someone is caught outside in a storm; their head icon otherwise
 	radio_icon.texture = Assets.frame("portrait_" + crew_id, 1) if text == Strings.t("crew.caught") else Assets.tex("head_" + crew_id)
 	radio_label.text = "%s: %s" % [crew_id.to_upper(), text]
-	radio.visible = true
 	radio_until = Time.get_ticks_msec() + 4500
 
 
@@ -1431,7 +1430,7 @@ func _alert(text: String, kind: String) -> void:
 	ic.custom_minimum_size = Vector2(28, 28)
 	row.add_child(ic)
 	# crew radio chatter is one small line; real alerts are big
-	var lab := Ui.body(text, 20, true, Palette.INK, 400)        # readable body font (D63)
+	var lab := Ui.body(text, 20, true, Palette.INK, 508)        # readable body font (D63)
 	lab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(lab)
 	alert_box.add_child(l)
@@ -1473,8 +1472,8 @@ func _process(delta: float) -> void:
 	if shake_amt > 0.0:
 		shake_amt = maxf(0.0, shake_amt - delta * 30.0)
 		position = Vector2(randf_range(-shake_amt, shake_amt), randf_range(-shake_amt, shake_amt)) if shake_amt > 0.0 else Vector2.ZERO
-	if radio.visible and Time.get_ticks_msec() > radio_until:
-		radio.visible = false
+	# Keep the radio line below urgent alerts in priority and above the monitors in layout.
+	radio.visible = alert_box.get_child_count() < 3 and Time.get_ticks_msec() < radio_until
 	var s := SimState.sim
 	_update_windows(s)
 	pause_label.visible = SimState.paused and not Game.flow

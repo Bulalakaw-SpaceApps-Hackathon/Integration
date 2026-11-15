@@ -39,6 +39,7 @@ var hud_root: Control
 var mat_label: Label
 var food_label: Label
 var card_layer: Control
+var briefing_sun: HBoxContainer
 var fx: Sprite2D
 var fx_t := -1.0
 var plot_labels: Dictionary = {}
@@ -87,7 +88,7 @@ func _ready() -> void:
 	_build_debris()
 	_build_rover()
 	commander = Commander.new()
-	commander.position = HABITAT_POS + Vector2(0, 150)
+	commander.position = HABITAT_POS + Vector2(0, 200)
 	add_child(commander)
 	var blob := BlobShadow.new()
 	blob.show_behind_parent = true
@@ -112,6 +113,7 @@ func _ready() -> void:
 	_build_hud()
 	Progression.changed.connect(_refresh_hud)
 	Game.mute_changed.connect(_refresh_mute)
+	DonkiService.updated.connect(_refresh_briefing_sun)
 	if Game.tutorial:
 		_show_tutorial_card()
 	elif not Progression.story_seen and not Progression.judge_mode:
@@ -598,6 +600,7 @@ func _close_card() -> void:
 		card_layer.hide()
 		card_layer.queue_free()
 		card_layer = null
+		briefing_sun = null
 		commander.set_physics_process(true)
 
 
@@ -676,9 +679,8 @@ func _show_briefing() -> void:
 			r.add_child(Ui.badge(ev.badge if ev.badge in ["real", "simplified"] else "real"))
 			r.add_child(Ui.body("Real event · %s · %s" % [ev.real_date, ev.source_name], 20, true, Palette.BASE_PLUM, 560))
 			break
-	var sun := Ui.row(v, 10, BoxContainer.ALIGNMENT_BEGIN)
-	sun.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
-	sun.add_child(Ui.body(DonkiService.summary(), 20, false, Palette.INK, 700))
+	briefing_sun = Ui.row(v, 10, BoxContainer.ALIGNMENT_BEGIN)
+	_refresh_briefing_sun()
 	# tonight's 3 stars (the same three every night)
 	var beat := SimState.story_beat(cfg.id)
 	v.add_child(Ui.label("TONIGHT'S 3 STARS", Ui.BODY, true))
@@ -695,7 +697,20 @@ func _show_briefing() -> void:
 	v.add_child(Ui.body("Tap a building or walk up and press E. Visit each open building before starting.", 20, true, Palette.BASE_PLUM, 820))
 	var btns := Ui.row(card)
 	btns.add_child(Ui.button("LET'S BUILD", _close_card, Vector2(240, 64)))
-	btns.add_child(Ui.button("START NIGHT", _start_night, Vector2(240, 64)))
+	var start := Ui.button("START NIGHT", _start_night, Vector2(240, 64))
+	start.disabled = _visited_count() < _required().size() and not Progression.judge_mode
+	btns.add_child(start)
+
+
+func _refresh_briefing_sun() -> void:
+	if briefing_sun == null:
+		return
+	for child in briefing_sun.get_children():
+		briefing_sun.remove_child(child)
+		child.queue_free()
+	if DonkiService.state != "loading":
+		briefing_sun.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
+	briefing_sun.add_child(Ui.body(DonkiService.summary(), 20, false, Palette.INK, 700))
 
 
 ## Sponsor deal (Night 2+): a clickable sponsor icon at the bottom-right, above START NIGHT.
@@ -852,7 +867,7 @@ func _show_building(id: String) -> void:
 		left.add_child(frame)
 		var cap := Ui.row(left, 6, BoxContainer.ALIGNMENT_BEGIN)
 		cap.add_child(Ui.badge("real"))
-		cap.add_child(Ui.body(str(les.image) + " · NASA photo", 20, true, Palette.BASE_PLUM, 360))
+		cap.add_child(Ui.body(str(les.image), 20, true, Palette.BASE_PLUM, 360))
 		left.add_child(FigureChart.new(les.get("figure", {})))
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 10)
@@ -1111,6 +1126,10 @@ func _build_crew() -> void:
 			continue
 		var spot: String = CREW_SPOT.get(id, "")
 		var at: Vector2 = PLOT_POS[spot] + Vector2(124 if id == "lani" else 84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
+		if id == "maya":
+			at += Vector2(-25, 8)
+		elif id == "carlo":
+			at.y -= 12
 		var s := Sprite2D.new()
 		s.texture = Assets.frame("crew_%s_eva" % id, 0)
 		_stand(s, at, 2.0)

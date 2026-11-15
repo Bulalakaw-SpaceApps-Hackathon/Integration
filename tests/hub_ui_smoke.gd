@@ -1,4 +1,7 @@
 extends SceneTree
+## Regression smoke for surface EVA art, click-through hub dialogs and Night 6 help/replies.
+## godot --path . -s res://tests/hub_ui_smoke.gd
+## Set BUL_SMOKE_OUT to an existing directory to capture screenshots.
 
 var game: Node
 var progress: Node
@@ -28,9 +31,9 @@ func click(pos: Vector2) -> void:
 		event.pressed = pressed
 		root.push_input(event)
 
-func escape() -> void:
+func key(code: Key) -> void:
 	var event := InputEventKey.new()
-	event.keycode = KEY_ESCAPE
+	event.keycode = code
 	event.pressed = true
 	root.push_input(event)
 
@@ -52,7 +55,9 @@ func press(node: Node, title: String) -> void:
 		click(bounds.get_center())
 
 func shot(name: String) -> void:
-	root.get_texture().get_image().save_png(OS.get_environment("BUL_SMOKE_OUT").path_join("bul_" + name + ".png"))
+	var out := OS.get_environment("BUL_SMOKE_OUT")
+	if not out.is_empty() and DisplayServer.get_name() != "headless":
+		root.get_texture().get_image().save_png(out.path_join("bul_" + name + ".png"))
 
 func run() -> void:
 	await frames()
@@ -62,13 +67,26 @@ func run() -> void:
 	progress.story_seen = true
 	progress.resting.clear()
 	progress.materials = 20
+	progress.reset_levels()
 	game.goto("hub", 7)
 	await frames()
 	var hub: Node = game.screen
+	check(button_in(hub.card_layer, "START NIGHT").disabled, "briefing respects the visit requirement")
+	var donki := root.get_node("DonkiService")
+	donki.state = "archived"
+	donki.updated.emit()
+	await frames()
+	check(hub.briefing_sun.get_child_count() == 2, "briefing updates its provenance badge")
 	shot("briefing")
 	press(hub.card_layer, "LET'S BUILD")
 	await frames()
 	check(hub.card_layer == null, "briefing click closes")
+	progress.judge_mode = true
+	var was_muted: bool = progress.muted
+	key(KEY_M)
+	await frames()
+	check(progress.muted != was_muted and hub.mute_button.tooltip_text.begins_with("Unmute") == progress.muted, "mute shortcut updates hub button")
+	key(KEY_M)
 	shot("hub")
 	var assets: Node = root.get_node("Assets")
 	check(hub.commander.sprite.texture == assets.frame("char_commander_eva", 0), "Commander EVA")
@@ -89,11 +107,10 @@ func run() -> void:
 		shot("solar")
 		var before: int = progress.materials
 		var lv: int = progress.levels["solar"]
-		progress.judge_mode = true
 		press(hub.card_layer, "UPGRADE")
 		await frames()
 		check(progress.materials < before and progress.levels["solar"] == lv + 1, "upgrade applies cost and level")
-		escape()
+		key(KEY_ESCAPE)
 		await frames()
 		check(hub.card_layer == null and hub.commander.is_physics_processing(), "Escape closes lesson and restores movement")
 	progress.seen_guides.append(6)
@@ -102,7 +119,6 @@ func run() -> void:
 	var desk: Control = game.screen
 	desk._start_night()
 	await frames()
-	click(Vector2(1022, 500))
 	click(Vector2(348, 76))
 	await frames()
 	check(desk.help_box.visible and sim_state.paused, "desk clock help opens and pauses")
@@ -115,6 +131,7 @@ func run() -> void:
 	sim_state.sim.add_request("maya", "May I turn on the crop lamp?", {}, {}, 60.0)
 	desk._open_answer(0, "maya")
 	await frames()
+	check(desk.alert_box.get_rect().end.y <= desk.feeds[0].position.y, "alerts stay above the feeds")
 	shot("desk_reply")
 	press(desk.answer_box, "YES")
 	await frames()
