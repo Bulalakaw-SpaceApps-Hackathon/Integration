@@ -58,6 +58,7 @@ Agreed, not all built yet.
 | D44 | Push once, at the final draft, to GitHub Bulalakaw-SpaceApps-Hackathon/Integration branch final-gameplay. |
 | D45 | Merge the team's newer final-gameplay commits first; then open a PR final-gameplay -> main for the team to review (never merge it). Stop and ask on any conflict that touches someone else's work. |
 | D46 | Asset zips sent during the runs go to assets/source/; the team's art always wins over mine, and each run's summary says what it replaced. |
+<<<<<<< HEAD
 | D47 | One art style per layer: camera feeds and night cover art are painted pixel art matching CF-03 (shaded, no outlines, no sketch lines); everything walked on or tapped (base map, crew, UI) is flat pixel art with a 1 px ink outline. Every sketchy or smooth piece (Airlock, Shelter, Life Support, Greenhouse, NO SIGNAL feeds) is remastered. |
 | D48 | Everything in the team's zips is scratch art (a guide) and is redrawn to fit the game. Used as-is only: NASA photos, the sounds, the CF-01 Sky Radar and CF-03 Solar Field feeds, and any file named FINAL_ or called final. Replaces D46's "team art always wins" for art. |
 | D49 | One pixel size on the base map: everything drawn at 2x. Buildings redrawn at about 96x96; debris, plots and the Control Room scaled to match. |
@@ -78,3 +79,5 @@ Agreed, not all built yet.
 | D64 | The SC screen set is used as-is where it passes the locked palette and map style; the rest is redrawn. Crew walking sprites stay (D57); portraits and briefing portraits are redrawn at 96x96 from the new scratch. |
 | D65 | New scratch art lives in assets/source/scratch-1115 (the 2026-11-15 zip). |
 | D66 | Anything meant to move is animated in the remaster (2-4 frames at 120-300 ms, hard-edged, same pixel size). Base map: building lights blink, Life Support fan spins, Greenhouse lamp pulses, comms dish turns, Shelter beacon blinks, flag and parol sway, rover drives, antenna blinks. Feeds: stars twinkle, radar sweep, dust drifts, Greenhouse plants sway under the lamp. Desk/UI: alert icons, attention badge, hint arrow bob, request and fault markers, battery-low blink. Night cards: one subtle loop each (sunset shimmer, aurora, meteors). tests/asset_check.gd checks every sheet holds the frames the manifest lists. |
+=======
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988

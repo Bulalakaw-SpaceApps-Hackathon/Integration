@@ -23,8 +23,13 @@ func _ready() -> void:
 	add_child(shape)
 	sprite = Sprite2D.new()
 	sprite.texture = Assets.frame("char_commander", 0)
+<<<<<<< HEAD
 	sprite.scale = Vector2(2, 2)             # 32x48 art shown at 2x, like everything on the map (D49)
 	sprite.offset = Vector2(0, -24)          # feet at the node position, so y-sort compares feet with building bases
+=======
+	sprite.scale = Vector2(2, 2)             # 32x48 art shown at 2x (buildings are 3x)
+	sprite.offset = Vector2(0, -16)          # feet sit on the collision circle
+>>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 	add_child(sprite)
 
 
