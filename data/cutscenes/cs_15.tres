@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CutsceneBeat" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/CutsceneBeat.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "CS-15"
+title = "A Home Together"
+panel_assets = Array[String](["cam_solar_field"])
+portrait_assets = Array[String](["portrait_commander"])
+captions = Array[String](["Seven nights of learning brought us here. Together, we made this small station a home."])
+panel_durations_sec = Array[float]([0.0])
+next_route = "continue"
+

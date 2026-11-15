@@ -40,6 +40,7 @@ var mat_label: Label
 var food_label: Label
 var card_layer: Control
 var briefing_sun: HBoxContainer
+var night_story_shown: bool = false
 var fx: Sprite2D
 var fx_t := -1.0
 var plot_labels: Dictionary = {}
@@ -641,27 +642,33 @@ func _show_tutorial_card() -> void:
 
 # ---------------------------------------------------------------- the mission (first time only)
 func _show_story() -> void:
-	var v := _new_card(900, "ui_briefing")
-	var top := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
-	top.add_child(Ui.image("portrait_mission_control"))
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	top.add_child(col)
-	col.add_child(Ui.label("YOUR MISSION", Ui.BIG, true))
-	col.add_child(Ui.label(Strings.t("goal.story"), Ui.BODY, false, Palette.INK, 700))
-	col.add_child(Ui.label(Strings.t("goal.science"), Ui.BODY, false, Palette.INK, 700))
-	v.add_child(Ui.label("EVERY NIGHT: BALANCE POWER, AIR, FOOD AND RADIATION SHIELDING.", Ui.BODY, true, Palette.BASE_PLUM, 840))
-	v.add_child(Ui.label("BETWEEN NIGHTS: SPEND MATERIALS TO UPGRADE YOUR BASE.", Ui.BODY, true, Palette.BASE_PLUM, 840))
-	var btns := Ui.row(v)
-	btns.add_child(Ui.button("I'M READY!", func() -> void:
-		Progression.story_seen = true
-		Progression.save_game()
-		_show_briefing(), Vector2(260, 64)))
+	commander.joystick = Vector2.ZERO
+	commander.velocity = Vector2.ZERO
+	commander.set_physics_process(false)
+	var scene := load("res://scenes/CutscenePlayer.tscn") as PackedScene
+	var player := scene.instantiate() as CutscenePlayer
+	var beat := load("res://data/cutscenes/cs_00_opening.tres") as CutsceneBeat
+	hud_root.add_child(player)
+	player.continued.connect(_finish_opening_cutscene)
+	player.skipped.connect(_finish_opening_cutscene)
+	player.play(beat)
+
+
+func _finish_opening_cutscene(_next_route: String) -> void:
+	Progression.story_seen = true
+	Progression.save_game()
+	commander.set_physics_process(true)
+	_show_briefing()
 
 
 # ---------------------------------------------------------------- D-07 Morning Briefing
 func _show_briefing() -> void:
 	if cfg == null:
+		return
+	if not night_story_shown and not Progression.judge_mode and not Game.tutorial:
+		night_story_shown = true
+		commander.set_physics_process(false)
+		Game.play_story(cfg.id * 2 - 1, _show_briefing)
 		return
 	var card := _new_card(980, "ui_briefing")
 	var v := _card_scroll(card, 482.0)

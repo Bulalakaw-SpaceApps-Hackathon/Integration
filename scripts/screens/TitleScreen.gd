@@ -13,6 +13,9 @@ func _ready() -> void:
 	logo.position = Vector2(340, 60)
 	logo.size = Vector2(600, 200)
 	add_child(logo)
+	var gallery: Button = Ui.button("CUTSCENE GALLERY", func() -> void: Game.goto("cutscene_gallery"), Vector2(320, 64))
+	gallery.position = Vector2(24, 540)
+	add_child(gallery)
 
 	# The supplied title art includes a mock menu. Cover it with the real menu surface.
 	var menu_back := Panel.new()
