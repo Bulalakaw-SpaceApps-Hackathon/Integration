@@ -140,7 +140,7 @@
   "path": "res://assets/sprites/hub/bld_habitat.png",
   "w": 128,
   "h": 96,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "boot_splash": {
@@ -410,7 +410,7 @@
  "deco_antenna": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_antenna.png",
-  "w": 64,
+  "w": 32,
   "h": 64,
   "frames": 1,
   "kind": "image"
@@ -418,8 +418,8 @@
  "deco_crates": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_crates.png",
-  "w": 64,
-  "h": 64,
+  "w": 72,
+  "h": 40,
   "frames": 1,
   "kind": "image"
  },
@@ -434,8 +434,8 @@
  "deco_flag": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_flag.png",
-  "w": 64,
-  "h": 64,
+  "w": 32,
+  "h": 48,
   "frames": 1,
   "kind": "image"
  },
@@ -450,8 +450,8 @@
  "deco_rocks": {
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_rocks.png",
-  "w": 64,
-  "h": 64,
+  "w": 48,
+  "h": 32,
   "frames": 1,
   "kind": "image"
  },
@@ -459,7 +459,7 @@
   "id": "HM-12",
   "path": "res://assets/sprites/hub/deco_rover.png",
   "w": 64,
-  "h": 64,
+  "h": 48,
   "frames": 1,
   "kind": "image"
  },
@@ -1276,7 +1276,7 @@
   "path": "res://assets/sprites/hub/plot_battery_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_battery_l2": {
@@ -1284,7 +1284,7 @@
   "path": "res://assets/sprites/hub/plot_battery_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_battery_l3": {
@@ -1292,7 +1292,7 @@
   "path": "res://assets/sprites/hub/plot_battery_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_comms_dish_l1": {
@@ -1332,7 +1332,7 @@
   "path": "res://assets/sprites/hub/plot_greenhouse_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_greenhouse_l2": {
@@ -1340,7 +1340,7 @@
   "path": "res://assets/sprites/hub/plot_greenhouse_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_greenhouse_l3": {
@@ -1348,7 +1348,7 @@
   "path": "res://assets/sprites/hub/plot_greenhouse_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_life_support_l1": {
@@ -1356,7 +1356,7 @@
   "path": "res://assets/sprites/hub/plot_life_support_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_life_support_l2": {
@@ -1364,7 +1364,7 @@
   "path": "res://assets/sprites/hub/plot_life_support_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_life_support_l3": {
@@ -1372,7 +1372,7 @@
   "path": "res://assets/sprites/hub/plot_life_support_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_locked": {
@@ -1388,7 +1388,7 @@
   "path": "res://assets/sprites/hub/plot_shelter_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_shelter_l2": {
@@ -1396,7 +1396,7 @@
   "path": "res://assets/sprites/hub/plot_shelter_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_shelter_l3": {
@@ -1404,7 +1404,7 @@
   "path": "res://assets/sprites/hub/plot_shelter_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_solar_l1": {
@@ -1412,7 +1412,7 @@
   "path": "res://assets/sprites/hub/plot_solar_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_solar_l2": {
@@ -1420,7 +1420,7 @@
   "path": "res://assets/sprites/hub/plot_solar_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_solar_l3": {
@@ -1428,7 +1428,7 @@
   "path": "res://assets/sprites/hub/plot_solar_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_suit_bay_l1": {
@@ -1436,7 +1436,7 @@
   "path": "res://assets/sprites/hub/plot_suit_bay_l1.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_suit_bay_l2": {
@@ -1444,7 +1444,7 @@
   "path": "res://assets/sprites/hub/plot_suit_bay_l2.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
   "kind": "image"
  },
  "plot_suit_bay_l3": {
@@ -1452,7 +1452,47 @@
   "path": "res://assets/sprites/hub/plot_suit_bay_l3.png",
   "w": 64,
   "h": 64,
-  "frames": 4,
+  "frames": 1,
+  "kind": "image"
+ },
+ "portrait_briefing_carlo": {
+  "id": "CH-08",
+  "path": "res://assets/sprites/characters/portrait_briefing_carlo.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "portrait_briefing_commander": {
+  "id": "CH-08",
+  "path": "res://assets/sprites/characters/portrait_briefing_commander.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "portrait_briefing_lani": {
+  "id": "CH-08",
+  "path": "res://assets/sprites/characters/portrait_briefing_lani.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "portrait_briefing_mateo": {
+  "id": "CH-08",
+  "path": "res://assets/sprites/characters/portrait_briefing_mateo.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
+  "kind": "image"
+ },
+ "portrait_briefing_maya": {
+  "id": "CH-08",
+  "path": "res://assets/sprites/characters/portrait_briefing_maya.png",
+  "w": 128,
+  "h": 128,
+  "frames": 1,
   "kind": "image"
  },
  "portrait_carlo": {
@@ -2068,6 +2108,22 @@
   "path": "res://assets/sprites/hub/ui_prompt_build.png",
   "w": 48,
   "h": 48,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_radio_earth": {
+  "id": "UI-20",
+  "path": "res://assets/sprites/ui/ui_radio_earth.png",
+  "w": 12,
+  "h": 12,
+  "frames": 1,
+  "kind": "image"
+ },
+ "ui_radio_mars": {
+  "id": "UI-20",
+  "path": "res://assets/sprites/ui/ui_radio_mars.png",
+  "w": 12,
+  "h": 12,
   "frames": 1,
   "kind": "image"
  },
