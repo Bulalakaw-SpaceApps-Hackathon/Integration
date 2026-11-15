@@ -1,4 +1,3 @@
-class_name SpotlightOverlay
 extends Control
 ## Darkens the screen outside a target rectangle while leaving all underlying buttons clickable.
 

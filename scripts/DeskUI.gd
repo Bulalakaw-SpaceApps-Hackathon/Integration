@@ -79,9 +79,11 @@ var tut_step := 0
 var tut_recalled := false
 var tut_asked := false
 var tut_skip := false                 # this step was already done before it came up: just show NEXT
+const SpotlightOverlay := preload("res://scripts/SpotlightOverlay.gd")
+
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
 var night1_guide := false              # true during Night 1's 3-step spotlight walkthrough
-var spotlight: SpotlightOverlay
+var spotlight: Control
 var _n1_heater_start := 0
 var hint_t := 0.0
 var tick_t := 0.0

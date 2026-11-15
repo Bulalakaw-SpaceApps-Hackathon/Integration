@@ -18,8 +18,10 @@ var skip_button: Button
 var finished: bool = false
 var portrait: TextureRect
 var transition: Tween
+const CutsceneStage := preload("res://scripts/CutsceneStage.gd")
+
 var calm_override: int = -1
-var stage: CutsceneStage
+var stage: Control
 
 
 func _ready() -> void:

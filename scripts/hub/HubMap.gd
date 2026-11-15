@@ -45,8 +45,10 @@ var fx: Sprite2D
 var fx_t := -1.0
 var plot_labels: Dictionary = {}
 var start_button: Button
+const SpotlightOverlay := preload("res://scripts/SpotlightOverlay.gd")
+
 var mute_button: TextureButton
-var spotlight: SpotlightOverlay
+var spotlight: Control
 var lessons: Dictionary = {}
 var anim_t := 0.0                   # building idle loops (lights, smoke, fans, waves...)
 var anim_f := -1
