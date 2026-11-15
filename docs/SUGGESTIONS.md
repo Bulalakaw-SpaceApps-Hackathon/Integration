@@ -68,3 +68,5 @@ Agreed, not all built yet.
 | D54 | One locked game palette (the team colours already in the code, about 32). Every remastered piece uses only those colours. |
 | D55 | Visual bug sweep includes the ARCHIVED badge in the menu; the user may send more. |
 | D56 | Order: collision and pixel size on the base map; Solar Field and building remaster; night cover art; repaint sketchy feeds; placeholders by priority. Test, build and screenshot after each step; drop the later steps if time runs short. Work starts when the user sends the asset files. |
+| D57 | Crew and Commander keep the current 32x48 map-style conversions; only their size and collision are fixed on the 2x map. |
+| D58 | Pieces with no scratch art (night cards, badges, meters, stars, desk icons, …) are designed from scratch in the map or feed style and the game palette; anything with scratch art is redrawn from it. |
