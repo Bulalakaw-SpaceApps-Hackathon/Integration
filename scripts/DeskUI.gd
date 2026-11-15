@@ -254,10 +254,10 @@ func _build_desk() -> void:
 	for i in 2:
 		monitor_sprites.append(_tex("desk_monitor.png", Vector2(229 + i * 470, 258)))
 		var mi := i
-		var sb := _button("SCAN", Rect2(245 + i * 470 + 254, 290, 62, 20), 8, func() -> void: _press_scan(mi))
+		var sb := _button("SCAN", Rect2(245 + i * 470 + 250, 289, 68, 22), 10, func() -> void: _press_scan(mi))
 		sb.tooltip_text = "Look for a clue here (costs a little battery)"
 		scan_buttons.append(sb)
-		nameplates.append(_label("", Vector2(345 + i * 470, 264), Vector2(120, 17), 8, Palette.HIGHLIGHT, false,
+		nameplates.append(_label("", Vector2(335 + i * 470, 263), Vector2(140, 19), 10, Palette.HIGHLIGHT, false,
 			HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER))
 
 	_tex("desk_panel_left.png", Vector2(16, 198))
@@ -319,7 +319,7 @@ func _build_desk() -> void:
 	signal_strip.size = Vector2(236, 30)
 	signal_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(signal_strip)
-	diagnose_btn = _button("DIAGNOSE", Rect2(1086, 140, 158, 22), 8, _open_diagnose)
+	diagnose_btn = _button("DIAGNOSE", Rect2(1086, 139, 158, 24), 11, _open_diagnose)
 	diagnose_btn.tooltip_text = "Pick the cause you think is right"
 	stars_strip = StarsStrip.new()
 	stars_strip.position = Vector2(130, 92)
@@ -726,15 +726,17 @@ func _build_panel_controls() -> void:
 	var lx := 16 + 34
 	var rx := 1104 + 14
 	var slot_y := func(k: int) -> int: return 198 + 18 + 98 * k
-	ctl["shelter"] = _button("DOOR\nCLOSED", Rect2(lx + 20, slot_y.call(0) + 7, 72, 60), 8, _press_shelter)
-	ctl["recall"] = _button("RECALL", Rect2(lx + 20, slot_y.call(1) + 7, 72, 60), 8, _press_recall)
+	ctl["shelter"] = _button("DOOR\nCLOSED", Rect2(lx + 20, slot_y.call(0) + 7, 72, 60), 10, _press_shelter)
+	ctl["recall"] = _button("RECALL", Rect2(lx + 20, slot_y.call(1) + 7, 72, 60), 10, _press_recall)
 	# COMMS: three 30 px buttons that fit inside the 100 px slot (D60)
 	ctl["dish"] = _button("DISH", Rect2(lx + 8, slot_y.call(2) + 10, 30, 54), 8, _press_dish)
 	ctl["ask"] = _button("ASK", Rect2(lx + 41, slot_y.call(2) + 10, 30, 54), 8, _press_ask)
 	ctl["send"] = _button("SEND", Rect2(lx + 74, slot_y.call(2) + 10, 30, 54), 8, _press_send)
-	ctl["heater"] = _button("HEAT\nMID", Rect2(rx + 20, slot_y.call(0) + 7, 72, 60), 8, _press_heater)
-	ctl["life"] = _button("AIR\nNORM", Rect2(rx + 20, slot_y.call(1) + 7, 72, 60), 8, _press_life)
-	ctl["lamp"] = _button("LAMP\nOFF", Rect2(rx + 20, slot_y.call(2) + 7, 72, 60), 8, _press_lamp)
+	ctl["heater"] = _button("HEAT\nMID", Rect2(rx + 20, slot_y.call(0) + 7, 72, 60), 10, _press_heater)
+	ctl["life"] = _button("AIR\nNORM", Rect2(rx + 20, slot_y.call(1) + 7, 72, 60), 10, _press_life)
+	ctl["lamp"] = _button("LAMP\nOFF", Rect2(rx + 20, slot_y.call(2) + 7, 72, 60), 10, _press_lamp)
+	for k in ["shelter", "recall", "heater", "life", "lamp"]:
+		(ctl[k] as Button).clip_text = true
 	for k in ["dish", "ask", "send"]:
 		(ctl[k] as Button).clip_text = true                   # never grow past the 30 px slot (D60)
 		(ctl[k] as Button).add_theme_constant_override("h_separation", 0)
@@ -748,8 +750,9 @@ func _build_panel_controls() -> void:
 	var plates := [[lx, 0, "SHELTER DOOR"], [lx, 1, "RECALL CREW"], [lx, 2, "COMMS"],
 		[rx, 0, "HEATER"], [rx, 1, "LIFE SUPPORT"], [rx, 2, "CROP LAMP"]]
 	for p in plates:
-		_label(p[2], Vector2(p[0] + 6, slot_y.call(p[1]) + 70), Vector2(100, 14), 8, Palette.INK, false,
+		var pl := _label(p[2], Vector2(p[0] + 2, slot_y.call(p[1]) + 68), Vector2(108, 18), 10, Palette.INK, false,
 			HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
+		pl.clip_text = true
 
 
 # ============================================================================
@@ -1057,7 +1060,7 @@ func _on_night_ended(report: Dictionary) -> void:
 			tw.tween_property(st, "scale", Vector2(1.25, 1.25), 0.12)
 			tw.tween_property(st, "scale", Vector2.ONE, 0.1)
 		star_i += 1
-		r.add_child(Ui.label("%s: %s" % [l[1], l[2]], 8, true, Palette.INK, 560))
+		r.add_child(Ui.label("%s: %s" % [l[1], l[2]], 14, true, Palette.INK, 560))
 	if won:
 		var m := HBoxContainer.new()
 		m.add_child(Ui.image("icon_materials"))
@@ -1069,9 +1072,9 @@ func _on_night_ended(report: Dictionary) -> void:
 		for c in mf.causes:
 			if c.id == mf["true"]:
 				answer = c.name
-		_ov_label("MALFUNCTION: IT WAS THE %s. %s" % [answer, mf.why], 8, true, Palette.BASE_PLUM)
+		_ov_label("MALFUNCTION: IT WAS THE %s. %s" % [answer, mf.why], 13, true, Palette.BASE_PLUM)
 	if report.get("discovery_found", false):
-		_ov_label("DISCOVERY: %s: %s" % [report.discovery.title, report.discovery.text], 8, false, Palette.BASE_PLUM)
+		_ov_label("DISCOVERY: %s: %s" % [report.discovery.title, report.discovery.text], 13, false, Palette.BASE_PLUM)
 	# the crew's faces: happy after a good night, worried after a rough one or if they were caught outside
 	var faces := HBoxContainer.new()
 	faces.add_theme_constant_override("separation", 6)
@@ -1084,9 +1087,9 @@ func _on_night_ended(report: Dictionary) -> void:
 		tr.custom_minimum_size = Vector2(56, 56)
 		faces.add_child(tr)
 	for id in report.get("resting", []):
-		_ov_label(Strings.t("rest.caught") % str(id).to_upper(), 8, true, Palette.STATUS_DANGER_SHADE)
+		_ov_label(Strings.t("rest.caught") % str(id).to_upper(), 13, true, Palette.STATUS_DANGER_SHADE)
 	if won and beat.has("close"):
-		_ov_label(str(beat.close), 8, true, Palette.SKY_INDIGO)
+		_ov_label(str(beat.close), 13, true, Palette.SKY_INDIGO)
 	debrief_more = VBoxContainer.new()
 	debrief_more.visible = false
 	overlay_body.add_child(debrief_more)
@@ -1095,8 +1098,8 @@ func _on_night_ended(report: Dictionary) -> void:
 		for k in mf.clues:
 			if k.found:
 				found.append("- %s (%s)" % [k.text, "always right" if int(k.reliability) >= 5 else "right %d in 5" % int(k.reliability)])
-		debrief_more.add_child(Ui.label("CLUES YOU FOUND:\n" + ("\n".join(found) if not found.is_empty() else "none. Try SCAN next time!"), 8, false, Palette.INK, 640))
-	debrief_more.add_child(Ui.label("DID YOU KNOW? " + cfg.did_you_know + " (SOURCE: " + cfg.did_you_know_source + ")", 8, false, Palette.BASE_PLUM, 640))
+		debrief_more.add_child(Ui.label("CLUES YOU FOUND:\n" + ("\n".join(found) if not found.is_empty() else "none. Try SCAN next time!"), 13, false, Palette.INK, 640))
+	debrief_more.add_child(Ui.label("DID YOU KNOW? " + cfg.did_you_know + " (SOURCE: " + cfg.did_you_know_source + ")", 13, false, Palette.BASE_PLUM, 640))
 	if Game.flow:
 		if report.won:
 			var label := "MISSION COMPLETE!" if cfg.id >= Progression.NIGHT_COUNT else "CONTINUE"
@@ -1251,11 +1254,11 @@ func _open_diagnose() -> void:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 8)
 	diag_box.add_child(v)
-	v.add_child(Ui.label("WHAT IS THE CAUSE? " + str(s.malf.title), 8, true, Palette.INK, 450))
+	v.add_child(Ui.label("WHAT IS THE CAUSE? " + str(s.malf.title), 14, true, Palette.INK, 450))
 	for c in s.malf.causes:
 		var cid: String = c.id
 		var txt := "%s · %s" % [c.name, "NOT IT" if c.crossed else MalfBoard.word(c.p)]
-		var b := _button(txt, Rect2(0, 0, 450, 36), 8, func() -> void:
+		var b := _button(txt, Rect2(0, 0, 450, 40), 13, func() -> void:
 			var ss := _live()
 			if ss:
 				var right := ss.diagnose(cid)
@@ -1265,12 +1268,13 @@ func _open_diagnose() -> void:
 					juice.pop(board.position + Vector2(board.size.x / 2.0, board.size.y + 10), "-%d%% BATTERY" % int(ss.balance.wrong_diagnosis_cost), Palette.STATUS_DANGER)
 			_close_diagnose())
 		b.reparent(v)
-		b.custom_minimum_size = Vector2(450, 36)
+		b.custom_minimum_size = Vector2(450, 40)
+		b.clip_text = true
 		b.disabled = c.crossed
-	var cancel := _button("NOT YET", Rect2(0, 0, 160, 32), 8, _close_diagnose)
+	var cancel := _button("NOT YET", Rect2(0, 0, 160, 36), 13, _close_diagnose)
 	cancel.reparent(v)
-	cancel.custom_minimum_size = Vector2(160, 32)
-	v.add_child(Ui.label("A wrong guess costs %d%% battery, but crosses that cause off." % int(s.balance.wrong_diagnosis_cost), 8, false, Palette.BASE_PLUM, 450))
+	cancel.custom_minimum_size = Vector2(160, 36)
+	v.add_child(Ui.label("A wrong guess costs %d%% battery, but crosses that cause off." % int(s.balance.wrong_diagnosis_cost), 13, false, Palette.BASE_PLUM, 450))
 
 
 func _close_diagnose() -> void:
@@ -1945,17 +1949,17 @@ class MalfBoard extends Control:
 			var done: bool = s.malf.solved and p >= 1.0
 			var word_txt := "NOT IT" if c.crossed else ("SOLVED!" if done else word(p))
 			var name_col := Palette.BASE_MAUVE if c.crossed else Palette.INK
-			draw_string(fb, Vector2(0, y + 8), name, HORIZONTAL_ALIGNMENT_LEFT, size.x, 8, name_col)
+			draw_string(fb, Vector2(0, y + 10), name, HORIZONTAL_ALIGNMENT_LEFT, size.x, 10, name_col)
 			if c.crossed:
-				var w := fb.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
-				draw_line(Vector2(0, y + 4), Vector2(minf(w, size.x), y + 4), Palette.STATUS_DANGER, 1.0)
+				var w := fb.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
+				draw_line(Vector2(0, y + 5), Vector2(minf(w, size.x), y + 5), Palette.STATUS_DANGER, 1.0)
 			# bar on its own line, word under the bar's right end
-			draw_rect(Rect2(0, y + 11, size.x, 7), Palette.BASE_STONE)
+			draw_rect(Rect2(0, y + 13, size.x, 6), Palette.BASE_STONE)
 			if not c.crossed:
 				var col := Palette.STATUS_OK if done else (Palette.STATUS_WARN if p >= 0.45 else Palette.SKY_HAZE)
-				draw_rect(Rect2(0, y + 11, size.x * p, 7), col)
-			draw_rect(Rect2(0, y + 11, size.x, 7), Palette.INK, false, 1.0)
-			draw_string(f, Vector2(0, y + 27), word_txt, HORIZONTAL_ALIGNMENT_RIGHT, size.x, 8, Palette.STATUS_DANGER_SHADE if c.crossed else Palette.INK)
+				draw_rect(Rect2(0, y + 13, size.x * p, 6), col)
+			draw_rect(Rect2(0, y + 13, size.x, 6), Palette.INK, false, 1.0)
+			draw_string(f, Vector2(0, y + 29), word_txt, HORIZONTAL_ALIGNMENT_RIGHT, size.x, 10, Palette.STATUS_DANGER_SHADE if c.crossed else Palette.INK)
 			y += 31.0
 
 

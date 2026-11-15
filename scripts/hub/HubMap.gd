@@ -237,7 +237,7 @@ func _build_habitat() -> void:
 	_animate(s, "bld_habitat")
 	_stand(s, HABITAT_POS + Vector2(0, 96), BSCALE)
 	_foot(s.texture, HABITAT_POS + Vector2(0, 96), BSCALE, 0.92, 54.0)   # footprint only: you can walk behind the roof
-	var l := Ui.label("CONTROL ROOM", 8, true, Palette.HIGHLIGHT)
+	var l := Ui.label("CONTROL ROOM", 11, true, Palette.HIGHLIGHT)
 	l.z_index = 5
 	l.position = HABITAT_POS + Vector2(-44, 98)
 	add_child(l)
@@ -253,7 +253,7 @@ func _build_plot(id: String) -> void:
 	_stand(post, PLOT_POS[id] + Vector2(0, 12), BSCALE)
 	s.set_meta("post", post)
 	s.set_meta("body", _solid(PLOT_POS[id] + Vector2(0, 40), Vector2(150, 48)))
-	var l := Ui.label(PLOT_NAME[id], 8, true, Palette.HIGHLIGHT)
+	var l := Ui.label(PLOT_NAME[id], 10, true, Palette.HIGHLIGHT)
 	l.z_index = 5
 	plot_labels[id] = l
 	l.position = PLOT_POS[id] + Vector2(-60, 66)
@@ -566,7 +566,7 @@ func _build_hud() -> void:
 	start_button = Ui.button("START NIGHT", _start_night, Vector2(260, 72))
 	start_button.position = Vector2(1004, 632)
 	hud_root.add_child(start_button)
-	var help := Ui.label("WALK: WASD / ARROWS · BUILD: E OR TAP A PLOT · ESC: PAUSE", 8, true, Palette.HIGHLIGHT)
+	var help := Ui.label("WALK: WASD / ARROWS · BUILD: E OR TAP A PLOT · ESC: PAUSE", 11, true, Palette.HIGHLIGHT)
 	help.position = Vector2(16, 700)
 	hud_root.add_child(help)
 
@@ -776,7 +776,7 @@ func _show_briefing() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 8)
 	top.add_child(col)
-	col.add_child(Ui.label("MORNING BRIEFING · NIGHT %d" % cfg.id, 8, true, Palette.BASE_PLUM))
+	col.add_child(Ui.label("MORNING BRIEFING · NIGHT %d" % cfg.id, 14, true, Palette.BASE_PLUM))
 	col.add_child(Ui.label(cfg.title.to_upper(), Ui.BIG, true, Palette.INK, 700))
 	col.add_child(Ui.body(cfg.briefing_text, 20, false, Palette.INK, 700))
 	for ev in cfg.hazard_events:
@@ -855,7 +855,7 @@ func _build_sponsor_panel() -> void:
 		Sfx.play("click")
 		_show_sponsor_poster())
 	hud_root.add_child(sponsor_icon)
-	sponsor_mark = Ui.label("OFFER!", 8, true, Palette.HIGHLIGHT)
+	sponsor_mark = Ui.label("OFFER!", 11, true, Palette.HIGHLIGHT)
 	sponsor_mark.position = Vector2(1236, 552)
 	hud_root.add_child(sponsor_mark)
 	_refresh_sponsor(false)
@@ -947,7 +947,7 @@ func _show_building(id: String) -> void:
 	var hc := VBoxContainer.new()
 	head.add_child(hc)
 	hc.add_child(Ui.label("INSIDE: " + PLOT_NAME[id], Ui.BIG, true))
-	hc.add_child(Ui.label("LEVEL %d OF 3 · DAY %d LESSON (%d OF %d)" % [lv, Game.night, int(les.get("index", 0)) + 1, int(les.get("count", 1))], 8, true, Palette.BASE_PLUM))
+	hc.add_child(Ui.label("LEVEL %d OF 3 · DAY %d LESSON (%d OF %d)" % [lv, Game.night, int(les.get("index", 0)) + 1, int(les.get("count", 1))], 14, true, Palette.BASE_PLUM))
 	var content := _card_scroll(v, 430.0)
 	var body := Ui.row(content, 20, BoxContainer.ALIGNMENT_BEGIN)
 	var left := VBoxContainer.new()
@@ -1252,7 +1252,7 @@ func _build_crew() -> void:
 		m.visible = not _talked().has(id)
 		add_child(m)
 		crew_marks[id] = m
-		var n := Ui.label(str(id).to_upper(), 8, true, Palette.HIGHLIGHT)
+		var n := Ui.label(str(id).to_upper(), 11, true, Palette.HIGHLIGHT)
 		n.position = at + Vector2(-20, 2)
 		n.z_index = 5
 		add_child(n)
