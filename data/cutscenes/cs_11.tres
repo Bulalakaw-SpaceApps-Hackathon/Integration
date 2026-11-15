@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-11"
 title = "Solar Flare Day"
-panel_assets = Array[String](["cam_sky_radar"])
+panel_assets = Array[String](["cutscene_cs11"])
 portrait_assets = Array[String](["portrait_mateo"])
 captions = Array[String](["Watch for the flare warning. Recall the crew and close the shelter before particles arrive."])
 panel_durations_sec = Array[float]([0.0])

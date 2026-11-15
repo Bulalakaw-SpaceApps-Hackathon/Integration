@@ -279,6 +279,134 @@
 		"frames": 16,
 		"kind": "image"
 	},
+	"cutscene_cs00": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs00.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs01": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs01.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs02": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs02.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs03": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs03.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs04": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs04.png",
+		"w": 836,
+		"h": 188,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs05": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs05.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs06": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs06.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs07": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs07.png",
+		"w": 1672,
+		"h": 941,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs08": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs08.png",
+		"w": 836,
+		"h": 189,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs09": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs09.png",
+		"w": 836,
+		"h": 189,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs10": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs10.png",
+		"w": 1920,
+		"h": 1080,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs11": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs11.png",
+		"w": 1920,
+		"h": 1080,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs12": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs12.png",
+		"w": 1920,
+		"h": 1080,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs13": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs13.png",
+		"w": 1920,
+		"h": 1080,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs14": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs14.png",
+		"w": 1920,
+		"h": 1080,
+		"frames": 1,
+		"kind": "image"
+	},
+	"cutscene_cs15": {
+		"id": "U-01",
+		"path": "res://assets/sprites/cutscenes/cutscene_cs15.png",
+		"w": 1920,
+		"h": 1080,
+		"frames": 1,
+		"kind": "image"
+	},
 	"codex_battery_solar": {
 		"id": "SC-06",
 		"path": "res://assets/sprites/ui/codex_battery_solar.png",

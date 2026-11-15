@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-02"
 title = "First Sunrise"
-panel_assets = Array[String](["cam_solar_field"])
+panel_assets = Array[String](["cutscene_cs02"])
 portrait_assets = Array[String](["portrait_lani"])
 captions = Array[String](["Our first watch is over. The debrief shows what our power choices changed."])
 panel_durations_sec = Array[float]([0.0])

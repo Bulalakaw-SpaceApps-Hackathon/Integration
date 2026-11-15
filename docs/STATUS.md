@@ -1,5 +1,15 @@
 # Bulalakaw Station status
 
+## U-01 supplied cutscene scenery — 2026-11-15
+
+- Final aspect-ratio correction: changed the scenery viewport to exactly 736×414, an integer 16:9 frame, and moved the caption into a separate 76 px panel below it. Reduced caption text to the 20 px accessibility minimum so two short lines fit without covering the image. A rendered 1280×720 CS-15 capture confirmed the complete source frame is visible with no caption overlap.
+- Re-ran Godot import and `tests/cutscene_test.gd`; both exited 0. Captured CS-01 through a temporary 1280×720 rendered test scene and visually confirmed the image occupies the intended 16:9 frame with the caption and buttons readable. The renderer emitted its existing shutdown texture diagnostics after saving the verified screenshot.
+- Copied the supplied `3232323` artwork into `assets/sprites/cutscenes/` and registered `cutscene_cs00` through `cutscene_cs15` in `data/assets.json`. Thirteen scenes use the supplied high-resolution scenery. CS-04, CS-08 and CS-09 use their supplied storyboard panels because no matching high-resolution scenery file was present.
+- Updated all sixteen cutscene resources to use the new assets. CS-00 retains four timed panels and its Night 1 briefing route. `CutsceneStage.gd` displays supplied cutscene images as covered cinematic backgrounds while the existing Godot caption and navigation UI remains readable and interactive.
+- Godot 4.7.2 headless editor import exited 0. `tests/cutscene_test.gd` passed every scene, array, asset-path, CS-00 timing and route check. The main scene ran headlessly and exited 0, with the existing resource-cleanup diagnostics at shutdown. `git diff --check` passed.
+- `tests/asset_check.gd` still reports four existing character-sheet mismatches: `crew_carlo`, `crew_lani`, `crew_mateo` and `crew_maya` are 192×32 while their manifest entries expect 512×48. The cutscene assets themselves imported successfully. `tests/smoke_main.gd` still hits its existing invalid `readout` access at line 17. Neither issue was introduced by this resource change.
+- Visual review inside the Cutscene Gallery remains pending. The supplied README says CS-12 timing labels are illustrative, CS-13 is a visual metaphor, and CS-14 delivery must remain conditional on the player result. Existing runtime captions preserve those gameplay meanings.
+
 ## Hub and Camera Desk UI repair — 2026-11-15
 
 - **Task IDs** B-01/B-02 and CH-06. The Commander and all four crewmates wear EVA suits on the surface. Clicking a plot opens its building information immediately. Upgrading applies the configured cost and raises the level. The existing building-visit requirement still gates the start of the night.

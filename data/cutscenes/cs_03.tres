@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-03"
 title = "Roots in Red Soil"
-panel_assets = Array[String](["cam_greenhouse_on"])
+panel_assets = Array[String](["cutscene_cs03"])
 portrait_assets = Array[String](["portrait_maya"])
 captions = Array[String](["These little plants need light and warmth. Life Support needs power too, so we must share the battery."])
 panel_durations_sec = Array[float]([0.0])

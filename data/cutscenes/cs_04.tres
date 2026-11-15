@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-04"
 title = "Small Green Things"
-panel_assets = Array[String](["cam_greenhouse_off"])
+panel_assets = Array[String](["cutscene_cs04"])
 portrait_assets = Array[String](["portrait_maya"])
 captions = Array[String](["Morning is here. Check our crop results to see what the greenhouse needs next."])
 panel_durations_sec = Array[float]([0.0])

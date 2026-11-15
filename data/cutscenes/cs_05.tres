@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-05"
 title = "The Unseen Storm"
-panel_assets = Array[String](["cam_shelter"])
+panel_assets = Array[String](["cutscene_cs05"])
 portrait_assets = Array[String](["portrait_mateo"])
 captions = Array[String](["Radiation is invisible. Learn the shelter route before tonight's warning."])
 panel_durations_sec = Array[float]([0.0])

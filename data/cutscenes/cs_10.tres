@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-10"
 title = "Dawn Through Dust"
-panel_assets = Array[String](["cam_solar_field_dusty"])
+panel_assets = Array[String](["cutscene_cs10"])
 portrait_assets = Array[String](["portrait_lani"])
 captions = Array[String](["Morning has returned through the dust. Review the forecast and choose our next upgrade."])
 panel_durations_sec = Array[float]([0.0])

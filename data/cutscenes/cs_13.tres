@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-13"
 title = "The Bulalakaw Night"
-panel_assets = Array[String](["cam_sky_radar"])
+panel_assets = Array[String](["cutscene_cs13"])
 portrait_assets = Array[String](["portrait_commander"])
 captions = Array[String](["Tonight combines archived dust and flare events in a simplified scenario. Send our report early, before the radio blackout."])
 panel_durations_sec = Array[float]([0.0])

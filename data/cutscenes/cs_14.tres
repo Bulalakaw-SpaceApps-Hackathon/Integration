@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-14"
 title = "Final Transmission"
-panel_assets = Array[String](["cam_airlock"])
+panel_assets = Array[String](["cutscene_cs14"])
 portrait_assets = Array[String](["portrait_commander"])
 captions = Array[String](["Sunrise is here. The debrief records whether our report reached Earth before the blackout."])
 panel_durations_sec = Array[float]([0.0])

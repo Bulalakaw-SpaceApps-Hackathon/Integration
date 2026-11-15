@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-12"
 title = "Light Is Faster"
-panel_assets = Array[String](["cam_shelter"])
+panel_assets = Array[String](["cutscene_cs12"])
 portrait_assets = Array[String](["portrait_mateo"])
 captions = Array[String](["Flare light arrived before the particles. Our debrief shows how we used that warning."])
 panel_durations_sec = Array[float]([0.0])

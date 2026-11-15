@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "CS-15"
 title = "A Home Together"
-panel_assets = Array[String](["cam_solar_field"])
+panel_assets = Array[String](["cutscene_cs15"])
 portrait_assets = Array[String](["portrait_commander"])
 captions = Array[String](["Seven nights of learning brought us here. Together, we made this small station a home."])
 panel_durations_sec = Array[float]([0.0])

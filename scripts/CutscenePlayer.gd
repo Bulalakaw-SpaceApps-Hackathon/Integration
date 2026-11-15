@@ -19,6 +19,7 @@ var finished: bool = false
 var portrait: TextureRect
 var transition: Tween
 var calm_override: int = -1
+var stage: CutsceneStage
 
 
 func _ready() -> void:
@@ -62,6 +63,10 @@ func _build_ui() -> void:
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(portrait)
+	stage = CutsceneStage.new()
+	stage.position = Vector2(272, 146)
+	stage.size = Vector2(736, 414)
+	add_child(stage)
 
 	var header := VBoxContainer.new()
 	header.position = Vector2(48, 42)
@@ -74,11 +79,11 @@ func _build_ui() -> void:
 	header.add_child(progress_label)
 
 	var caption_box := PanelContainer.new()
-	caption_box.position = Vector2(84, 486)
-	caption_box.size = Vector2(1112, 146)
-	caption_box.add_theme_stylebox_override("panel", Ui.nine("ui_briefing", 22))
+	caption_box.position = Vector2(84, 566)
+	caption_box.size = Vector2(1112, 76)
+	caption_box.add_theme_stylebox_override("panel", Ui.nine("ui_briefing", 14))
 	add_child(caption_box)
-	caption_label = Ui.body("", 24, false, Palette.INK, 1030)
+	caption_label = Ui.body("", 20, false, Palette.INK, 1050)
 	caption_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	caption_box.add_child(caption_label)
 
@@ -124,6 +129,10 @@ func _show_panel() -> void:
 		return
 	elapsed_sec = 0.0
 	var asset := beat.panel_assets[panel_index]
+	var speaker: String = beat.portrait_assets[panel_index] if panel_index < beat.portrait_assets.size() else ""
+	stage.show_panel(asset, speaker, beat.id == "CS-15")
+	art.hide()
+	portrait.hide()
 	art.texture = Assets.frame(asset, 0)
 	# Buildings are foreground objects; preserve their silhouette rather than cropping.
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -136,11 +145,14 @@ func _show_panel() -> void:
 	art.modulate.a = 1.0
 	portrait.modulate.a = 1.0
 	var calm_enabled: bool = Progression.calm_mode if calm_override < 0 else calm_override == 1
+	stage.modulate.a = 1.0
 	if not calm_enabled and beat.fade_sec > 0.0:
 		art.modulate.a = 0.0
 		portrait.modulate.a = 0.0
 		portrait.position.x += beat.portrait_slide_px
 		transition = create_tween().set_parallel(true)
+		stage.modulate.a = 0.0
+		transition.tween_property(stage, "modulate:a", 1.0, beat.fade_sec)
 		transition.tween_property(art, "modulate:a", 1.0, beat.fade_sec)
 		transition.tween_property(portrait, "modulate:a", 1.0, beat.fade_sec)
 		transition.tween_property(portrait, "position:x", 820.0, beat.fade_sec).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

@@ -6,7 +6,7 @@
 script = ExtResource("1_cutscene_beat")
 id = "CS-00"
 title = "BULALAKAW STATION"
-panel_assets = Array[String](["bld_habitat", "bld_habitat", "desk_bg", "desk_bg"])
+panel_assets = Array[String](["cutscene_cs00", "cutscene_cs00", "cutscene_cs01", "cutscene_cs01"])
 portrait_assets = Array[String](["", "portrait_commander", "portrait_lani", "portrait_lani"])
 fade_sec = 0.8
 portrait_slide_px = 18.0
