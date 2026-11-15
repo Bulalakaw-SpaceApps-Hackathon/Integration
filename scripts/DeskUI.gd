@@ -326,16 +326,18 @@ func _build_desk() -> void:
 	add_child(stars_strip)
 
 	# meter panel
-	_tex("desk_meter_panel.png", Vector2(16, 576))
+	var meter_back := _tex("desk_meter_panel.png", Vector2(8, 530))
+	meter_back.scale = Vector2(1.55, 1.5)
 	meter_panel = MeterPanel.new()
-	meter_panel.position = Vector2(16, 576)
+	meter_panel.position = Vector2(8, 530)
+	meter_panel.scale = Vector2(1.55, 1.5)
 	meter_panel.size = Vector2(192, 120)
 	meter_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	meter_panel.setup(FONT_R, FONT_B, load(S + "ui_meter_oxygen.png"), load(S + "ui_meter_dose.png"),
+	meter_panel.setup(Ui.FONT_BODY, Ui.FONT_BODY_B, load(S + "ui_meter_oxygen.png"), load(S + "ui_meter_dose.png"),
 		load(S + "ui_meter_comms.png"), load(S + "ui_meter_food.png"))
 	add_child(meter_panel)
-	_button("<", Rect2(140, 672, 26, 22), 8, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
-	_button(">", Rect2(170, 672, 26, 22), 8, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
+	_button("<", Rect2(170, 650, 64, 60), 24, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
+	_button(">", Rect2(236, 650, 64, 60), 24, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
 
 	# camera buttons (BT-02)
 	for k in 6:
@@ -1718,7 +1720,7 @@ class FeedView extends Control:
 			var room: String = w.room
 			if ROOMS[cam].has(room):
 				# EVA suit outside and in the airlock (they suit up there); indoor clothes elsewhere
-				var suited: bool = OUTSIDE.has(room) or room == "airlock" or (w.mode == "out" and OUTSIDE.has(str(c.target)))
+				var suited: bool = OUTSIDE.has(room) or room in ["airlock", "shelter"] or (w.mode == "out" and OUTSIDE.has(str(c.target)))
 				var sheet := "crew_%s_eva" % c.id if suited else "crew_%s" % c.id
 				# 16-frame sheets: DOWN 0-3, LEFT 4-7, RIGHT 8-11, UP 12-15.
 				# Standing faces us; leaving walks RIGHT out of frame; arriving walks LEFT in from the right.
@@ -1802,14 +1804,14 @@ class MeterPanel extends Control:
 		match PAGES[page]:
 			"AIR":
 				draw_texture(icons.oxygen, Vector2(12, 10))
-				draw_string(fr, Vector2(68, 16), "OXYGEN", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(68, 16), "OXYGEN", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				_bar(68, 20, 112, 14, s.oxygen / 100.0, Palette.SKY_HAZE)
 				draw_string(fr, Vector2(68, 54), "%d%%" % int(s.oxygen), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
 				var rate := s.oxygen_per_sec()
-				draw_string(fr, Vector2(12, 80), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(12, 80), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 			"CREW DOSE":
 				draw_texture(icons.dose, Vector2(12, 4))
-				draw_string(fr, Vector2(68, 14), "MAX %.1f / %d X-RAYS" % [s.max_dose(), int(s.balance.dose_limit_xrays)], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(68, 14), "MAX %.1f / %d X-RAYS" % [s.max_dose(), int(s.balance.dose_limit_xrays)], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				var i := 0
 				for c in s.crew:
 					var x := 68 + (i % 2) * 60
@@ -1817,7 +1819,7 @@ class MeterPanel extends Control:
 					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(x, y, 18, 18), false)
 					_bar(x + 20, y + 5, 36, 8, c.dose / s.balance.dose_limit_xrays, Palette.STATUS_WARN)
 					i += 1
-				draw_string(fr, Vector2(12, 80), "LIMIT %d PER CREWMATE" % int(s.balance.dose_limit_xrays), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(12, 80), "LIMIT %d PER CREWMATE" % int(s.balance.dose_limit_xrays), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 			"CREW WHERE":
 				var j := 0
 				for c in s.crew:
@@ -1826,13 +1828,13 @@ class MeterPanel extends Control:
 					var where: String = ROOM_SHORT.get(c.room, str(c.room).to_upper())
 					if c.walk_left > 0.0:
 						where = "> " + ROOM_SHORT.get(c.target, str(c.target).to_upper())
-					draw_string(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 					j += 1
 			"RADIO":
 				draw_texture(icons.comms, Vector2(12, 10))
-				draw_string(fr, Vector2(68, 16), "LINK TO EARTH", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				draw_string(fr, Vector2(68, 16), "LINK TO EARTH", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				if s.config.comms_delay_real_min <= 0.0:
-					draw_string(fr, Vector2(68, 44), "NO DISH YET", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(68, 44), "NO DISH YET", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				else:
 					_bar(68, 20, 112, 14, s.comms / 100.0, Palette.SKY_INDIGO)
 					draw_string(fr, Vector2(68, 54), "%d%%" % int(s.comms), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
@@ -1840,11 +1842,11 @@ class MeterPanel extends Control:
 				draw_texture(icons.food, Vector2(12, 10))
 				if s.config.food_enabled:
 					draw_string(fr, Vector2(68, 32), "FOOD: %d" % s.food, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
-					draw_string(fr, Vector2(68, 50), "LAMP %d/%d S" % [int(s.crop_lamp_on_sec), int(s.balance.crop_min_sec)], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(68, 50), "LAMP %d/%d S" % [int(s.crop_lamp_on_sec), int(s.balance.crop_min_sec)], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 				else:
-					draw_string(fr, Vector2(68, 32), "FROM NIGHT 2", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					draw_string(fr, Vector2(68, 32), "FROM NIGHT 2", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, blue)
 		# footer: page name + number (the < > buttons sit on the right)
-		draw_string(fb, Vector2(12, 112), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+		draw_string(fb, Vector2(12, 108), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 
 
 # ============================================================================
