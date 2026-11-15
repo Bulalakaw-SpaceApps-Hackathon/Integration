@@ -64,10 +64,10 @@ func _image_scene(asset: String, bounds: Rect2) -> void:
 	layer.position = bounds.position
 	layer.size = bounds.size
 	layer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	var texture_aspect: float = float(layer.texture.get_width()) / float(layer.texture.get_height())
-	# The three storyboard-only fallbacks are extra-wide completed panels. Keep those
-	# whole. The high-resolution scenery is 16:9 and fills this 736x414 stage exactly.
-	layer.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED if texture_aspect > 2.2 else TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	# Keep every supplied frame whole. COVERED crops the top or sides whenever the
+	# browser viewport and the logical stage differ by even a few pixels, which made
+	# the character and scenery edges disappear in the cutscene viewer.
+	layer.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	layer.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(layer)
