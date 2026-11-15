@@ -813,6 +813,8 @@ func _show_building(id: String) -> void:
 		frame.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		var photo := Ui.image("nasa_%s_%d" % [id, int(les.index) + 1])
 		photo.custom_minimum_size = Vector2(320, 200)
+		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		frame.add_child(photo)
 		left.add_child(frame)
 		var cap := Ui.row(left, 6, BoxContainer.ALIGNMENT_BEGIN)
