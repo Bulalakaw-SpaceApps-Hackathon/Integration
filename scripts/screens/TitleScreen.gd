@@ -53,11 +53,7 @@ func _ready() -> void:
 
 	# live / archived NASA data status, bottom-left above the credit line
 	var status := Ui.row(self, 8)
-<<<<<<< HEAD
 	status.position = Vector2(20, 654)          # badge (32 px) clear of the credit line below (D55)
-=======
-	status.position = Vector2(20, 672)
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 	_fill_status(status)
 	DonkiService.updated.connect(func() -> void:
 		for ch in status.get_children():

@@ -77,11 +77,8 @@ var tut_label: Label
 var tut_next: Button
 var tut_step := 0
 var tut_recalled := false
-<<<<<<< HEAD
 var tut_asked := false
 var tut_skip := false                 # this step was already done before it came up: just show NEXT
-=======
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
 var hint_t := 0.0
 var tick_t := 0.0
@@ -578,11 +575,6 @@ func _tut_show() -> void:
 		"scan":
 			if not s.cameras_on.has("solar_field"):
 				s.toggle_camera("solar_field")
-<<<<<<< HEAD
-=======
-		"recall":
-			tut_recalled = false
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 		"ad":
 			s.sponsor = true
 			s.sponsors = [2]
@@ -637,11 +629,7 @@ func _tut_check(s: OutpostSim) -> void:
 		"diagnose": done = s.malfunction_solved()
 		"shelter": done = s.shelter_door_open
 		"recall": done = tut_recalled
-<<<<<<< HEAD
 		"ask": done = tut_asked or s.ask_in_flight()
-=======
-		"ask": done = s.ask_in_flight()
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 		"ad": done = s.sponsor_ads_closed > 0
 	if done:
 		_tut_advance()
@@ -961,10 +949,7 @@ func _on_night_ended(report: Dictionary) -> void:
 	if not rough.is_empty():
 		lines[1][2] = Strings.t("rough." + str(rough[0]))
 		lines[2][2] = Strings.t("rough.challenge")
-<<<<<<< HEAD
 	var star_i := 0
-=======
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 	for l in lines:
 		var r := HBoxContainer.new()
 		r.add_theme_constant_override("separation", 8)
@@ -1625,11 +1610,7 @@ class FeedView extends Control:
 		var s: OutpostSim = SimState.sim
 		if cam == "" or s == null or s.battery <= 0.0 and int(fmod(t, 4.0)) == 0 and cam != "shelter":
 			# no camera, or the battery is empty: cameras flicker out to NO SIGNAL
-<<<<<<< HEAD
 			draw_texture(Assets.frame("cam_off", int(t * 6.0) % Assets.frame_count("cam_off")), Vector2.ZERO)   # rolling static
-=======
-			draw_texture(Assets.tex("cam_off"), Vector2.ZERO)
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 			if s != null and s.battery <= 0.0:
 				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
 			return
@@ -1638,7 +1619,6 @@ class FeedView extends Control:
 		if cam == "airlock" and last_bg != "" and bg != last_bg:
 			Sfx.play("door_open" if bg == "cam_airlock_open" else "door_close", -12.0)
 		last_bg = bg
-<<<<<<< HEAD
 		draw_texture(Assets.frame(bg, int(t * 2.0) % Assets.frame_count(bg)), Vector2.ZERO)   # plants sway, static rolls (D66)
 		# outside feeds: a few stars twinkle; the Sky Radar sweep turns (D66)
 		if cam in ["sky_radar", "solar_field"]:
@@ -1651,9 +1631,6 @@ class FeedView extends Control:
 			for k in 4:
 				var a := sweep - k * 0.08
 				draw_line(c0, c0 + Vector2(cos(a), sin(a)) * 70.0, Color(0.64, 0.9, 0.62, 0.5 - k * 0.11), 1.0)
-=======
-		draw_texture(Assets.tex(bg), Vector2.ZERO)
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 		# Solar Field gets darker as the battery charge drops
 		if cam == "solar_field":
 			draw_rect(Rect2(0, 0, 320, 180), Color(0.05, 0.02, 0.12, clampf((60.0 - s.battery) / 100.0, 0.0, 0.45)))
