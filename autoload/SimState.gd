@@ -29,6 +29,12 @@ func story_beat(night_id: int) -> Dictionary:
 			var d: Variant = JSON.parse_string(f.get_as_text())
 			if d is Dictionary:
 				_story = d
+	if night_id == 0:                       # practice night: Night 1's malfunction, its own radio line
+		var b: Dictionary = (_story.get("1", {}) as Dictionary).duplicate()
+		b["open"] = "Mission Control: This is a practice night. Nothing can go wrong, so try every button!"
+		b.erase("close")
+		b.erase("radio")
+		return b
 	return _story.get(str(night_id), {})
 
 
@@ -46,10 +52,27 @@ func night_extras(night_id: int) -> Dictionary:
 
 
 func load_night(night_id: int) -> NightConfig:
+	if night_id == 0:
+		return _practice_night()
 	var path := NIGHT_PATH % night_id
 	if not ResourceLoader.exists(path):
 		return null
 	return load(path) as NightConfig
+
+
+## Night 0: the last night's base (everything unlocked, radio on) with no hazards at all.
+var _practice: NightConfig
+func _practice_night() -> NightConfig:
+	if _practice == null:
+		_practice = (load(NIGHT_PATH % 7) as NightConfig).duplicate() as NightConfig
+		_practice.id = 0
+		_practice.title = "Practice Night"
+		_practice.theme = "Practice"
+		_practice.comms_delay_real_min = 4.0
+		_practice.briefing_text = "Walk to every building and go inside to see what it does. Then start the practice night and try every control. Nothing can fail here!"
+		var none: Array[HazardEvent] = []
+		_practice.hazard_events = none
+	return _practice
 
 
 func start_night(night_id: int) -> bool:

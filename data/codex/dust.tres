@@ -6,7 +6,7 @@
 script = ExtResource("1_xllvn")
 id = "dust"
 title = "DUST STORMS"
-text = "Mars has dust storms that can cover the whole planet. In 2018 a global storm blocked so much sunlight that the solar-powered Opportunity rover lost power."
-real_number = "Global dust storm, June 2018"
-source = "NASA JPL"
+text = "Mars has dust storms that can cover the whole planet for weeks. In June 2018 a planet-wide storm blocked so much sunlight that day turned almost into night for the solar-powered Opportunity rover, and its mission ended."
+real_number = "June 2018 global storm: opacity tau > 10.8"
+source = "NASA JPL (Opportunity / Mars Reconnaissance Orbiter)"
 order = 2

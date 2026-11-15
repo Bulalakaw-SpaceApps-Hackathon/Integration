@@ -60,6 +60,11 @@ func _init() -> void:
 	check("N2 ASK EARTH reply arrives after the round trip", asked.reply > 0.0 and asked.reply - asked.sent >= want - 1.0)
 	check("N2 Earth's reply crosses off a wrong cause", asked.crossed >= 1)
 
+	# --- Balance target: a player who does NOTHING all night
+	for nn in range(1, 8):
+		var rr := play(nn, func(_s: OutpostSim, _d: NightDirector) -> void: pass)
+		print("    passive N%d: won %s, battery %.0f%%, oxygen %.0f%%, rough %s, stars %d" % [nn, rr.won, rr.battery, rr.oxygen, rr.rough, rr.stars])
+
 	# --- The real cause must not always be the first row
 	var first_true := 0
 	for i in 20:
@@ -170,6 +175,7 @@ func _init() -> void:
 			_attentive(s)
 			shelter_p.call(s, d))
 		check("N%d attentive player wins with 3 stars possible (stars %d, science %s, challenge %s)" % [n, r.stars, r.star_science, r.star_challenge], r.won and r.star_science)
+		if not r.star_science: print("    N%d detail: rough %s, discovery %s, malf solved %s, battery %.0f, faults %d/%d" % [n, r.rough, r.discovery_found, r.malfunction.get("solved", false), r.battery, r.faults_fixed, r.faults_total])
 		if not r.won:
 			print("      lost: ", r.reason, " battery ", r.battery, " oxygen ", r.oxygen)
 	var lazy := play_extras(2, extras, func(_s: OutpostSim, _d: NightDirector) -> void: pass)
@@ -283,6 +289,11 @@ func _attentive(s: OutpostSim) -> void:
 		for r in s.requests:
 			if r.answer == "":
 				want = s.crew_cam(r.crew)
+	# detective: a clue is showing somewhere right now -> go and watch it
+	if want == "" and s.has_malfunction() and not s.malf.solved:
+		for k in s.malf.clues:
+			if not k.found and s.clock_sec >= float(k.at) and s.clock_sec <= float(k.at) + OutpostSim.CLUE_SECONDS:
+				want = k.cam
 	# careful with power: switch extras off when the forecast says the battery won't last
 	if s.forecast_empty_at() < s.balance.night_length_sec:
 		if s.crop_lamp:

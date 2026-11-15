@@ -73,6 +73,37 @@ func _process(_d: float) -> bool:
 		13: shot("try_again")
 		14:
 			print("deals after loss: ", prog.sponsor_deals, " rough: ", ss.sim.rough)
-			return true
+			prog.sponsor_deals.clear()
+			game.goto("title")
+		15:
+			game.open_panel("judge")
+		16:
+			shot("judge_best_of")
+			game.top_panel()._best_of()
+		17:
+			desk.overlay.visible = false
+			if desk.guide_mode > 0:
+				desk._tut_advance()
+			ss.frozen = false
+			ss.sim.toggle_camera("sky_radar")
+			ss.speed = 4.0
+			wait = 620
+		18:
+			print("clock ", ss.sim.clock_sec)
+			shot("n7_meteor_shower")
+			wait = 420
+		19:
+			print("n7 faults: ", ss.sim.faults.map(func(f): return f.kind), " discovery: ", ss.sim.discovery.get("title", "-"), " on ", ss.sim.discovery.get("cam", "-"))
+			shot("n7_after_meteors")
+			ss.speed = 1.0
+		20:
+			prog.discoveries = {1: "FROST ON THE GROUND", 3: "A RADIATION RECORD", 7: "A BULALAKAW LANDED!"}
+			prog.stars = {1: 3, 2: 2, 3: 3, 4: 1, 5: 2, 6: 3, 7: 2}
+			game.goto("complete")
+			wait = 300
+		21: shot("ending")
+		22: game.open_panel("real")
+		23: shot("what_was_real")
+		24: return true
 	step += 1
 	return false

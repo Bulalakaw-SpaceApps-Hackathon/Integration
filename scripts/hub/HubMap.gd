@@ -108,9 +108,12 @@ func _ready() -> void:
 	fx.z_index = 11
 	fx.scale = Vector2(BSCALE, BSCALE)
 	add_child(fx)
+	_build_crew()
 	_build_hud()
 	Progression.changed.connect(_refresh_hud)
-	if not Progression.story_seen and not Progression.judge_mode:
+	if Game.tutorial:
+		_show_tutorial_card()
+	elif not Progression.story_seen and not Progression.judge_mode:
 		_show_story()
 	else:
 		_show_briefing()
@@ -409,11 +412,19 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if card_layer != null:
 		return
-	if event.is_action_pressed("interact") and near_target != "":
+	if event.is_action_pressed("interact") and _crew_near() != "":
+		_talk(_crew_near())
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("interact") and near_target != "":
 		_interact(near_target)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var p: Vector2 = get_canvas_transform().affine_inverse() * (event as InputEventMouseButton).position
+		for id in crew_nodes:
+			if Rect2(crew_nodes[id].position - Vector2(36, 100), Vector2(72, 108)).has_point(p):
+				_talk(id)
+				get_viewport().set_input_as_handled()
+				return
 		if Rect2(HABITAT_POS - Vector2(192, 192), Vector2(384, 288)).has_point(p):
 			_walk_or_interact("habitat", HABITAT_POS + Vector2(0, 124))
 			return
@@ -488,7 +499,7 @@ func _build_hud() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 2)
 	bar.add_child(col)
-	col.add_child(Ui.label("DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""], 8, true))
+	col.add_child(Ui.label(("TUTORIAL · VISIT EVERY BUILDING, THEN START THE PRACTICE NIGHT" if Game.tutorial else "DAY %d OF %d · TONIGHT: %s" % [Game.night, Progression.NIGHT_COUNT, cfg.title.to_upper() if cfg else ""]), 8, true))
 	var res := Ui.row(col, 6, BoxContainer.ALIGNMENT_BEGIN)
 	for pair in [["icon_materials", "MATERIALS"], ["ui_meter_food", "FOOD"]]:
 		var ic := Ui.image(pair[0])
@@ -581,6 +592,17 @@ func _new_card(width := 760.0, asset := "ui_panel") -> VBoxContainer:
 	hud_root.add_child(card_layer)
 	Ui.dim(card_layer, 0.45)
 	return Ui.card(card_layer, asset, width)
+
+
+# ---------------------------------------------------------------- Night 0: the tutorial day
+func _show_tutorial_card() -> void:
+	var v := _new_card(900, "ui_briefing")
+	v.add_child(Ui.label("TUTORIAL · PRACTICE DAY", Ui.BIG, true))
+	v.add_child(Ui.label(Strings.t("tut0.day1"), Ui.BODY, false, Palette.INK, 820))
+	v.add_child(Ui.label(Strings.t("tut0.day2"), Ui.BODY, false, Palette.INK, 820))
+	v.add_child(Ui.label(Strings.t("tut0.day3"), Ui.BODY, true, Palette.BASE_PLUM, 820))
+	var btns := Ui.row(v)
+	btns.add_child(Ui.button("LET'S LOOK AROUND", _close_card, Vector2(320, 60)))
 
 
 # ---------------------------------------------------------------- the mission (first time only)
@@ -773,10 +795,24 @@ func _show_building(id: String) -> void:
 	left.add_theme_constant_override("separation", 6)
 	body.add_child(left)
 	if not les.is_empty():
+		# real photos get a frame (dark outline + cream mat) so they read as "a real picture", not game art
+		var frame := PanelContainer.new()
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Palette.HIGHLIGHT
+		sb.border_color = Palette.INK
+		sb.set_border_width_all(3)
+		sb.set_content_margin_all(5)
+		sb.shadow_color = Color(Palette.INK, 0.35)
+		sb.shadow_offset = Vector2(4, 4)
+		frame.add_theme_stylebox_override("panel", sb)
+		frame.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		var photo := Ui.image("nasa_%s_%d" % [id, int(les.index) + 1])
 		photo.custom_minimum_size = Vector2(320, 200)
-		left.add_child(photo)
-		left.add_child(Ui.label("PHOTO: " + str(les.image).to_upper() + " (CREDIT: NASA)", 8, false, Palette.BASE_PLUM, 420))
+		frame.add_child(photo)
+		left.add_child(frame)
+		var cap := Ui.row(left, 6, BoxContainer.ALIGNMENT_BEGIN)
+		cap.add_child(Ui.badge("real"))
+		cap.add_child(Ui.label("REAL PHOTO: " + str(les.image).to_upper() + " · CREDIT: NASA", 8, true, Palette.BASE_PLUM, 360))
 		left.add_child(FigureChart.new(les.get("figure", {})))
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 10)
@@ -985,3 +1021,101 @@ class DustDrift extends Node2D:
 	func _draw() -> void:
 		for v in specks:
 			draw_rect(Rect2(v.x, v.y, 2, 1), Color(Palette.MARS_SAND, 0.35))
+
+
+# ============================================================================ the crew by day
+## Each crew member stands by their building. Talk to them (tap, or walk up + E): one line a day.
+## One of them has noticed something about tonight's Malfunction. Nights 1-3 that hint is right;
+## from Night 4 it can be an honest wrong guess, so the night's clues still matter.
+## A crew member who was caught outside in last night's storm is resting: not on the map, no hint.
+const CREW_SPOT := {"lani": "solar", "maya": "greenhouse", "mateo": "life_support", "carlo": "suit_bay"}
+const CREW_ROLE := {"lani": "ENGINEER", "maya": "BOTANIST", "mateo": "DOCTOR", "carlo": "EVA SPECIALIST"}
+const ROOM_NAME := {"solar_field": "SOLAR FIELD", "life_support": "LIFE SUPPORT", "airlock": "AIRLOCK", "greenhouse": "GREENHOUSE",
+	"shelter": "SHELTER", "sky_radar": "SKY RADAR", "outside": "SKY RADAR", "comms_dish": "SKY RADAR"}
+const WRONG_HINT_NIGHTS := [5, 7]
+var crew_nodes: Dictionary = {}       # crew id -> Sprite2D
+var crew_marks: Dictionary = {}       # crew id -> "!" label until they have spoken today
+
+func _build_crew() -> void:
+	if cfg == null:
+		return
+	var free_spots := [HABITAT_POS + Vector2(-190, 120), HABITAT_POS + Vector2(190, 120), HABITAT_POS + Vector2(-250, 150), HABITAT_POS + Vector2(250, 150)]
+	var resting: Array = Progression.resting
+	for id in cfg.crew_ids:
+		if resting.has(id):
+			Game.toast("%s was caught in last night's storm and is resting today." % str(id).to_upper(), "info", 6.0)
+			continue
+		var spot: String = CREW_SPOT.get(id, "")
+		var at: Vector2 = PLOT_POS[spot] + Vector2(100 if id == "lani" else 84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
+		var s := Sprite2D.new()
+		s.texture = Assets.frame("crew_" + str(id), 0)
+		_stand(s, at, 2.0)
+		crew_nodes[id] = s
+		var m := Ui.label("!", 16, true, Palette.STATUS_WARN)
+		m.position = at + Vector2(-4, -122)
+		m.z_index = 6
+		m.visible = not _talked().has(id)
+		add_child(m)
+		crew_marks[id] = m
+		var n := Ui.label(str(id).to_upper(), 8, true, Palette.HIGHLIGHT)
+		n.position = at + Vector2(-20, 2)
+		n.z_index = 5
+		add_child(n)
+
+
+func _talked() -> Array:
+	if not Game.talked.has(Game.night):
+		Game.talked[Game.night] = []
+	return Game.talked[Game.night]
+
+
+func _crew_near() -> String:
+	for id in crew_nodes:
+		if commander.position.distance_to(crew_nodes[id].position) < 70.0:
+			return id
+	return ""
+
+
+## Who has the hint today, and what they say.
+func _hint_line(id: String) -> String:
+	var ids: Array = cfg.crew_ids
+	var hinter: String = ids[Game.night % ids.size()] if not ids.is_empty() else ""
+	var malf: Dictionary = SimState.story_beat(Game.night).get("malfunction", {})
+	if id != hinter or malf.is_empty():
+		return Strings.t("day.%s.%d" % [id, Game.night % 3])
+	var right_room := ""
+	var wrong_room := ""
+	for c in malf.get("causes", []):
+		var rooms: Array = c.get("rooms", [])
+		if rooms.is_empty():
+			continue
+		if c.id == malf.get("true", ""):
+			right_room = ROOM_NAME.get(rooms[0], str(rooms[0]).to_upper())
+		elif wrong_room == "":
+			wrong_room = ROOM_NAME.get(rooms[0], str(rooms[0]).to_upper())
+	if Game.night in WRONG_HINT_NIGHTS and wrong_room != "":
+		return Strings.t("day.hint_guess") % wrong_room
+	if Game.night >= 4:
+		return Strings.t("day.hint_guess") % right_room
+	return Strings.t("day.hint_sure") % right_room
+
+
+func _talk(id: String) -> void:
+	Sfx.play("msg_received", -6.0)
+	if not _talked().has(id):
+		_talked().append(id)
+	if crew_marks.has(id):
+		crew_marks[id].visible = false
+	var v := _new_card(760, "ui_briefing")
+	var top := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
+	var p := TextureRect.new()
+	p.texture = Assets.frame("portrait_" + id, 0)
+	p.custom_minimum_size = Vector2(96, 96)
+	top.add_child(p)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 8)
+	top.add_child(col)
+	col.add_child(Ui.label("%s · %s" % [id.to_upper(), CREW_ROLE.get(id, "CREW")], 8, true, Palette.BASE_PLUM))
+	col.add_child(Ui.label(_hint_line(id), Ui.BODY, false, Palette.INK, 580))
+	var btns := Ui.row(v)
+	btns.add_child(Ui.button("OK", _close_card, Vector2(160, 52)))

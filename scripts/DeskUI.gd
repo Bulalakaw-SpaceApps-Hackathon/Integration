@@ -76,6 +76,7 @@ var tut_box: PanelContainer
 var tut_label: Label
 var tut_next: Button
 var tut_step := 0
+var tut_recalled := false
 var guide_mode := 0                    # > 0 while the small "New tonight" strip is up
 var hint_t := 0.0
 var tick_t := 0.0
@@ -449,7 +450,12 @@ func _tut_steps() -> Array:
 		["tut.10", Rect2(1058, 2, 212, 196), "next"],
 		["tut.11", scan_buttons[0].get_rect(), "scan"],
 		["tut.12", diagnose_btn.get_rect(), "diagnose"],
-		["tut.9", Rect2(1058, 2, 212, 196), "start"],
+		["tut.13", ctl["shelter"].get_rect(), "shelter"],
+		["tut.14", ctl["recall"].get_rect(), "recall"],
+		["tut.15", ctl["ask"].get_rect(), "ask"],
+		["tut.16", Rect2(feeds[0].position + Vector2(260, 0), Vector2(60, 40)), "ad"],
+		["tut.17", fan.get_rect(), "next"],
+		["tut.18", Rect2(1058, 2, 212, 196), "finish"],
 	]
 
 
@@ -491,8 +497,8 @@ func _start_tutorial() -> void:
 func _tut_show() -> void:
 	var st: Array = _tut_steps()[tut_step]
 	tut_label.text = Strings.t(st[0])
-	tut_next.visible = st[2] in ["next", "start"]
-	tut_next.text = "START!" if st[2] == "start" else "NEXT"
+	tut_next.visible = st[2] in ["next", "start", "finish"]
+	tut_next.text = "START!" if st[2] == "start" else ("FINISH!" if st[2] == "finish" else "NEXT")
 	_fit_tut_box.call_deferred()
 	_point_at(st[1])
 	var s := SimState.sim
@@ -506,6 +512,17 @@ func _tut_show() -> void:
 		"scan":
 			if not s.cameras_on.has("solar_field"):
 				s.toggle_camera("solar_field")
+		"recall":
+			tut_recalled = false
+		"ad":
+			s.sponsor = true
+			s.sponsors = [2]
+			s.sponsor_ads_closed = 0
+			_close_ad(0)
+			_close_ad(1)
+			s.show_sponsor_ad()
+			var m := 1 if ads[1] != null else 0
+			_point_at(Rect2(feeds[m].position + Vector2(260, 0), Vector2(60, 40)))
 		"discovery":
 			var d: Dictionary = SimState.night_extras(1).get("discovery", {})
 			if not s.cameras_on.has("solar_field"):
@@ -527,9 +544,7 @@ func _tut_advance() -> void:
 	if tut_step >= _tut_steps().size():
 		tut_box.visible = false
 		hint_arrow.visible = false
-		SimState.frozen = false
-		Progression.tutorial_done = true
-		Progression.save_game()
+		Game.finish_tutorial()            # practice over: back to the title with the Ready for duty badge
 		return
 	_tut_show()
 
@@ -547,6 +562,10 @@ func _tut_check(s: OutpostSim) -> void:
 		"discovery": done = s.discovery_found()
 		"scan": done = s.has_malfunction() and s.malf.clues[0].found
 		"diagnose": done = s.malfunction_solved()
+		"shelter": done = s.shelter_door_open
+		"recall": done = tut_recalled
+		"ask": done = s.ask_in_flight()
+		"ad": done = s.sponsor_ads_closed > 0
 	if done:
 		_tut_advance()
 
@@ -607,6 +626,7 @@ func _press_shelter() -> void:
 
 func _press_recall() -> void:
 	_hint_used("recall")
+	tut_recalled = true
 	var s := _live()
 	if s:
 		s.recall_crew()
@@ -753,7 +773,7 @@ func _start_night() -> void:
 func _on_night_started(cfg: NightConfig) -> void:
 	SimState.sim.alert.connect(_alert)
 	meter_panel.reset_page(cfg)
-	clock_night.text = "NIGHT %d · %s" % [cfg.id, _theme_short(cfg)]
+	clock_night.text = "PRACTICE NIGHT" if cfg.id == 0 else "NIGHT %d · %s" % [cfg.id, _theme_short(cfg)]
 	# the scroll fits 5 lines: 2 for the main goal, up to 3 bonus goals (+)
 	var s0 := SimState.sim
 	scroll_title.text = "MALFUNCTION" if s0.has_malfunction() else "TONIGHT"
@@ -875,6 +895,17 @@ func _on_night_ended(report: Dictionary) -> void:
 		_ov_label("MALFUNCTION: IT WAS THE %s. %s" % [answer, mf.why], 8, true, Palette.BASE_PLUM)
 	if report.get("discovery_found", false):
 		_ov_label("DISCOVERY: %s: %s" % [report.discovery.title, report.discovery.text], 8, false, Palette.BASE_PLUM)
+	# the crew's faces: happy after a good night, worried after a rough one or if they were caught outside
+	var faces := HBoxContainer.new()
+	faces.add_theme_constant_override("separation", 6)
+	overlay_body.add_child(faces)
+	for c in SimState.sim.crew:
+		var sad: bool = not rough.is_empty() or (report.get("resting", []) as Array).has(c.id)
+		var tr := TextureRect.new()
+		tr.texture = Assets.frame("portrait_" + str(c.id), 1 if sad else 0)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.custom_minimum_size = Vector2(56, 56)
+		faces.add_child(tr)
 	for id in report.get("resting", []):
 		_ov_label(Strings.t("rest.caught") % str(id).to_upper(), 8, true, Palette.STATUS_DANGER_SHADE)
 	if won and beat.has("close"):
@@ -1075,7 +1106,8 @@ func _close_diagnose() -> void:
 # ---------------------------------------------------------------- crew talk + requests
 ## Crew chatter goes on ONE radio line under the battery (replaced, never stacked).
 func _crew_said(crew_id: String, text: String) -> void:
-	radio_icon.texture = Assets.tex("head_" + crew_id)
+	# worried portrait when someone is caught outside in a storm; their head icon otherwise
+	radio_icon.texture = Assets.frame("portrait_" + crew_id, 1) if text == Strings.t("crew.caught") else Assets.tex("head_" + crew_id)
 	radio_label.text = "%s: %s" % [crew_id.to_upper(), text]
 	radio.visible = true
 	radio_until = Time.get_ticks_msec() + 4500
@@ -1138,7 +1170,11 @@ func _open_answer(i: int, crew_id: String) -> void:
 	answer_box.add_child(v)
 	var head := HBoxContainer.new()
 	v.add_child(head)
-	head.add_child(Ui.image("head_" + crew_id))
+	var face := TextureRect.new()
+	face.texture = Assets.frame("portrait_" + crew_id, 2)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.custom_minimum_size = Vector2(48, 48)
+	head.add_child(face)
 	head.add_child(Ui.label(crew_id.to_upper() + " ASKS:", 8, true))
 	v.add_child(Ui.label(r.text, 8, false, Palette.INK, 290))
 	var row := HBoxContainer.new()
@@ -1436,6 +1472,7 @@ class FeedView extends Control:
 	var cam: String = ""
 	var t := 0.0
 	var crew_rects: Array[Dictionary] = []    # {id, rect} where each crewmate was drawn (for taps)
+	var last_bg := ""
 
 	func _gui_input(event: InputEvent) -> void:
 		var mb := event as InputEventMouseButton
@@ -1449,6 +1486,18 @@ class FeedView extends Control:
 	func _process(delta: float) -> void:
 		t += delta
 
+	## Which room's camera shows this crewmate right now, and how: "stand", walking "out"
+	## of the room (first half of a walk) or walking "in" to the next one (second half).
+	## p goes 0 -> 1 across that half.
+	static func where(c: Dictionary) -> Dictionary:
+		if c.walk_left <= 0.0 or str(c.target) == "":
+			return {"room": c.room, "mode": "stand", "p": 0.0}
+		var total: float = maxf(float(c.get("walk_total", c.walk_left)), c.walk_left)
+		var frac: float = 1.0 - float(c.walk_left) / maxf(total, 0.001)
+		if frac < 0.5:
+			return {"room": c.room, "mode": "out", "p": frac * 2.0}
+		return {"room": c.target, "mode": "in", "p": (frac - 0.5) * 2.0}
+
 	func _bg(s: OutpostSim) -> String:
 		match cam:
 			"sky_radar":
@@ -1456,7 +1505,8 @@ class FeedView extends Control:
 				return "cam_sky_radar_glow" if glowing else "cam_sky_radar"
 			"airlock":
 				for c in s.crew:
-					if c.walk_left > 0.0 and (c.room == "airlock" or OUTSIDE.has(c.room)):
+					var w: Dictionary = where(c)
+					if w.room == "airlock" and w.mode != "stand":
 						return "cam_airlock_open"
 				return "cam_airlock"
 			"solar_field": return "cam_solar_field_dusty" if s.hazard.dust > 0.0 else "cam_solar_field"
@@ -1468,15 +1518,48 @@ class FeedView extends Control:
 	func _draw() -> void:
 		var font: Font = preload("res://assets/fonts/Silkscreen-Regular.ttf")
 		var s: OutpostSim = SimState.sim
-		if cam == "" or s == null:
+		if cam == "" or s == null or s.battery <= 0.0 and int(fmod(t, 4.0)) == 0 and cam != "shelter":
+			# no camera, or the battery is empty: cameras flicker out to NO SIGNAL
 			draw_texture(Assets.tex("cam_off"), Vector2.ZERO)
+			if s != null and s.battery <= 0.0:
+				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
 			return
-		draw_texture(Assets.tex(_bg(s)), Vector2.ZERO)
+		var bg := _bg(s)
+		# the airlock door hisses open when a crewmate walks through, and clunks shut after
+		if cam == "airlock" and last_bg != "" and bg != last_bg:
+			Sfx.play("door_open" if bg == "cam_airlock_open" else "door_close", -12.0)
+		last_bg = bg
+		draw_texture(Assets.tex(bg), Vector2.ZERO)
+		# Solar Field gets darker as the battery charge drops
+		if cam == "solar_field":
+			draw_rect(Rect2(0, 0, 320, 180), Color(0.05, 0.02, 0.12, clampf((60.0 - s.battery) / 100.0, 0.0, 0.45)))
+		# Life Support: the big wall fan spins at the LOW / MID / HIGH setting, and stops with no power
+		if cam == "life_support":
+			var spin: float = [0.0, 1.5, 4.0, 8.0][s.life_support + 1] if s.battery > 0.0 else 0.0
+			if s.hazard.co2 > 0.0: spin *= 0.4
+			var ang := t * spin
+			var c0 := Vector2(160, 74)
+			for k in 4:
+				var a := ang + k * PI / 2.0
+				var tip := c0 + Vector2(cos(a), sin(a)) * 44.0
+				var side := Vector2(cos(a + 0.35), sin(a + 0.35)) * 30.0
+				draw_colored_polygon(PackedVector2Array([c0, c0 + side, tip]), Color(0.75, 0.68, 0.78, 0.55))
+			draw_circle(c0, 5.0, Palette.INK)
+			var lbl: String = ["FAN OFF", "FAN LOW", "FAN MID", "FAN HIGH"][s.life_support + 1] if s.battery > 0.0 else "FAN STOPPED"
+			draw_string(font, Vector2(8, 172), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 		# shelter door sliding shut (CF-11)
 		if cam == "shelter" and s.door_closing_left > 0.0:
 			var total: float = s.balance.door_close_sec[clampi(int(s.levels.get("shelter", 1)) - 1, 0, 2)]
 			var k := clampi(int((1.0 - s.door_closing_left / total) * 4.0), 0, 3)
-			draw_texture(Assets.frame("cam_shelter_door_anim", k), Vector2(150, -10))
+			draw_texture(Assets.frame("cam_shelter_door_anim", k), Vector2.ZERO)
+		# Night 7: the Bulalakaw meteor shower streaks across the Sky Radar
+		if cam == "sky_radar" and s.meteors_active():
+			for k in 7:
+				var ph := fposmod(t * (0.9 + 0.13 * k) + k * 0.37, 1.0)
+				var head := Vector2(340.0 - ph * 420.0 + k * 22.0, -10.0 + ph * 150.0 + (k % 3) * 12.0)
+				for seg in 6:
+					draw_rect(Rect2(head + Vector2(seg * 5.0, -seg * 2.0), Vector2(4, 2)), Color(Palette.HIGHLIGHT if seg < 2 else Palette.STATUS_WARN, 1.0 - seg * 0.16))
+			draw_string(font, Vector2(8, 16), "METEOR SHOWER!", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
 		# radar blip for a crewmate on EVA (CF-10): "it's just Carlo!"
 		if cam == "sky_radar":
 			var i := 0
@@ -1505,27 +1588,43 @@ class FeedView extends Control:
 		crew_rects.clear()
 		var x := 24.0
 		for c in s.crew:
-			var room: String = c.room
+			var w: Dictionary = where(c)
+			var room: String = w.room
 			if ROOMS[cam].has(room):
-				var sheet := "crew_%s_eva" % c.id if OUTSIDE.has(room) or room == "airlock" else "crew_%s" % c.id
-				var walking: bool = c.walk_left > 0.0
-				var f := (2 + int(t * 8.0) % 4) if walking and Assets.frame_count(sheet) >= 6 else (1 + int(t * 8.0) % 4 if walking else int(t * 2.0) % 2)
-				var tex := Assets.frame(sheet, f)
-				draw_texture_rect(tex, Rect2(x, 112, 48, 48), false)
-				draw_string(font, Vector2(x, 108), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-				crew_rects.append({"id": c.id, "rect": Rect2(x, 100, 48, 60)})
+				# EVA suit outside and in the airlock (they suit up there); indoor clothes elsewhere
+				var suited: bool = OUTSIDE.has(room) or room == "airlock" or (w.mode == "out" and OUTSIDE.has(str(c.target)))
+				var sheet := "crew_%s_eva" % c.id if suited else "crew_%s" % c.id
+				# 16-frame sheets: DOWN 0-3, LEFT 4-7, RIGHT 8-11, UP 12-15.
+				# Standing faces us; leaving walks RIGHT out of frame; arriving walks LEFT in from the right.
+				var f := 0
+				var cx := x
+				match w.mode:
+					"out":
+						f = 8 + int(t * 8.0) % 4
+						cx = lerpf(x, 330.0, w.p)
+					"in":
+						f = 4 + int(t * 8.0) % 4
+						cx = lerpf(330.0, x, w.p)
+				var bob := 0.0 if w.mode != "stand" else roundf(sin(t * 2.0 + x) * 0.6)
+				draw_texture_rect(Assets.frame(sheet, f), Rect2(cx, 90 + bob, 48, 72), false)
+				draw_string(font, Vector2(cx, 88), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+				crew_rects.append({"id": c.id, "rect": Rect2(cx, 84, 48, 78)})
 				if not s.open_request_for(c.id).is_empty():
-					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(x + 30, 84))
+					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(cx + 34, 66))
+				if c.held and w.mode != "stand":
+					draw_string(font, Vector2(cx - 4, 160), "RECALLED", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
 				x += 60
 		# dust haze on outside cameras (CF-09)
-		if cam in ["solar_field", "sky_radar", "airlock"] and s.hazard.dust > 0.0:
-			draw_texture(Assets.tex("fx_dust_haze"), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.dust, 0.0, 1.0)))
+		# dust haze on every feed in a dust storm: thick outside, a light film indoors (dust on the lenses)
+		if s.hazard.dust > 0.0:
+			var thick := 1.0 if cam in ["solar_field", "sky_radar", "airlock"] else 0.35
+			draw_texture(Assets.tex("fx_dust_haze"), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.dust, 0.0, 1.0) * thick))
 		# static when the link is weak (CF-08)
 		if s.hazard.comms_loss > 0.0:
 			draw_texture(Assets.frame("fx_static", int(t * 12.0) % 4), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.comms_loss, 0.2, 1.0)))
 		if cam == "shelter":
 			var door := "OPEN" if s.shelter_door_open else ("CLOSING" if s.door_closing_left > 0.0 else "CLOSED")
-			draw_string(font, Vector2(200, 20), "DOOR: " + door, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+			draw_string(font, Vector2(8, 20), "DOOR: " + door, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 		draw_string(font, Vector2(260, 172), s.clock_string(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
 
 

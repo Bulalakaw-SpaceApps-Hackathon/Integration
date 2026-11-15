@@ -214,7 +214,7 @@
    ],
    [
     80,
-    "In September 2017, Curiosity measured radiation 2 to 3 times higher than normal."
+    "In September 2017, Curiosity measured radiation more than double its old record."
    ],
    [
     150,
@@ -559,20 +559,12 @@
   },
   "faults": [
    [
-    "panel_dust",
-    20
-   ],
-   [
-    "greenhouse_leak",
-    60
-   ],
-   [
     "shelter_seal",
-    30
+    75
    ],
    [
     "dish_drift",
-    110
+    120
    ]
   ],
   "radio": [
@@ -582,12 +574,20 @@
    ],
    [
     70,
-    "Space rocks hit Mars more often than Earth because its air is so thin."
+    "More space rocks reach the ground on Mars, because its thin air burns up fewer of them."
    ],
    [
     150,
     "Send it now: a message takes minutes to reach Earth!"
    ]
-  ]
+  ],
+  "meteors": {
+   "at": 36,
+   "seconds": 26,
+   "hits": [
+    "panel_dust",
+    "loose_cable"
+   ]
+  }
  }
 }

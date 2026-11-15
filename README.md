@@ -1,8 +1,13 @@
 # Bulalakaw Station (Godot 4.7.2, GDScript)
 
 The **whole game is playable end to end**: Title → Night Select → Base map (Morning Briefing, build) →
-Camera Desk night → Debrief → next night … → Mission Complete. **Every asset is a placeholder** with the
-final file name, folder and size, so finals drop in without code changes (see "Swapping in final art").
+Camera Desk night → Debrief → next night … → Mission Complete, plus a Night 0 practice tutorial.
+
+**Final draft status (Nov 15):** the gameplay is complete. Art: the team's characters, camera feeds, base map,
+UI and sponsor art, with the base-map buildings redrawn to match their feeds. Sound: the team's Audio-Design
+Set 1. Facts: checked against NASA in `docs/FACT_CHECK.md`. **Not done yet: the storyline** — `data/story.json`
+still has placeholder open/close/radio lines (fill `docs/STORY_TEMPLATE.md`). Decisions D1–D46 are in
+`docs/SUGGESTIONS.md`. Any file can still be swapped by overwriting it with the same name and size.
 
 ## Open and run
 1. Open the folder in **Godot 4.7.2** (Compatibility renderer). Press **F5**.
@@ -71,7 +76,12 @@ godot --headless --path . --export-release "Windows" build/windows/BulalakawStat
 
 ## Tests
 ```
-godot --headless --path . -s res://tests/test_sim.gd          # 21 balance checks, ALL PASSED
+godot --headless --path . -s res://tests/test_sim.gd          # sim + balance checks, ALL PASSED
+godot --headless --path . -s res://tests/audio_check.gd       # every sound loads
+godot --path . -s res://tests/tutorial_playtest.gd            # Night 0 practice night, step by step
+godot --path . -s res://tests/stage_playtest.gd               # sponsors, rough nights, meteors, ending
+godot --path . -s res://tests/feeds_playtest.gd               # dynamic camera feeds + crew walking
+godot --path . -s res://tests/chars_playtest.gd               # crew on the day map, cams and debrief
 godot --headless --path . -s res://tests/smoke_debug.gd       # debug harness smoke test
 godot --path . -s res://tests/desk_playtest.gd                # auto-plays Night 1 + 6 on the desk (needs a window)
 godot --path . -s res://tests/flow_playtest.gd                # whole game flow + screenshots in user://
@@ -88,3 +98,5 @@ godot --path . -s res://tests/flow_playtest.gd                # whole game flow 
 - Night 5 (dust): default settings fail; heater LOW + dish off survives.
 - Night 6: doing nothing fails on radiation; recall + shelter at the alarm survives with max dose ~3.7 chest X-rays.
 - Nights 6–7 finish with only 2–5% battery at Level 1. That is intended: real players will have upgraded Solar or Battery by then.
+- Doing nothing at all: Nights 1–4 and 6 are survivable (Night 6 is a "rough night", Survive star only); Nights 5 and 7 need the player to act. An attentive test bot earns the Science star on every night and 3 stars on Nights 3, 5 and 6.
+- Only an empty battery ends a night (RETRY NIGHT / BACK TO BASE); low oxygen or a high dose makes a rough night instead.

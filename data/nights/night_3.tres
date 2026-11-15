@@ -28,8 +28,8 @@ script = ExtResource("2_s4sol")
 start_sec = 15.0
 peak_sec = 60.0
 intensity = 0.4
-source_name = "Based on Curiosity rover weather data (simplified)"
-why_text = "It's getting very cold outside. Mars nights are colder than any freezer on Earth, so the heater works harder."
+source_name = "Curiosity REMS weather telemetry (Gale Crater, simplified)"
+why_text = "Outside temperatures are plunging toward -80 C! Mars's thin air can't hold heat, so the heater works harder."
 
 [sub_resource type="Resource" id="Resource_upy7v"]
 script = ExtResource("2_s4sol")
@@ -38,7 +38,7 @@ start_sec = 60.0
 peak_sec = 60.0
 end_sec = 75.0
 real_date = "2017-09-10"
-source_name = "NASA solar observations"
+source_name = "NASA DONKI / Solar Observations (Sep 10, 2017 CME)"
 badge = "real"
 
 [sub_resource type="Resource" id="Resource_ixj3a"]
@@ -61,7 +61,7 @@ theme = "Radiation and shielding"
 briefing_text = "Doctor Mateo is here. A real solar storm from September 2017 is coming. Our shelter has thick shielding!"
 debrief_why = "Light from a solar flare travels fastest, so it arrives before the particles. That gap is your warning time."
 debrief_tip = "When the sky glows: recall anyone outside, open the shelter, then close the door once everyone is in."
-did_you_know = "In September 2017, Curiosity's radiation detector measured dose rates on Mars 2 to 3 times higher than normal."
+did_you_know = "In September 2017, a solar storm pushed radiation on the ground of Mars to more than double anything Curiosity had measured before."
 did_you_know_source = "Zeitlin et al. 2018, Geophysical Research Letters (Curiosity RAD)"
 hazard_events = Array[ExtResource("2_s4sol")]([SubResource("Resource_a24tn"), SubResource("Resource_upy7v"), SubResource("Resource_ixj3a")])
 crew_ids = Array[String](["lani", "maya", "mateo"])

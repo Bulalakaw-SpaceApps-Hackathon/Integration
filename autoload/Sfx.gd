@@ -56,6 +56,8 @@ func loop(name: String, on: bool, volume_db := -6.0) -> void:
 		var stream := Assets.sound(asset)
 		if stream == null:
 			return
+		if stream is AudioStreamOggVorbis:
+			(stream as AudioStreamOggVorbis).loop = true      # the team's .ogg files are imported as one-shots
 		var p := AudioStreamPlayer.new()
 		p.bus = "Music" if name.begins_with("music_") else "SFX"
 		p.stream = stream
