@@ -7,14 +7,9 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 
 # Art and sound
 - Art by Team ALT-F4: characters, camera feeds, base map, UI, alerts, sponsor ads and effects (sources in assets/source/).
-<<<<<<< HEAD
 - The team's scratch art (assets/source/) was remastered into the game's style with the tools in tools/: base-map buildings, decorations and ground (draw_flat, draw_feed_buildings, rescale_map, animate_deco), indoor camera feeds and markers (paint_rooms), night covers and the title backdrop (paint_night_cards, paint_title), desk and alert icons, badges, stars (draw_desk_icons, draw_alerts, draw_badges, draw_ui_small), crew portraits (remaster_portraits) and Mission Control (draw_mission_control).
 - Used as made by the team: the CF-01 Sky Radar and CF-03 Solar Field feeds, the screen set (panel, codex page, NASA panel, certificate, toggles, joystick, ending backdrop), the task backgrounds, the sounds and the NASA photos.
 - A few small UI pieces (codex pictures, sponsor logos, meters, battery bar) are still made by tools/make_placeholders.py and tools/make_dk*.py in the team palette.
-=======
-- Pixel conversions and the redrawn base-map buildings were made with tools/draw_characters.py, tools/paint_feeds.py, tools/draw_flat.py and tools/draw_feed_buildings.py from the team's art.
-- A few remaining UI pieces are still made by tools/make_placeholders.py and tools/make_dk*.py in the team palette.
->>>>>>> 3757b8b42369dbed611261392235ce92fae39988
 - Sounds were chosen by the team's audio designer (Audio-Design pack, Set 1) and built with tools/import_audio.sh.
   - Kenney (www.kenney.nl), CC0: Interface Sounds / Digital Audio packs (sfx_click, sfx_camera, sfx_sunrise, sfx_evacuate, sfx_flare_alarm, sfx_msg_sent, sfx_msg_received, sfx_upgrade, sfx_star, sfx_materials, sfx_low_battery (reversed), sfx_dose_tick), Impact Sounds (sfx_thump), Sci-Fi Sounds (music_hub), footsteps (sfx_step_1..3).
   - "Sci-fi doors airlock sound effect" by ryankingart, Freesound 607265, CC0 (https://freesound.org/s/607265/): sfx_door_open and sfx_door_close, cut from one recording.
@@ -81,8 +76,6 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 - `nasa_solar_4.png`: NASA — "Ingenuity Mars Helicopter's Record-Breaking Flight" (PIA25321), https://images.nasa.gov/details/PIA25321
 - `nasa_solar_5.png`: NASA — "InSight's Power Generation: After Landing and Spring 2022" (PIA25284), https://images.nasa.gov/details/PIA25284
 - `nasa_solar_6.png`: NASA — "Mars Climate Sounder Studies 2018 Dust Storm" (PIA22737), https://images.nasa.gov/details/PIA22737
-- `nasa_solar_7.png`: NASA — "Mars 2020's MMRTG" (PIA23306), https://images.nasa.gov/details/PIA23306
-
 - `nasa_solar_7.png`: NASA — "Orientation of Mars Helicopter Base Station Antenna for Flight 17" (PIA24966), https://images.nasa.gov/details/PIA24966
 - `nasa_suit_bay_1.png`: NASA — "NASA astronaut Scott Tingle wears a U.S. spacesuit" (iss054e022341), https://images.nasa.gov/details/iss054e022341
 - `nasa_suit_bay_2.png`: NASA — "Spacesuit Materials on Perseverance's SHERLOC Calibration Target" (PIA24033), https://images.nasa.gov/details/PIA24033
