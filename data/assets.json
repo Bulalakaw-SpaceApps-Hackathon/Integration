@@ -2270,5 +2270,157 @@
 		"h": 24,
 		"frames": 1,
 		"kind": "image"
+	},
+	"task_plug": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_plug.png",
+		"w": 44,
+		"h": 44,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_socket": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_socket.png",
+		"w": 70,
+		"h": 70,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_lamp": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_lamp.png",
+		"w": 12,
+		"h": 12,
+		"frames": 2,
+		"kind": "image"
+	},
+	"task_sandbag": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_sandbag.png",
+		"w": 30,
+		"h": 15,
+		"frames": 2,
+		"kind": "image"
+	},
+	"task_marker": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_marker.png",
+		"w": 22,
+		"h": 84,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_dust": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_dust.png",
+		"w": 24,
+		"h": 24,
+		"frames": 2,
+		"kind": "image"
+	},
+	"task_moxie": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_moxie.png",
+		"w": 64,
+		"h": 54,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_tank": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_tank.png",
+		"w": 24,
+		"h": 56,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_thermo": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_thermo.png",
+		"w": 26,
+		"h": 96,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_heat_button": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_heat_button.png",
+		"w": 70,
+		"h": 30,
+		"frames": 2,
+		"kind": "image"
+	},
+	"task_patch": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_patch.png",
+		"w": 14,
+		"h": 14,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_pipe": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_pipe.png",
+		"w": 16,
+		"h": 10,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_clamp": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_clamp.png",
+		"w": 18,
+		"h": 16,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_drop": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_drop.png",
+		"w": 7,
+		"h": 10,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_cup": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_cup.png",
+		"w": 28,
+		"h": 16,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_dish_head": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_dish_head.png",
+		"w": 32,
+		"h": 32,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_dish_base": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_dish_base.png",
+		"w": 24,
+		"h": 18,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_earth": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_earth.png",
+		"w": 12,
+		"h": 12,
+		"frames": 1,
+		"kind": "image"
+	},
+	"task_cross": {
+		"id": "TK-P",
+		"path": "res://assets/sprites/tasks/task_cross.png",
+		"w": 28,
+		"h": 28,
+		"frames": 2,
+		"kind": "image"
 	}
 }

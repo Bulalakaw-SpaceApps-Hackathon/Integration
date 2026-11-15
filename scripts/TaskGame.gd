@@ -24,8 +24,9 @@ const HOW := {"loose_cable": "The plug spins. Tap when the two yellow notches li
 	"clogged_filter": "Hold HEAT to keep the needle in the green band. Too hot and it shuts off!",
 	"airlock_leak": "Watch for dust drifting out of the door. Tap where the air escapes!",
 	"greenhouse_leak": "Move the cup to catch 5 drops, then tap the leak to clamp it.",
-	"shelter_seal": "Tap the low parts of the wall to pile Mars dirt up to the line.",
+	"shelter_seal": "Tap the low spots to pile sandbags up to the green flag.",
 	"dish_drift": "Drag the crosshair onto Earth and stay on it as it moves."}
+const PLUG_C := Vector2(304, 114)     # centre of the socket
 const SKY_TOP := Color("#2A0E3D")
 const EARTH_BLUE := Color("#4FA3FF")
 
@@ -43,6 +44,7 @@ var age := 0.0               # seconds since this attempt started
 # juice
 var parts: Array[Dictionary] = []    # {p, v, life, max, col, r, g}
 var shake := 0.0
+var _shake_off := Vector2.ZERO
 var flash := 0.0
 var stars: Array[Vector2] = []
 # PLUG
@@ -78,6 +80,13 @@ var aim := Vector2(260, 180)
 var lock_t := 0.0
 # kept for older tests
 var wires_done: Array[bool] = [false, false, false]
+# movement: things ease, snap and wobble instead of jumping
+var plug_push := 0.0          # 1 -> 0 after a good tap: the plug pushes into the socket
+var plug_wobble := 0.0        # 1 -> 0 after a bad tap: the plug shakes
+var bag_drop: Array[float] = []   # per column: 1 -> 0 while the newest sandbag falls into place
+var patch_pop: Array[float] = []  # per leak: 1 -> 0 while the patch pops on
+var cup_target := 260.0
+var aim_draw := Vector2(260, 180)
 
 
 func _init(fault_kind: String, harder: bool) -> void:
@@ -96,7 +105,7 @@ func _ready() -> void:
 	add_child(v)
 	title_l = Ui.label("TASK: " + str(NAMES.get(kind, kind)), 16, true)
 	v.add_child(title_l)
-	info_l = Ui.label(str(HOW.get(kind, "")), 8, true, Palette.BASE_PLUM, AREA.x)
+	info_l = Ui.body(str(HOW.get(kind, "")), 16, true, Palette.BASE_PLUM, AREA.x)
 	v.add_child(info_l)
 	timer_bar = ProgressBar.new()
 	timer_bar.custom_minimum_size = Vector2(AREA.x, 10)
@@ -107,6 +116,7 @@ func _ready() -> void:
 	area.custom_minimum_size = AREA
 	area.clip_contents = true
 	area.mouse_filter = Control.MOUSE_FILTER_STOP
+	area.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST      # props are pixel art shown at 2x
 	area.draw.connect(_draw_area)
 	area.gui_input.connect(_area_input)
 	v.add_child(area)
@@ -128,8 +138,10 @@ func _setup() -> void:
 	match kind:
 		"loose_cable":
 			plugs_done = 0
-			plug_angle = rng.randf_range(0.0, TAU)
+			plug_angle = rng.randf_range(1.5, 4.5)
 			plug_speed = 2.4
+			plug_push = 0.0
+			plug_wobble = 0.0
 		"panel_dust":
 			dust.clear()
 			for i in 22:
@@ -148,19 +160,24 @@ func _setup() -> void:
 			for i in 3:
 				leaks.append(edges[i])
 				leak_fixed.append(false)
+			patch_pop = [0.0, 0.0, 0.0]
 		"greenhouse_leak":
 			leak_x = rng.randf_range(120, 400)
 			drops.clear()
 			caught = 0
+			cup_target = cup_x
 			drip_t = 0.6
 			clamped = false
 		"shelter_seal":
 			cols.clear()
+			bag_drop.clear()
 			for i in 6:
 				cols.append(rng.randi_range(1, 3))
+				bag_drop.append(0.0)
 		"dish_drift":
 			earth_u = rng.randf_range(0.1, 0.25)
 			aim = Vector2(260, 190)
+			aim_draw = aim
 			lock_t = 0.0
 
 
@@ -180,7 +197,11 @@ func _process(delta: float) -> void:
 	timer_bar.value = t_left / time_limit
 	match kind:
 		"loose_cable":
-			plug_angle = fmod(plug_angle + plug_speed * delta, TAU)
+			# slows down near the lined-up spot, so a 7-year-old can hit it
+			var off := absf(wrapf(plug_angle, -PI, PI))
+			var ease_k := lerpf(0.45, 1.0, clampf(off / 0.9, 0.0, 1.0))
+			if plug_push <= 0.0:
+				plug_angle = fmod(plug_angle + plug_speed * ease_k * delta, TAU)
 		"clogged_filter":
 			if overheat_t > 0.0:
 				overheat_t -= delta
@@ -283,6 +304,14 @@ func _puff(p: Vector2, v: Vector2, col: Color, r: float, life: float) -> void:
 
 
 func _tick_juice(delta: float) -> void:
+	plug_push = maxf(0.0, plug_push - delta * 3.5)
+	plug_wobble = maxf(0.0, plug_wobble - delta * 3.0)
+	for i in bag_drop.size():
+		bag_drop[i] = maxf(0.0, bag_drop[i] - delta * 4.0)
+	for i in patch_pop.size():
+		patch_pop[i] = maxf(0.0, patch_pop[i] - delta * 5.0)
+	cup_x = lerpf(cup_x, cup_target, 1.0 - exp(-18.0 * delta))          # the bucket glides after the pointer
+	aim_draw = aim_draw.lerp(aim, 1.0 - exp(-14.0 * delta))             # the dish swings to the crosshair
 	shake = maxf(0.0, shake - delta * 20.0)
 	flash = maxf(0.0, flash - delta * 3.0)
 	for i in range(parts.size() - 1, -1, -1):
@@ -309,7 +338,7 @@ func _area_input(e: InputEvent) -> void:
 			_tap(mb.position)
 	elif mm:
 		if kind == "greenhouse_leak":
-			cup_x = clampf(mm.position.x, 30, AREA.x - 30)
+			cup_target = clampf(mm.position.x, 30, AREA.x - 30)
 		if dragging:
 			_drag(mm.position)
 	area.queue_redraw()
@@ -319,16 +348,24 @@ func _tap(p: Vector2) -> void:
 	match kind:
 		"loose_cable":
 			var diff := absf(wrapf(plug_angle, -PI, PI))
+			if plug_push > 0.0:
+				return                                   # still clicking in
 			if diff < 0.4:
 				plugs_done += 1
 				Sfx.play("camera")
-				_burst(Vector2(260, 75), 14, Palette.STATUS_WARN, 120.0)
-				plug_speed += 0.6
-				plug_angle = rng.randf_range(1.5, 4.5)
+				_burst(PLUG_C, 16, Palette.STATUS_WARN, 130.0)
+				plug_push = 1.0                          # pushes in with a click and a spark
+				shake = 1.5
+				plug_speed += 0.6                        # each cable turns a bit faster
 				if plugs_done >= 3:
 					_win()
+				else:
+					get_tree().create_timer(0.3).timeout.connect(func() -> void:
+						if is_instance_valid(self) and state == "play":
+							plug_angle = rng.randf_range(1.5, 4.5))
 			else:
-				_oops(Vector2(260, 115))
+				plug_wobble = 1.0                        # wrong moment: the plug shakes
+				_oops(PLUG_C)
 				t_left -= 1.0
 		"panel_dust", "dish_drift":
 			_drag(p)
@@ -336,13 +373,14 @@ func _tap(p: Vector2) -> void:
 			for i in leaks.size():
 				if not leak_fixed[i] and leaks[i].distance_to(p) < 24:
 					leak_fixed[i] = true
+					patch_pop[i] = 1.0
 					Sfx.play("camera")
 					_burst(leaks[i], 10, Palette.STATUS_WARN, 80.0)
 					if not leak_fixed.has(false):
 						_win()
 					return
 		"greenhouse_leak":
-			cup_x = clampf(p.x, 30, AREA.x - 30)
+			cup_target = clampf(p.x, 30, AREA.x - 30)
 			if caught >= 5 and Vector2(leak_x, 40).distance_to(p) < 30:
 				clamped = true
 				_win()
@@ -351,6 +389,7 @@ func _tap(p: Vector2) -> void:
 				if Rect2(70 + i * 64, 20, 60, 200).has_point(p):
 					if cols[i] < WALL_TARGET:
 						cols[i] += 1
+						bag_drop[i] = 1.0
 						Sfx.play("thump", -14.0)
 						shake = 1.5
 						_burst(Vector2(100 + i * 64, 214 - cols[i] * 30), 8, Palette.MARS_SAND, 70.0)
@@ -374,8 +413,8 @@ func _drag(p: Vector2) -> void:
 
 # ---------------------------------------------------------------- drawing
 func _draw_area() -> void:
-	var off := Vector2(rng.randf_range(-shake, shake), rng.randf_range(-shake, shake)) if shake > 0.0 else Vector2.ZERO
-	area.draw_set_transform(off)
+	_shake_off = Vector2(rng.randf_range(-shake, shake), rng.randf_range(-shake, shake)).round() if shake > 0.0 else Vector2.ZERO
+	area.draw_set_transform(_shake_off)
 	var f: Font = Ui.FONT_R
 	area.draw_rect(Rect2(-8, -8, AREA.x + 16, AREA.y + 16), Palette.INK)
 	match kind:
@@ -394,6 +433,9 @@ func _draw_area() -> void:
 	if state == "won":
 		area.draw_rect(Rect2(Vector2.ZERO, AREA), Color(Palette.STATUS_OK, 0.25))
 	area.draw_set_transform(Vector2.ZERO)
+	# framed work area: ink outside, a cream line inside
+	area.draw_rect(Rect2(Vector2.ZERO, AREA), Palette.INK, false, 4.0)
+	area.draw_rect(Rect2(Vector2(4, 4), AREA - Vector2(8, 8)), Palette.BASE_CREAM, false, 2.0)
 
 
 func _draw_bg(asset_name: String) -> bool:
@@ -414,29 +456,45 @@ func _mars_sky(horizon: float) -> void:
 		area.draw_circle(Vector2(30 + i * 70, horizon + 14 + (i % 3) * 8), 5 + (i % 2) * 3, Palette.MARS_CRIMSON)
 
 
+# ---- helpers: pixel-art props at exactly 2x, HUD chips that read on any background
+func _spr(asset: String, pos: Vector2, frame := 0) -> void:
+	var tex := Assets.frame(asset, frame)
+	area.draw_texture_rect(tex, Rect2(pos.round(), tex.get_size() * 2.0), false)
+
+
+func _spr_c(asset: String, center: Vector2, frame := 0, rot := 0.0, k := 1.0, off := Vector2.ZERO) -> void:
+	var tex := Assets.frame(asset, frame)
+	var sz := tex.get_size() * 2.0
+	area.draw_set_transform(center + off + _shake_off, rot, Vector2(k, k))
+	area.draw_texture_rect(tex, Rect2(-sz / 2.0, sz), false)
+	area.draw_set_transform(_shake_off)
+
+
+func _hud(f: Font, pos: Vector2, text: String, col := Palette.HIGHLIGHT, size := 16) -> void:
+	var w := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+	area.draw_rect(Rect2(pos.x - 5, pos.y - size - 4, w + 10, size + 9), Color(Palette.INK, 0.82))
+	area.draw_string(f, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size, col)
+
+
+func _bar(pos: Vector2, w: float, frac: float, col: Color) -> void:
+	area.draw_rect(Rect2(pos, Vector2(w, 10)), Palette.INK)
+	area.draw_rect(Rect2(pos + Vector2(2, 2), Vector2((w - 4) * clampf(frac, 0.0, 1.0), 6)), col)
+
+
 func _draw_plug(f: Font) -> void:
 	if not _draw_bg("task_loose_cable"):
 		_mars_sky(150)
-	var c := Vector2(260, 115)
-	# three cable lights: one per plug
-	for i in 3:
-		var lit := i < plugs_done
-		area.draw_circle(Vector2(40, 40 + i * 30), 9, Palette.STATUS_OK if lit else Palette.BASE_PLUM)
-		area.draw_string(f, Vector2(56, 44 + i * 30), "CABLE %d" % (i + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-	# the socket on the panel box
-	area.draw_rect(Rect2(c - Vector2(70, 70), Vector2(140, 140)), Palette.BASE_STONE)
-	area.draw_rect(Rect2(c - Vector2(70, 70), Vector2(140, 140)), Palette.INK, false, 3)
-	area.draw_circle(c, 52, Palette.BASE_PLUM)
-	area.draw_colored_polygon(PackedVector2Array([c + Vector2(-9, -60), c + Vector2(9, -60), c + Vector2(0, -48)]), Palette.STATUS_WARN)
-	# the spinning plug with its key notch
-	area.draw_circle(c, 42, Palette.BASE_CREAM)
-	area.draw_arc(c, 42, 0, TAU, 32, Palette.INK, 3)
-	for k in 4:
-		area.draw_circle(c + Vector2.RIGHT.rotated(plug_angle + PI / 4.0 + k * PI / 2.0) * 22, 5, Palette.BASE_MAUVE)
-	var n := c + Vector2.UP.rotated(plug_angle) * 36
-	area.draw_circle(n, 7, Palette.STATUS_WARN)
+	_spr("task_socket", PLUG_C - Vector2(70, 70))
+	# the plug: turns, wobbles on a miss, pushes in on a hit
+	var rot := plug_angle + sin(plug_wobble * 40.0) * 0.18 * plug_wobble
+	var push := sin(plug_push * PI)                       # in and back out a little
+	_spr_c("task_plug", PLUG_C, 0, rot, 1.0 - 0.14 * push)
 	var near := absf(wrapf(plug_angle, -PI, PI)) < 0.4
-	area.draw_string(f, Vector2(370, 210), "TAP NOW!" if near else "WAIT...", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Palette.STATUS_WARN if near else Palette.BASE_MAUVE)
+	_hud(f, Vector2(PLUG_C.x - 50, 216), "TAP NOW!" if near else " WAIT... ", Palette.STATUS_WARN if near else Palette.BASE_STONE, 16)
+	# one lamp per cable
+	for i in 3:
+		_spr("task_lamp", Vector2(410, 40 + i * 40), 1 if i < plugs_done else 0)
+		_hud(f, Vector2(446, 60 + i * 40), "%d / 3" % (i + 1), Palette.STATUS_OK if i < plugs_done else Palette.BASE_STONE)
 
 
 func _draw_sweep(f: Font) -> void:
@@ -447,47 +505,45 @@ func _draw_sweep(f: Font) -> void:
 			area.draw_line(Vector2(x, 50), Vector2(x, 210), Palette.SKY_HAZE, 1)
 		for y in range(50, 211, 40):
 			area.draw_line(Vector2(60, y), Vector2(460, y), Palette.SKY_HAZE, 1)
-	for d in dust:
-		area.draw_circle(d, 22, Palette.MARS_SAND)
-		area.draw_circle(d + Vector2(-6, -5), 9, Color(Palette.MARS_ORANGE, 0.5))
+	for i in dust.size():
+		_spr_c("task_dust", dust[i], i % 2)
 	var power := 1.0 - float(dust.size()) / float(dust_start)
-	area.draw_string(f, Vector2(10, 20), "PANEL POWER %d%%" % int(lerpf(30.0, 100.0, power)), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-	area.draw_rect(Rect2(10, 26, 200, 8), Palette.BASE_PLUM)
-	area.draw_rect(Rect2(10, 26, 200 * lerpf(0.3, 1.0, power), 8), Palette.STATUS_WARN)
-	area.draw_string(f, Vector2(340, 20), "WIND >>>", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.MARS_SAND)
+	_hud(f, Vector2(14, 26), "PANEL POWER %d%%" % int(lerpf(30.0, 100.0, power)))
+	_bar(Vector2(9, 32), 216, lerpf(0.3, 1.0, power), Palette.STATUS_WARN)
+	_hud(f, Vector2(398, 26), "WIND >>>", Palette.MARS_SAND)
 
 
 func _draw_moxie(f: Font) -> void:
 	if not _draw_bg("task_clogged_filter"):
 		area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), Palette.BASE_PLUM)
-	# thermometer
-	area.draw_string(f, Vector2(30, 20), "HEAT", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-	area.draw_rect(Rect2(36, 30, 40, 180), Palette.INK)
-	area.draw_rect(Rect2(36, 30 + 180 * 0.2, 40, 180 * 0.2), Color(Palette.STATUS_OK, 0.5))
-	area.draw_string(f, Vector2(82, 30 + 180 * 0.3 + 4), "800 C", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_OK)
 	var hot := overheat_t > 0.0
+	# thermometer: green band = just right
+	_spr("task_thermo", Vector2(30, 30))
+	var tube := Rect2(40, 40, 32, 172)
+	area.draw_rect(Rect2(tube.position.x, tube.position.y + tube.size.y * 0.2, tube.size.x, tube.size.y * 0.2), Color(Palette.STATUS_OK, 0.55))
 	var col := Palette.STATUS_DANGER if hot or temp > 0.8 else (Palette.STATUS_OK if _in_band() else Palette.STATUS_WARN)
-	area.draw_rect(Rect2(42, 30 + 180 * (1.0 - temp), 28, 180 * temp), col)
-	# MOXIE box: CO2 in, O2 out
-	area.draw_rect(Rect2(160, 60, 120, 100), Palette.BASE_STONE)
-	area.draw_rect(Rect2(160, 60, 120, 100), Palette.INK, false, 3)
-	area.draw_string(f, Vector2(160, 115), "MOXIE", HORIZONTAL_ALIGNMENT_CENTER, 120, 16, Palette.INK)
-	area.draw_rect(Rect2(170, 70, 100, 12), Palette.STATUS_DANGER if hot else (Palette.STATUS_WARN if temp > 0.3 else Palette.BASE_MAUVE))
-	area.draw_string(f, Vector2(130, 50), "MARS AIR (CO2) >", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.MARS_SAND)
-	# oxygen tank
-	area.draw_string(f, Vector2(300, 50), "> OXYGEN", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.SKY_HAZE)
-	area.draw_rect(Rect2(300, 60, 40, 100), Palette.INK)
-	area.draw_rect(Rect2(304, 64 + 92 * (1.0 - oxygen), 32, 92 * oxygen), Palette.SKY_HAZE)
-	area.draw_rect(Rect2(360, 150, 140, 60), Palette.STATUS_WARN if holding else (Palette.BASE_MAUVE if hot else Palette.BASE_CREAM))
-	area.draw_rect(Rect2(360, 150, 140, 60), Palette.INK, false, 3)
-	area.draw_string(f, Vector2(360, 186), "HOLD: HEAT", HORIZONTAL_ALIGNMENT_CENTER, 140, 8, Palette.INK)
+	area.draw_rect(Rect2(tube.position.x + 6, tube.position.y + tube.size.y * (1.0 - temp), tube.size.x - 12, tube.size.y * temp), col)
+	_hud(f, Vector2(30, 26), "HEAT")
+	_hud(f, Vector2(90, 40 + 172 * 0.3 + 4), "800 C", Palette.STATUS_OK, 8)
+	# MOXIE: Mars air in, oxygen out
+	_spr("task_moxie", Vector2(150, 56))
+	area.draw_rect(Rect2(160, 74, 108, 24), Palette.STATUS_DANGER if hot else (Palette.STATUS_WARN if temp > 0.3 else Color("2c2450")))
+	if temp > 0.3 and not hot:
+		for k in 4:
+			area.draw_rect(Rect2(166 + k * 26, 78 + int(age * 6.0 + k) % 3 * 4, 14, 4), Palette.HIGHLIGHT)   # glowing coils
+	area.draw_string(f, Vector2(162, 148), "MOXIE", HORIZONTAL_ALIGNMENT_CENTER, 104, 16, Palette.INK)
+	_hud(f, Vector2(150, 44), "MARS AIR IN", Palette.MARS_SAND)
+	_spr("task_tank", Vector2(296, 52))
+	area.draw_rect(Rect2(302, 66 + 92 * (1.0 - oxygen), 36, 92 * oxygen), Palette.SKY_HAZE)
+	_hud(f, Vector2(354, 76), "OXYGEN", Palette.SKY_HAZE)
+	_spr("task_heat_button", Vector2(360, 150), 1 if holding else 0)
+	area.draw_string(f, Vector2(360, 186 + (4 if holding else 0)), "COOLING" if hot else "HOLD: HEAT", HORIZONTAL_ALIGNMENT_CENTER, 140, 16, Palette.INK)
 
 
 func _draw_leaks(f: Font) -> void:
 	if not _draw_bg("task_airlock_leak"):
 		area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), SKY_TOP)
 		area.draw_rect(Rect2(0, 200, AREA.x, 30), Palette.MARS_RUST)
-		# airlock door: a round-cornered hatch
 		area.draw_rect(Rect2(150, 22, 220, 198), Palette.BASE_MAUVE)
 		area.draw_rect(Rect2(166, 34, 188, 174), Palette.BASE_STONE)
 		area.draw_rect(Rect2(166, 34, 188, 174), Palette.INK, false, 3)
@@ -496,84 +552,83 @@ func _draw_leaks(f: Font) -> void:
 		area.draw_line(Vector2(240, 121), Vector2(280, 121), Palette.BASE_CREAM, 4)
 	for i in leaks.size():
 		if leak_fixed[i]:
-			area.draw_rect(Rect2(leaks[i] - Vector2(12, 12), Vector2(24, 24)), Palette.STATUS_WARN)
-			area.draw_rect(Rect2(leaks[i] - Vector2(12, 12), Vector2(24, 24)), Palette.INK, false, 2)
-	var left := leak_fixed.count(false)
-	area.draw_string(f, Vector2(10, 20), "LEAKS LEFT: %d" % left, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-	area.draw_string(f, Vector2(390, 20), "AIR %d%%" % int(100.0 * t_left / time_limit), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.SKY_HAZE)
+			var pop := patch_pop[i] if i < patch_pop.size() else 0.0
+			_spr_c("task_patch", leaks[i], 0, 0.0, 1.0 + 0.5 * sin(pop * PI))   # the patch pops on
+	_hud(f, Vector2(14, 26), "LEAKS LEFT: %d" % leak_fixed.count(false))
+	_hud(f, Vector2(404, 26), "AIR %d%%" % int(100.0 * t_left / time_limit), Palette.SKY_HAZE)
 
 
 func _draw_water(f: Font) -> void:
 	var has_bg := _draw_bg("task_greenhouse_leak")
 	if not has_bg:
 		area.draw_rect(Rect2(0, 0, AREA.x, AREA.y), Color("#1E3B2A"))
-	# the pipe and its leak
-	area.draw_rect(Rect2(0, 28, AREA.x, 16), Palette.BASE_STONE)
-	area.draw_rect(Rect2(0, 28, AREA.x, 16), Palette.INK, false, 2)
+	for x in range(0, int(AREA.x), 32):
+		_spr("task_pipe", Vector2(x, 26))
 	if clamped:
-		area.draw_rect(Rect2(leak_x - 14, 24, 28, 24), Palette.STATUS_WARN)
+		_spr_c("task_clamp", Vector2(leak_x, 36))
 	else:
-		area.draw_circle(Vector2(leak_x, 44), 5, EARTH_BLUE)
+		_spr_c("task_drop", Vector2(leak_x, 50 + 2.0 * sin(age * 9.0)))       # the leak bulges before it drips
 		if caught >= 5:
 			area.draw_arc(Vector2(leak_x, 38), 22 + 4 * sin(age * 8.0), 0, TAU, 24, Palette.STATUS_WARN, 3)
 	for d in drops:
-		area.draw_circle(d, 5, EARTH_BLUE)
-		area.draw_colored_polygon(PackedVector2Array([d + Vector2(-4, -1), d + Vector2(4, -1), d + Vector2(0, -9)]), EARTH_BLUE)
-	# plants along the floor
+		_spr_c("task_drop", d)
 	if not has_bg:
 		for i in 7:
 			var x := 30.0 + i * 75.0
 			area.draw_rect(Rect2(x - 10, 214, 20, 16), Palette.MARS_CRIMSON)
 			area.draw_circle(Vector2(x, 208), 8, Palette.STATUS_OK)
-	# the cup
-	area.draw_rect(Rect2(cup_x - 24, 186, 48, 22), Palette.BASE_CREAM)
-	area.draw_rect(Rect2(cup_x - 24, 186, 48, 22), Palette.INK, false, 2)
-	area.draw_rect(Rect2(cup_x - 20, 206 - 4 * caught, 40, 4 * caught), EARTH_BLUE)
-	area.draw_string(f, Vector2(10, 20), "DROPS SAVED: %d / 5" % caught, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+	# the bucket fills up; it tilts a little while it glides
+	area.draw_rect(Rect2(cup_x - 18, 206 - 4 * caught, 36, 4 * caught), EARTH_BLUE)
+	_spr_c("task_cup", Vector2(cup_x, 196), 0, clampf((cup_target - cup_x) * 0.004, -0.2, 0.2))
+	_hud(f, Vector2(14, 78), "DROPS SAVED: %d / 5" % caught)
 
 
 func _draw_shield(f: Font) -> void:
 	if not _draw_bg("task_shelter_seal"):
 		_mars_sky(220)
 	var line_y := 214.0 - WALL_TARGET * 30.0
-	# space particles raining down; they stop on the wall where it is high enough
+	# space particles raining down
 	for k in 14:
 		var x := fmod(k * 37.0 + age * 160.0, AREA.x)
 		var y := fmod(k * 53.0 + age * 220.0, 220.0)
 		area.draw_rect(Rect2(x, y, 2, 6), Color(Palette.STATUS_WARN, 0.7))
-	area.draw_line(Vector2(60, line_y), Vector2(460, line_y), Palette.STATUS_OK, 2)
-	area.draw_string(f, Vector2(380, line_y - 6), "SAFE HEIGHT", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_OK)
+	# striped marker pole: its green flag is the safe height
+	_spr("task_marker", Vector2(20, line_y - 2))
+	for x in range(64, 460, 12):
+		area.draw_rect(Rect2(x, line_y - 1, 6, 2), Palette.STATUS_OK)
 	for i in cols.size():
 		var x := 70.0 + i * 64.0
 		for b in cols[i]:
-			var r := Rect2(x + (4 if b % 2 else 0), 214 - (b + 1) * 30, 56, 28)
-			area.draw_rect(r, Palette.MARS_SAND)
-			area.draw_rect(r, Palette.INK, false, 2)
+			var y := 214.0 - (b + 1) * 30.0
+			if b == cols[i] - 1 and i < bag_drop.size() and bag_drop[i] > 0.0:
+				# the newest bag falls in and bounces once
+				var u := 1.0 - bag_drop[i]
+				y -= (1.0 - u) * 70.0 if u < 0.7 else sin((u - 0.7) / 0.3 * PI) * 6.0
+			_spr("task_sandbag", Vector2(x + (4 if b % 2 else -2), y), (i + b) % 2)
 		if cols[i] < WALL_TARGET:
-			area.draw_string(f, Vector2(x, 214 - (cols[i] + 1) * 30 + 18), "TAP", HORIZONTAL_ALIGNMENT_CENTER, 60, 8, Palette.HIGHLIGHT)
-	area.draw_string(f, Vector2(10, 20), "SHELTER WALL: PILE UP MARS DIRT (REGOLITH)", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+			var ty := 214.0 - (cols[i] + 1) * 30.0 + 18.0 + 2.0 * sin(age * 5.0 + i)
+			_hud(f, Vector2(x + 18, ty), "TAP", Palette.HIGHLIGHT, 8)
+	_hud(f, Vector2(96, 26), "PILE UP TO THE GREEN FLAG")
 
 
 func _draw_earth(f: Font) -> void:
 	if not _draw_bg("task_dish_drift"):
 		_mars_sky(190)
 	var e := _earth_pos()
-	area.draw_circle(e, 12, Color(EARTH_BLUE, 0.25))
-	area.draw_circle(e, 6, EARTH_BLUE)
-	area.draw_circle(e + Vector2(10, -6), 2, Palette.BASE_STONE)   # the Moon
-	area.draw_string(f, e + Vector2(14, 14), "EARTH", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, EARTH_BLUE)
-	# the dish on the ground, pointing at the crosshair
-	var base := Vector2(70, 205)
-	var dirv := (aim - base).normalized()
-	area.draw_line(base, base + dirv * 40, Palette.BASE_STONE, 4)
-	area.draw_arc(base + dirv * 40, 22, dirv.angle() + PI / 2.0, dirv.angle() + PI * 1.5, 12, Palette.BASE_CREAM, 6)
+	area.draw_circle(e, 16 + 2.0 * sin(age * 3.0), Color(EARTH_BLUE, 0.22))
+	_spr_c("task_earth", e)
+	area.draw_rect(Rect2(e + Vector2(14, -10), Vector2(4, 4)), Palette.BASE_STONE)   # the Moon
+	_hud(f, e + Vector2(20, 30), "EARTH", EARTH_BLUE, 8)
+	# the dish swings smoothly to point at the crosshair
+	var base := Vector2(70, 200)
+	_spr("task_dish_base", base - Vector2(24, 0))
+	var dirv := (aim_draw - base).normalized()
+	_spr_c("task_dish_head", base + dirv * 18.0, 0, dirv.angle())
 	var locked := aim.distance_to(e) < 20.0
-	var col := Palette.STATUS_OK if locked else Palette.STATUS_WARN
-	area.draw_arc(aim, 18, 0, TAU, 24, col, 2)
-	area.draw_line(aim - Vector2(26, 0), aim - Vector2(10, 0), col, 2)
-	area.draw_line(aim + Vector2(10, 0), aim + Vector2(26, 0), col, 2)
-	area.draw_line(aim - Vector2(0, 26), aim - Vector2(0, 10), col, 2)
-	area.draw_line(aim + Vector2(0, 10), aim + Vector2(0, 26), col, 2)
-	area.draw_string(f, Vector2(10, 20), "SIGNAL", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-	area.draw_rect(Rect2(60, 13, 160, 8), Palette.BASE_PLUM)
-	area.draw_rect(Rect2(60, 13, 160 * clampf(lock_t / 1.6, 0.0, 1.0), 8), Palette.STATUS_OK)
+	if locked:
+		for k in 3:                                               # signal travelling to Earth
+			var u := fmod(age * 1.5 + k / 3.0, 1.0)
+			area.draw_rect(Rect2(base.lerp(e, u) - Vector2(2, 2), Vector2(4, 4)), Palette.STATUS_OK)
+	_spr_c("task_cross", aim, 1 if locked else 0, 0.0, 1.0 + (0.08 * sin(age * 10.0) if locked else 0.0))
+	_hud(f, Vector2(14, 26), "SIGNAL")
+	_bar(Vector2(104, 13), 160, lock_t / 1.6, Palette.STATUS_OK)
