@@ -1391,6 +1391,14 @@
 		"frames": 1,
 		"kind": "image"
 	},
+	"plot_locked_post": {
+		"id": "HM-10P",
+		"path": "res://assets/sprites/hub/plot_locked_post.png",
+		"w": 36,
+		"h": 48,
+		"frames": 1,
+		"kind": "image"
+	},
 	"plot_shelter_l1": {
 		"id": "HM-06",
 		"path": "res://assets/sprites/hub/plot_shelter_l1.png",
