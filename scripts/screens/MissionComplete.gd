@@ -35,6 +35,9 @@ func _ready() -> void:
 	var sub := Ui.label("MISSION PLANNER CERTIFICATE · 7 MARS NIGHTS · POWER, AIR, FOOD AND RADIATION SHIELDING", 8, true, Palette.BASE_PLUM, 840)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	c.add_child(sub)
+	var commander := Ui.label("AWARDED TO: " + Progression.commander_name, Ui.BODY, true, Palette.BASE_PLUM, 840)
+	commander.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	c.add_child(commander)
 
 	var stats := Ui.row(c, 28)
 	var st := Ui.row(stats, 8)
@@ -84,7 +87,12 @@ func _play_again() -> void:
 func _save() -> void:
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
-	var r := Rect2i(cert.global_position, cert.size)
+	# Viewport images may be larger than the logical 1280×720 canvas on HiDPI
+	# displays.  Convert the Control-space rectangle before cropping so the saved
+	# certificate is not zoomed into its upper-left corner.
+	var canvas_size := get_viewport().get_visible_rect().size
+	var pixel_scale := Vector2(img.get_size()) / canvas_size
+	var r := Rect2i(Vector2i(cert.global_position * pixel_scale), Vector2i(cert.size * pixel_scale))
 	img = img.get_region(r.intersection(Rect2i(Vector2i.ZERO, img.get_size())))
 	var png := img.save_png_to_buffer()
 	if OS.has_feature("web"):

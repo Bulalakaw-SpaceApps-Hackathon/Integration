@@ -2,6 +2,7 @@ extends BasePanel
 ## J-03 Settings: Mute, Calm Mode, NASA API key (+ reset progress).
 
 var key_edit: LineEdit
+var name_edit: LineEdit
 
 
 func _build() -> void:
@@ -12,6 +13,15 @@ func _build() -> void:
 	body.add_child(_toggle("CALM MODE (MORE TIME)", Progression.calm_mode, func(on: bool) -> void:
 		Progression.calm_mode = on))
 	body.add_child(Ui.label("Calm Mode gives 1.5x more time before particles arrive, and spaces events further apart.", 8, false, Palette.BASE_PLUM, 740))
+	body.add_child(Ui.label("COMMANDER NAME (FOR CERTIFICATE)", Ui.BODY, true))
+	name_edit = LineEdit.new()
+	name_edit.text = Progression.commander_name
+	name_edit.placeholder_text = "COMMANDER"
+	name_edit.max_length = 24
+	name_edit.custom_minimum_size = Vector2(740, 48)
+	name_edit.text_changed.connect(func(t: String) -> void:
+		Progression.commander_name = t.strip_edges().to_upper() if not t.strip_edges().is_empty() else "COMMANDER")
+	body.add_child(name_edit)
 	body.add_child(Ui.label("NASA API KEY (FREE AT API.NASA.GOV)", Ui.BODY, true))
 	key_edit = LineEdit.new()
 	key_edit.text = Progression.api_key

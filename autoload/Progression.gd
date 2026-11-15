@@ -19,6 +19,7 @@ var muted: bool = false
 var judge_mode: bool = false     # session only: Judge Mode flags are never saved
 var unlock_all: bool = false
 var api_key: String = ""
+var commander_name: String = "COMMANDER"
 var seen_guides: Array[int] = []   # nights whose first-time guide popup was shown
 var tutorial_done: bool = false
 var story_seen: bool = false
@@ -150,6 +151,7 @@ func save_game() -> void:
 	f.set_value("settings", "calm_mode", calm_mode)
 	f.set_value("settings", "muted", muted)
 	f.set_value("settings", "api_key", api_key)
+	f.set_value("settings", "commander_name", commander_name)
 	f.set_value("progress", "seen_guides", seen_guides)
 	f.set_value("progress", "tutorial_done", tutorial_done)
 	f.set_value("progress", "story_seen", story_seen)
@@ -196,6 +198,9 @@ func load_game() -> void:
 	calm_mode = f.get_value("settings", "calm_mode", false)
 	muted = f.get_value("settings", "muted", false)
 	api_key = f.get_value("settings", "api_key", "")
+	commander_name = str(f.get_value("settings", "commander_name", "COMMANDER")).strip_edges().to_upper()
+	if commander_name.is_empty():
+		commander_name = "COMMANDER"
 	seen_guides.assign(f.get_value("progress", "seen_guides", []))
 	tutorial_done = f.get_value("progress", "tutorial_done", false)
 	story_seen = f.get_value("progress", "story_seen", false)

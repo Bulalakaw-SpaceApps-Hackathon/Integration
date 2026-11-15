@@ -379,7 +379,8 @@ func _build_desk() -> void:
 	alert_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	alert_box.add_theme_constant_override("separation", 4)
 	add_child(alert_box)
-	banner = _label("", Vector2(380, 470), Vector2(520, 40), 16, Palette.INK, true,
+	# A wide, central banner leaves its warning text and icon fully visible.
+	banner = _label("", Vector2(250, 480), Vector2(780, 44), 14, Palette.INK, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	banner.add_theme_stylebox_override("normal", Ui.nine("ui_warning_banner", 8))
 	banner.visible = false
@@ -1436,7 +1437,9 @@ func _alert(text: String, kind: String) -> void:
 	alert_box.add_child(l)
 	if icon != "crew":
 		Sfx.play(ALERT_SOUND.get(icon, "click"), -4.0)
-	while alert_box.get_child_count() > 3:          # radio line + never more than 2 alerts
+	# One urgent message at a time is enough; additional alerts are less useful than
+	# the camera feed the player needs to act on.
+	while alert_box.get_child_count() > 2:          # radio line + one active alert
 		alert_box.get_child(1).free()
 	l.set_meta("expires", Time.get_ticks_msec() + int(ALERT_SECONDS * 1000.0))
 
@@ -1473,7 +1476,7 @@ func _process(delta: float) -> void:
 		shake_amt = maxf(0.0, shake_amt - delta * 30.0)
 		position = Vector2(randf_range(-shake_amt, shake_amt), randf_range(-shake_amt, shake_amt)) if shake_amt > 0.0 else Vector2.ZERO
 	# Keep the radio line below urgent alerts in priority and above the monitors in layout.
-	radio.visible = alert_box.get_child_count() < 3 and Time.get_ticks_msec() < radio_until
+	radio.visible = alert_box.get_child_count() < 2 and Time.get_ticks_msec() < radio_until
 	var s := SimState.sim
 	_update_windows(s)
 	pause_label.visible = SimState.paused and not Game.flow
