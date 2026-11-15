@@ -261,17 +261,21 @@ func _build_desk() -> void:
 
 	# top bar
 	var pb := _button("", Rect2(16, 22, 48, 48), 16, _toggle_pause)
+	pb.add_theme_constant_override("icon_max_width", 24)
 	pb.icon = Assets.tex("icon_pause"); pb.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER; pb.tooltip_text = "Pause (Esc)"
 	_button("2X", Rect2(72, 22, 48, 48), 16, _toggle_speed)
 	var hint := _button("?", Rect2(16, 78, 48, 48), 16, _show_hint)
 	hint.icon = Assets.tex("icon_hint")
 	hint.text = ""
-	hint.expand_icon = true
+	hint.add_theme_constant_override("icon_max_width", 24)
 	hint.tooltip_text = "Hint from Mission Control"
 	var mute_b := _button("", Rect2(72, 78, 48, 48), 16, Game.toggle_mute)
 	mute_b.tooltip_text = "Mute (M)"; mute_b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mute_b.add_theme_constant_override("icon_max_width", 24)
 	mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
-	mute_b.pressed.connect(func() -> void: mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off"))
+	Game.mute_changed.connect(func() -> void:
+		mute_b.icon = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
+		mute_b.tooltip_text = "Unmute (M)" if Progression.muted else "Mute (M)")
 	_tex("desk_clock.png", Vector2(130, 10))
 	clock_time = _label("18:00", Vector2(141, 13), Vector2(214, 34), 32, Palette.SKY_HAZE, true,
 		HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
@@ -333,7 +337,7 @@ func _build_desk() -> void:
 	_button("<", Rect2(140, 672, 26, 22), 8, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
 	_button(">", Rect2(170, 672, 26, 22), 8, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
 
-	# camera buttons (BT-02 stand-ins)
+	# camera buttons (BT-02)
 	for k in 6:
 		var cam: String = CAMS[k]
 		var b := _button("%d %s" % [k + 1, CAM_SHORT[cam]], Rect2(322 + k * 108, 538, 96, 96), 8,
@@ -369,7 +373,7 @@ func _build_desk() -> void:
 
 	# alerts, particle banner, pause label
 	alert_box = VBoxContainer.new()
-	alert_box.position = Vector2(400, 74)    # under the battery, over the windows: never over the monitors
+	alert_box.position = Vector2(412, 78)    # under the battery, over the windows: never over the monitors
 	alert_box.size = Vector2(480, 0)
 	alert_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	alert_box.add_theme_constant_override("separation", 4)
@@ -400,14 +404,16 @@ func _build_desk() -> void:
 	alert_box.add_child(radio)
 	alert_box.move_child(radio, 0)
 	var rh := HBoxContainer.new()
+	rh.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rh.add_theme_constant_override("separation", 6)
 	radio.add_child(rh)
 	radio_icon = TextureRect.new()
-	radio_icon.custom_minimum_size = Vector2(16, 16)
+	radio_icon.custom_minimum_size = Vector2(28, 28)
+	radio_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	radio_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	radio_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rh.add_child(radio_icon)
-	radio_label = Ui.label("", 8, true, Palette.INK, 420)
+	radio_label = Ui.body("", 20, true, Palette.INK, 400)
 	rh.add_child(radio_label)
 
 	# briefing / debrief overlay
@@ -454,23 +460,30 @@ func _build_help_buttons() -> void:
 
 
 func _show_help(key: String) -> void:
-	for ch in help_box.get_children():
-		ch.queue_free()
+	for child in help_box.get_children():
+		help_box.remove_child(child)
+		child.queue_free()
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 10)
+	v.add_theme_constant_override("separation", 12)
 	help_box.add_child(v)
-	v.add_child(Ui.label(Strings.t("help." + key), 16, false, Palette.INK, 470))
-	var ok := _button("OK", Rect2(0, 0, 120, 40), 16, func() -> void:
-		help_box.visible = false
-		if SimState.running and Game.panels.is_empty():
-			SimState.paused = false)
-	ok.reparent(v)
-	ok.custom_minimum_size = Vector2(120, 40)
-	help_box.visible = true
+	v.add_child(Ui.body(Strings.t("help." + key), 22, false, Palette.INK, 470))
+	var actions := Ui.row(v)
+	actions.add_child(Ui.button("CLOSE", _close_help, Vector2(160, 64)))
+	help_box.reset_size()
+	help_box.position = (size - help_box.get_combined_minimum_size()) / 2.0
+	help_box.show()
 	pause_dim.move_to_front()
+	pause_dim.show()
 	help_box.move_to_front()
 	if SimState.running:
 		SimState.paused = true
+
+
+func _close_help() -> void:
+	help_box.hide()
+	if SimState.running and Game.panels.is_empty():
+		SimState.paused = overlay.visible
+	pause_dim.visible = SimState.paused or overlay.visible
 
 
 # ---------------------------------------------------------------- guided Night 1
@@ -667,6 +680,7 @@ func _build_panel_controls() -> void:
 		(ctl[k] as Button).size = Vector2(30, 54)              # it grew to fit the text before clipping was on
 	for k in ["shelter", "recall", "dish", "ask", "send", "heater", "life", "lamp"]:
 		var b: Button = ctl[k]
+		b.add_theme_constant_override("icon_max_width", 24)
 		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP      # icon on top, one short word under it
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_refresh_icons(null)
@@ -753,6 +767,12 @@ func _toggle_pause() -> void:
 
 func _toggle_speed() -> void:
 	SimState.speed = 2.0 if SimState.speed == 1.0 else 1.0
+
+
+func _input(event: InputEvent) -> void:
+	if help_box and help_box.visible and Game.top_panel() == null and event.is_action_pressed("ui_cancel"):
+		_close_help()
+		get_viewport().set_input_as_handled()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1261,21 +1281,22 @@ func _open_answer(i: int, crew_id: String) -> void:
 	face.texture = Assets.frame("portrait_" + crew_id, 2)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.custom_minimum_size = Vector2(48, 48)
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	head.add_child(face)
-	head.add_child(Ui.label(crew_id.to_upper() + " ASKS:", 8, true))
-	v.add_child(Ui.label(r.text, 8, false, Palette.INK, 290))
+	head.add_child(Ui.body(crew_id.capitalize(), 22, true))
+	v.add_child(Ui.body(r.text, 20, false, Palette.INK, 280))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	v.add_child(row)
 	for yes in [true, false]:
-		var b := _button("YES" if yes else "NO", Rect2(0, 0, 96, 32), 16, func() -> void:
+		var b := _button("YES" if yes else "NO", Rect2(0, 0, 112, 64), 16, func() -> void:
 			var s := _live()
 			if s:
 				s.answer_request(crew_id, yes)
 				Sfx.play("click")
 			_close_answer())
 		b.reparent(row)
-		b.custom_minimum_size = Vector2(96, 32)
+		b.custom_minimum_size = Vector2(112, 64)
 
 
 ## Ads and answer boxes appear during the night but must stay UNDER alerts and big popups.
@@ -1401,6 +1422,7 @@ func _alert(text: String, kind: String) -> void:
 	sb.content_margin_bottom = 6
 	l.add_theme_stylebox_override("panel", sb)
 	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override("separation", 8)
 	l.add_child(row)
 	var ic := Ui.image(icon_asset)
@@ -1409,7 +1431,7 @@ func _alert(text: String, kind: String) -> void:
 	ic.custom_minimum_size = Vector2(28, 28)
 	row.add_child(ic)
 	# crew radio chatter is one small line; real alerts are big
-	var lab := Ui.body(text, 14, true, Palette.INK, 400)        # readable body font (D63)
+	var lab := Ui.body(text, 20, true, Palette.INK, 400)        # readable body font (D63)
 	lab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(lab)
 	alert_box.add_child(l)
@@ -1464,7 +1486,8 @@ func _process(delta: float) -> void:
 			pause_dim.move_to_front()
 			pause_label.move_to_front()
 		elif pause_dim.get_index() != top.get_index() - 1:
-			move_child(pause_dim, top.get_index())
+			var target_index := top.get_index() - int(pause_dim.get_index() < top.get_index())
+			move_child(pause_dim, target_index)
 	if s == null:
 		return
 	# clock + battery + forecast

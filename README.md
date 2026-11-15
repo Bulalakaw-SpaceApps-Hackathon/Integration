@@ -69,6 +69,7 @@ Judge Mode is a sandbox: nothing it does is written to the player's save.
 - To use a final: **overwrite the placeholder with the same file name and the same size** (sprite sheets: same frame size and count, frames in one row). Godot re-imports it; nothing else changes.
 - `python3 tools/make_placeholders.py .` remakes missing placeholders and `data/assets.json`. It never overwrites an existing file unless you add `--force`.
 - **Layout templates for artists** are in `assets/templates/` (made by `tools/make_layout_templates.py`): camera feed, base map, buildings/plots, title, night select, mission complete, UI frames and icons. Each shows exact sizes and the zones where code draws text or sprites. `*_1x.png` files are exact-size guides to draw on.
+- The [team Assets repository](https://github.com/Bulalakaw-SpaceApps-Hackathon/Assets) is the source for shared artwork. In this workspace it is checked out beside the game as `../Assets`. Keep local source copies used by the authoring tools. Layout templates are excluded from the Web and Windows exports.
 - 9-slice frames (ui_panel, ui_button, ui_popup, ui_briefing, ui_debrief, ui_codex_page, ui_nasa_panel, ui_certificate) keep a ~12 px border; the code stretches the middle.
 
 ## Build for the web / Windows

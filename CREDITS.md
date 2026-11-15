@@ -6,6 +6,8 @@ A NASA Space Apps Challenge 2026 game by Team ALT-F4 (Polytechnic University of 
 - Built with the help of Claude (Anthropic)
 
 # Art and sound
+- The Commander's outdoor EVA sprite adapts Team ALT-F4's Carlo EVA walk cycle with cream and blue suit panels.
+- BT-01 through BT-11 (29 button, control and attention PNGs): original Team ALT-F4 art from the team Assets repository, in the matching folders under `BT-/`. The game copies are in `assets/sprites/ui/`.
 - Art by Team ALT-F4: characters, camera feeds, base map, UI, alerts, sponsor ads and effects (sources in assets/source/).
 - The team's scratch art (assets/source/) was remastered into the game's style with the tools in tools/: base-map buildings, decorations and ground (draw_flat, draw_feed_buildings, rescale_map, animate_deco), indoor camera feeds and markers (paint_rooms), night covers and the title backdrop (paint_night_cards, paint_title), desk and alert icons, badges, stars (draw_desk_icons, draw_alerts, draw_badges, draw_ui_small), crew portraits (remaster_portraits) and Mission Control (draw_mission_control).
 - Used as made by the team: the CF-01 Sky Radar and CF-03 Solar Field feeds, the screen set (panel, codex page, NASA panel, certificate, toggles, joystick, ending backdrop), the task backgrounds, the sounds and the NASA photos.

@@ -1,14 +1,13 @@
 class_name Commander
 extends CharacterBody2D
 ## CH-01 The Commander on the base map. WASD / arrows, or the touch joystick.
-## char_commander.png: 16 frames in one row = down 0-3, left 4-7, right 8-11, up 12-15.
+## char_commander_eva.png: 16 frames in one row = down 0-3, left 4-7, right 8-11, up 12-15.
 
 const SPEED := 170.0
 const DIRS := {"down": 0, "left": 4, "right": 8, "up": 12}
 
 var sprite: Sprite2D
 var joystick := Vector2.ZERO      # set by the touch joystick
-var auto_target := Vector2.INF    # tap-to-walk: walk here by itself
 var facing := "down"
 var anim_t := 0.0
 var step_t := 0.0
@@ -22,7 +21,7 @@ func _ready() -> void:
 	shape.position = Vector2(0, -6)          # around the feet: the node's position IS the feet
 	add_child(shape)
 	sprite = Sprite2D.new()
-	sprite.texture = Assets.frame("char_commander", 0)
+	sprite.texture = Assets.frame("char_commander_eva", 0)
 	sprite.scale = Vector2(2, 2)             # 32x48 art shown at 2x, like everything on the map (D49)
 	sprite.offset = Vector2(0, -24)          # feet at the node position, so y-sort compares feet with building bases
 	add_child(sprite)
@@ -32,13 +31,6 @@ func _physics_process(delta: float) -> void:
 	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if dir == Vector2.ZERO:
 		dir = joystick
-	if dir != Vector2.ZERO:
-		auto_target = Vector2.INF        # the player took over
-	elif auto_target != Vector2.INF:
-		if position.distance_to(auto_target) < 10.0 or get_slide_collision_count() > 0 and velocity.length() < 5.0:
-			auto_target = Vector2.INF
-		else:
-			dir = (auto_target - position).normalized()
 	velocity = dir.limit_length(1.0) * SPEED
 	move_and_slide()
 	if dir.length() > 0.1:
@@ -54,7 +46,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		anim_t = 0.0
 	var f := int(anim_t * 8.0) % 4
-	sprite.texture = Assets.frame("char_commander", int(DIRS[facing]) + f)
+	sprite.texture = Assets.frame("char_commander_eva", int(DIRS[facing]) + f)
 
 
 static func ensure_input_actions() -> void:

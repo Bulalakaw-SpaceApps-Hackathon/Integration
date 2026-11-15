@@ -41,9 +41,9 @@ var food_label: Label
 var card_layer: Control
 var fx: Sprite2D
 var fx_t := -1.0
-var pending := ""                   # tapped from far away: walk there, then go inside
 var plot_labels: Dictionary = {}
 var start_button: Button
+var mute_button: TextureButton
 var lessons: Dictionary = {}
 var anim_t := 0.0                   # building idle loops (lights, smoke, fans, waves...)
 var anim_f := -1
@@ -111,6 +111,7 @@ func _ready() -> void:
 	_build_crew()
 	_build_hud()
 	Progression.changed.connect(_refresh_hud)
+	Game.mute_changed.connect(_refresh_mute)
 	if Game.tutorial:
 		_show_tutorial_card()
 	elif not Progression.story_seen and not Progression.judge_mode:
@@ -384,11 +385,6 @@ func _physics_process(_delta: float) -> void:
 			best = id
 			best_d = d
 	near_target = best
-	if pending != "" and best == pending:
-		var go := pending
-		pending = ""
-		commander.auto_target = Vector2.INF
-		_interact(go)
 	if best == "" or card_layer != null:
 		highlight.visible = false
 		prompt.visible = false
@@ -414,6 +410,12 @@ func _process(delta: float) -> void:
 			fx.texture = Assets.frame("fx_upgrade", f)
 
 
+func _input(event: InputEvent) -> void:
+	if card_layer != null and Game.top_panel() == null and event.is_action_pressed("ui_cancel"):
+		_close_card()
+		get_viewport().set_input_as_handled()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if card_layer != null:
 		return
@@ -431,21 +433,17 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 				return
 		if Rect2(HABITAT_POS - Vector2(192, 192), Vector2(384, 288)).has_point(p):
-			_walk_or_interact("habitat", HABITAT_POS + Vector2(0, 124))
+			_interact("habitat")
+			get_viewport().set_input_as_handled()
 			return
 		for id in PLOT_POS:
-			if Rect2(PLOT_POS[id] - Vector2(96, 128), Vector2(192, 192)).has_point(p):
-				_walk_or_interact(id, PLOT_POS[id] + Vector2(0, 84))
+			var plot: Sprite2D = plots[id]
+			var bounds := plot.transform * plot.get_rect()
+			var label: Label = plot_labels[id]
+			if bounds.has_point(p) or label.get_rect().has_point(p):
+				_interact(id)
+				get_viewport().set_input_as_handled()
 				return
-
-
-## Hands-on: the Commander really walks to each building. Tapping far away walks there first.
-func _walk_or_interact(target: String, stand_at: Vector2) -> void:
-	if near_target == target or Progression.judge_mode:
-		_interact(target)
-	else:
-		pending = target
-		commander.auto_target = stand_at
 
 
 func _interact(target: String) -> void:
@@ -524,11 +522,16 @@ func _build_hud() -> void:
 		Progression.discoveries.size(), Progression.NIGHT_COUNT], 8, true, Palette.STATUS_OK_SHADE))
 
 	var tools := Ui.row(hud_root, 6)
-	tools.position = Vector2(860, 8)
+	tools.position = Vector2(876, 8)
 	tools.add_child(Ui.icon_button("icon_hint", _hint, "Hint"))
-	tools.add_child(Ui.button("BRIEFING", _show_briefing, Vector2(140, 56)))
+	tools.add_child(Ui.button("BRIEFING", _show_briefing, Vector2(140, 64)))
 	tools.add_child(Ui.icon_button("icon_settings", func() -> void: Game.open_panel("pause"), "Pause"))
-	tools.add_child(Ui.icon_button("icon_mute_on" if Progression.muted else "icon_mute_off", Game.toggle_mute, "Mute (M)"))
+	mute_button = Ui.icon_button("icon_mute_off", Game.toggle_mute, "Mute (M)")
+	tools.add_child(mute_button)
+	for child in tools.get_children():
+		if child is TextureButton:
+			child.custom_minimum_size = Vector2(64, 64)
+			child.stretch_mode = TextureButton.STRETCH_KEEP_CENTERED
 
 	start_button = Ui.button("START NIGHT", _start_night, Vector2(260, 72))
 	start_button.position = Vector2(1004, 632)
@@ -550,6 +553,7 @@ func _refresh_hud() -> void:
 	if mat_label == null:
 		return
 	mat_label.text = str(Progression.materials)
+	_refresh_mute()
 	var food := Progression.food
 	if food < 0 and cfg and cfg.food_enabled:
 		food = Balance.config.food_start
@@ -565,6 +569,11 @@ func _refresh_hud() -> void:
 		var seen := (Game.visited[Game.night] as Array).has(id)
 		lab.text = PLOT_NAME[id] + (" (VISITED)" if seen else "")
 		lab.add_theme_color_override("font_color", Palette.STATUS_OK if seen else Palette.HIGHLIGHT)
+
+
+func _refresh_mute() -> void:
+	mute_button.texture_normal = Assets.tex("icon_mute_on" if Progression.muted else "icon_mute_off")
+	mute_button.tooltip_text = "Unmute (M)" if Progression.muted else "Mute (M)"
 
 
 func _hint() -> void:
@@ -586,17 +595,34 @@ func _hint() -> void:
 
 func _close_card() -> void:
 	if card_layer:
+		card_layer.hide()
 		card_layer.queue_free()
 		card_layer = null
+		commander.set_physics_process(true)
 
 
 func _new_card(width := 760.0, asset := "ui_panel") -> VBoxContainer:
 	_close_card()
+	commander.joystick = Vector2.ZERO
+	commander.velocity = Vector2.ZERO
+	commander.set_physics_process(false)
 	card_layer = Control.new()
 	card_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	hud_root.add_child(card_layer)
 	Ui.dim(card_layer, 0.45)
 	return Ui.card(card_layer, asset, width)
+
+
+func _card_scroll(parent: VBoxContainer, height: float) -> VBoxContainer:
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size.y = height
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent.add_child(scroll)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 12)
+	scroll.add_child(content)
+	return content
 
 
 # ---------------------------------------------------------------- Night 0: the tutorial day
@@ -627,14 +653,15 @@ func _show_story() -> void:
 	btns.add_child(Ui.button("I'M READY!", func() -> void:
 		Progression.story_seen = true
 		Progression.save_game()
-		_show_briefing(), Vector2(260, 60)))
+		_show_briefing(), Vector2(260, 64)))
 
 
 # ---------------------------------------------------------------- D-07 Morning Briefing
 func _show_briefing() -> void:
 	if cfg == null:
 		return
-	var v := _new_card(900, "ui_briefing")
+	var card := _new_card(980, "ui_briefing")
+	var v := _card_scroll(card, 482.0)
 	var top := Ui.row(v, 16, BoxContainer.ALIGNMENT_BEGIN)
 	top.add_child(Ui.image("portrait_mission_control"))
 	var col := VBoxContainer.new()
@@ -642,16 +669,16 @@ func _show_briefing() -> void:
 	top.add_child(col)
 	col.add_child(Ui.label("MORNING BRIEFING · NIGHT %d" % cfg.id, 8, true, Palette.BASE_PLUM))
 	col.add_child(Ui.label(cfg.title.to_upper(), Ui.BIG, true, Palette.INK, 700))
-	col.add_child(Ui.label(cfg.briefing_text, Ui.BODY, false, Palette.INK, 700))
+	col.add_child(Ui.body(cfg.briefing_text, 20, false, Palette.INK, 700))
 	for ev in cfg.hazard_events:
 		if ev.real_date != "":
 			var r := Ui.row(col, 10, BoxContainer.ALIGNMENT_BEGIN)
 			r.add_child(Ui.badge(ev.badge if ev.badge in ["real", "simplified"] else "real"))
-			r.add_child(Ui.label("REAL EVENT: %s · %s" % [ev.real_date, ev.source_name], 8, true, Palette.BASE_PLUM, 560))
+			r.add_child(Ui.body("Real event · %s · %s" % [ev.real_date, ev.source_name], 20, true, Palette.BASE_PLUM, 560))
 			break
 	var sun := Ui.row(v, 10, BoxContainer.ALIGNMENT_BEGIN)
 	sun.add_child(Ui.badge("live" if DonkiService.is_live() else "archived"))
-	sun.add_child(Ui.label("TONIGHT'S REAL SUN: " + DonkiService.summary(), 8, false, Palette.INK, 700))
+	sun.add_child(Ui.body(DonkiService.summary(), 20, false, Palette.INK, 700))
 	# tonight's 3 stars (the same three every night)
 	var beat := SimState.story_beat(cfg.id)
 	v.add_child(Ui.label("TONIGHT'S 3 STARS", Ui.BODY, true))
@@ -664,11 +691,11 @@ func _show_briefing() -> void:
 		st.custom_minimum_size = Vector2(20, 20)
 		st.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		r.add_child(st)
-		r.add_child(Ui.label("%s: %s" % [l[0], l[1]], 8, true, Palette.INK, 780))
-	v.add_child(Ui.label("BEFORE THE NIGHT: GO INSIDE EVERY BUILDING (WALK UP + E) TO LEARN AND UPGRADE.", Ui.BODY, true, Palette.BASE_PLUM, 820))
-	var btns := Ui.row(v)
-	btns.add_child(Ui.button("LET'S BUILD", _close_card, Vector2(240, 60)))
-	btns.add_child(Ui.button("START NIGHT", _start_night, Vector2(240, 60)))
+		r.add_child(Ui.body("%s · %s" % [l[0], l[1]], 20, true, Palette.INK, 780))
+	v.add_child(Ui.body("Tap a building or walk up and press E. Visit each open building before starting.", 20, true, Palette.BASE_PLUM, 820))
+	var btns := Ui.row(card)
+	btns.add_child(Ui.button("LET'S BUILD", _close_card, Vector2(240, 64)))
+	btns.add_child(Ui.button("START NIGHT", _start_night, Vector2(240, 64)))
 
 
 ## Sponsor deal (Night 2+): a clickable sponsor icon at the bottom-right, above START NIGHT.
@@ -695,7 +722,10 @@ func _build_sponsor_panel() -> void:
 	sponsor_decided = Progression.sponsor_answered == Game.night
 	sponsor_icon = TextureButton.new()
 	sponsor_icon.texture_normal = Assets.tex("sponsor_logo_%d" % sponsor_index)
-	sponsor_icon.position = Vector2(1184, 560)
+	sponsor_icon.position = Vector2(1176, 552)
+	sponsor_icon.ignore_texture_size = true
+	sponsor_icon.custom_minimum_size = Vector2(64, 64)
+	sponsor_icon.stretch_mode = TextureButton.STRETCH_KEEP_CENTERED
 	sponsor_icon.focus_mode = Control.FOCUS_NONE
 	sponsor_icon.tooltip_text = "Sponsor offer"
 	sponsor_icon.pressed.connect(func() -> void:
@@ -795,7 +825,8 @@ func _show_building(id: String) -> void:
 	head.add_child(hc)
 	hc.add_child(Ui.label("INSIDE: " + PLOT_NAME[id], Ui.BIG, true))
 	hc.add_child(Ui.label("LEVEL %d OF 3 · DAY %d LESSON (%d OF %d)" % [lv, Game.night, int(les.get("index", 0)) + 1, int(les.get("count", 1))], 8, true, Palette.BASE_PLUM))
-	var body := Ui.row(v, 20, BoxContainer.ALIGNMENT_BEGIN)
+	var content := _card_scroll(v, 430.0)
+	var body := Ui.row(content, 20, BoxContainer.ALIGNMENT_BEGIN)
 	var left := VBoxContainer.new()
 	left.add_theme_constant_override("separation", 6)
 	body.add_child(left)
@@ -812,6 +843,8 @@ func _show_building(id: String) -> void:
 		frame.add_theme_stylebox_override("panel", sb)
 		frame.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		var photo := Ui.image("nasa_%s_%d" % [id, int(les.index) + 1])
+		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		photo.custom_minimum_size = Vector2(320, 200)
 		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -819,7 +852,7 @@ func _show_building(id: String) -> void:
 		left.add_child(frame)
 		var cap := Ui.row(left, 6, BoxContainer.ALIGNMENT_BEGIN)
 		cap.add_child(Ui.badge("real"))
-		cap.add_child(Ui.label("REAL PHOTO: " + str(les.image).to_upper() + " · CREDIT: NASA", 8, true, Palette.BASE_PLUM, 360))
+		cap.add_child(Ui.body(str(les.image) + " · NASA photo", 20, true, Palette.BASE_PLUM, 360))
 		left.add_child(FigureChart.new(les.get("figure", {})))
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 10)
@@ -827,24 +860,24 @@ func _show_building(id: String) -> void:
 	if not les.is_empty():
 		var tr := Ui.row(right, 10, BoxContainer.ALIGNMENT_BEGIN)
 		tr.add_child(Ui.badge(str(les.get("badge", "real"))))
-		tr.add_child(Ui.label(str(les.title), Ui.BODY, true, Palette.INK, 560))
-		right.add_child(Ui.body(str(les.text), 18, false, Palette.INK, 660))
-		right.add_child(Ui.label("SOURCE: " + str(les.source), 8, false, Palette.BASE_PLUM, 660))
-	right.add_child(Ui.label("IN YOUR BASE: " + PLOT_WHY[id], 8, true, Palette.INK, 660))
-	right.add_child(Ui.label("NOW: " + _effect(id, lv), Ui.BODY, true, Palette.INK, 660))
+		tr.add_child(Ui.body(str(les.title), 22, true, Palette.INK, 560))
+		right.add_child(Ui.body(str(les.text), 20, false, Palette.INK, 660))
+		right.add_child(Ui.body(str(les.source), 20, false, Palette.BASE_PLUM, 660))
+	right.add_child(Ui.body(PLOT_WHY[id], 20, true, Palette.INK, 660))
+	right.add_child(Ui.body("Now · " + _effect(id, lv), 20, true, Palette.INK, 660))
 	var btns := Ui.row(v)
 	if lv < 3:
 		var cost := Progression.upgrade_cost(id)
-		right.add_child(Ui.label("NEXT LEVEL: " + _effect(id, lv + 1), Ui.BODY, true, Palette.STATUS_OK_SHADE, 660))
+		right.add_child(Ui.body("Next level · " + _effect(id, lv + 1), 20, true, Palette.STATUS_OK_SHADE, 660))
 		var cr := Ui.row(right, 8, BoxContainer.ALIGNMENT_BEGIN)
 		cr.add_child(Ui.image("icon_materials"))
 		cr.add_child(Ui.label("COSTS %d · YOU HAVE %d" % [cost, Progression.materials], Ui.BODY, true))
-		var up := Ui.button("UPGRADE", func() -> void: _upgrade(id), Vector2(220, 60))
+		var up := Ui.button("UPGRADE", func() -> void: _upgrade(id), Vector2(220, 64))
 		up.disabled = not Progression.can_upgrade(id)
 		btns.add_child(up)
 	else:
 		right.add_child(Ui.label("MAXED OUT!", Ui.BODY, true, Palette.STATUS_OK_SHADE))
-	btns.add_child(Ui.button("LEAVE BUILDING", _close_card, Vector2(260, 60)))
+	btns.add_child(Ui.button("LEAVE BUILDING", _close_card, Vector2(260, 64)))
 	_refresh_hud()
 
 
@@ -890,14 +923,14 @@ func _show_plot_card(id: String) -> void:
 	if not unlocked:
 		v.add_child(Ui.label("UNLOCKS ON NIGHT %d." % _unlock_night(id), Ui.BODY, true, Palette.STATUS_DANGER_SHADE))
 	else:
-		v.add_child(Ui.label("NOW: " + _effect(id, lv), Ui.BODY, true, Palette.INK, 700))
+		v.add_child(Ui.body("Now · " + _effect(id, lv), 20, true, Palette.INK, 700))
 		if lv < 3:
 			var cost := Progression.upgrade_cost(id)
 			v.add_child(Ui.label("NEXT: " + _effect(id, lv + 1), Ui.BODY, true, Palette.STATUS_OK_SHADE, 700))
 			var cost_row := Ui.row(v, 8, BoxContainer.ALIGNMENT_BEGIN)
 			cost_row.add_child(Ui.image("icon_materials"))
 			cost_row.add_child(Ui.label("COSTS %d · YOU HAVE %d" % [cost, Progression.materials], Ui.BODY, true))
-			var up := Ui.button("UPGRADE", func() -> void: _upgrade(id), Vector2(220, 60))
+			var up := Ui.button("UPGRADE", func() -> void: _upgrade(id), Vector2(220, 64))
 			up.disabled = not Progression.can_upgrade(id)
 			btns.add_child(up)
 			if up.disabled:
@@ -1079,7 +1112,7 @@ func _build_crew() -> void:
 		var spot: String = CREW_SPOT.get(id, "")
 		var at: Vector2 = PLOT_POS[spot] + Vector2(124 if id == "lani" else 84, 96) if spot != "" and Progression.plot_unlocked(spot, Game.night) else free_spots.pop_front()
 		var s := Sprite2D.new()
-		s.texture = Assets.frame("crew_" + str(id), 0)
+		s.texture = Assets.frame("crew_%s_eva" % id, 0)
 		_stand(s, at, 2.0)
 		crew_nodes[id] = s
 		var m := Ui.label("!", 16, true, Palette.STATUS_WARN)
@@ -1146,7 +1179,7 @@ func _talk(id: String) -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 8)
 	top.add_child(col)
-	col.add_child(Ui.label("%s · %s" % [id.to_upper(), CREW_ROLE.get(id, "CREW")], 8, true, Palette.BASE_PLUM))
-	col.add_child(Ui.label(_hint_line(id), Ui.BODY, false, Palette.INK, 580))
+	col.add_child(Ui.body("%s · %s" % [id.capitalize(), CREW_ROLE.get(id, "CREW").capitalize()], 20, true, Palette.BASE_PLUM))
+	col.add_child(Ui.body(_hint_line(id), 22, false, Palette.INK, 580))
 	var btns := Ui.row(v)
-	btns.add_child(Ui.button("OK", _close_card, Vector2(160, 52)))
+	btns.add_child(Ui.button("OK", _close_card, Vector2(160, 64)))

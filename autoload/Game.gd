@@ -1,5 +1,4 @@
-extends Node
-## Game flow: which screen is showing, plus the overlay layer (pause menu, panels, toasts)
+extends Node## Game flow: which screen is showing, plus the overlay layer (pause menu, panels, toasts)
 ## that sits above every screen.
 ##
 ##   Title -> Night Select -> Hub (Briefing card, Build) -> Desk (Night) -> Debrief
@@ -7,6 +6,7 @@ extends Node
 ##     lost -> Retry the same night (upgrades kept, nothing earned counts)
 
 signal screen_changed(name: String)
+signal mute_changed
 
 const SCREENS := {
 	"title": "res://scripts/screens/TitleScreen.gd",
@@ -188,6 +188,7 @@ func toggle_mute() -> void:
 	Progression.muted = not Progression.muted
 	Progression.save_game()
 	Sfx.apply_mute()
+	mute_changed.emit()
 	toast("Sound off" if Progression.muted else "Sound on", "info")
 
 
@@ -200,10 +201,11 @@ func toast(text: String, kind := "info", seconds := 4.0) -> void:
 	p.add_theme_stylebox_override("panel", Ui.nine("ui_popup", 12))
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var h := HBoxContainer.new()
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_theme_constant_override("separation", 10)
 	p.add_child(h)
 	h.add_child(Ui.image("alert_" + kind))
-	var l := Ui.label(text, 8, true, Palette.INK, 360)
+	var l := Ui.body(text, 20, true, Palette.INK, 360)
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
 	toast_box.add_child(p)
