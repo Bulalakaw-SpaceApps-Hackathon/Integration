@@ -1550,7 +1550,7 @@ class FeedView extends Control:
 		var s: OutpostSim = SimState.sim
 		if cam == "" or s == null or s.battery <= 0.0 and int(fmod(t, 4.0)) == 0 and cam != "shelter":
 			# no camera, or the battery is empty: cameras flicker out to NO SIGNAL
-			draw_texture(Assets.tex("cam_off"), Vector2.ZERO)
+			draw_texture(Assets.frame("cam_off", int(t * 6.0) % Assets.frame_count("cam_off")), Vector2.ZERO)   # rolling static
 			if s != null and s.battery <= 0.0:
 				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
 			return
@@ -1559,7 +1559,18 @@ class FeedView extends Control:
 		if cam == "airlock" and last_bg != "" and bg != last_bg:
 			Sfx.play("door_open" if bg == "cam_airlock_open" else "door_close", -12.0)
 		last_bg = bg
-		draw_texture(Assets.tex(bg), Vector2.ZERO)
+		draw_texture(Assets.frame(bg, int(t * 2.0) % Assets.frame_count(bg)), Vector2.ZERO)   # plants sway, static rolls (D66)
+		# outside feeds: a few stars twinkle; the Sky Radar sweep turns (D66)
+		if cam in ["sky_radar", "solar_field"]:
+			for k in 6:
+				if (int(t * 3.0) + k) % 4 != 0:
+					draw_rect(Rect2((k * 53 + 17) % 300 + 8, (k * 29 + 5) % 34 + 4, 1, 1), Color(1, 0.96, 0.92, 0.9))
+		if cam == "sky_radar":
+			var sweep := t * 1.2
+			var c0 := Vector2(160, 90)
+			for k in 4:
+				var a := sweep - k * 0.08
+				draw_line(c0, c0 + Vector2(cos(a), sin(a)) * 70.0, Color(0.64, 0.9, 0.62, 0.5 - k * 0.11), 1.0)
 		# Solar Field gets darker as the battery charge drops
 		if cam == "solar_field":
 			draw_rect(Rect2(0, 0, 320, 180), Color(0.05, 0.02, 0.12, clampf((60.0 - s.battery) / 100.0, 0.0, 0.45)))

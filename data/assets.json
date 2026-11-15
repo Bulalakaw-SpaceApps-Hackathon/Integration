@@ -180,7 +180,7 @@
 		"path": "res://assets/sprites/cameras/cam_greenhouse_on.png",
 		"w": 320,
 		"h": 180,
-		"frames": 1,
+		"frames": 2,
 		"kind": "image"
 	},
 	"cam_life_support": {
@@ -204,7 +204,7 @@
 		"path": "res://assets/sprites/cameras/cam_off.png",
 		"w": 320,
 		"h": 180,
-		"frames": 1,
+		"frames": 2,
 		"kind": "image"
 	},
 	"cam_shelter": {
