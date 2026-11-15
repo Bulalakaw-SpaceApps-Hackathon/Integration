@@ -7,10 +7,10 @@ extends Control
 ##   05:00-06:00  sunrise glow in the east (right) window
 ##   hazards      dust storm haze + blowing dust, bright sky pulse when a flare's light arrives
 ## Every object is placed in SCREEN coordinates, so Phobos can leave one window and enter the other.
-## Only palette colours are drawn (layer swaps use the dither_mix shader). Read-only: no game rules.
+## Crossfade the sky layers so flare and dust remain visible without a checkerboard.
 
 const DIR := "res://assets/sprites/desk/window/"
-const SHADER := preload("res://shaders/dither_mix.gdshader")
+const SHADER := preload("res://shaders/window_blend.gdshader")
 
 var key := "L"
 var hour := 18.0       # 18.0 .. 30.0 (30 = 06:00 next morning)

@@ -126,7 +126,7 @@ static func card(parent: Control, asset := "ui_panel", width := 760.0) -> VBoxCo
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	parent.add_child(center)
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", nine(asset, 14))
+	p.add_theme_stylebox_override("panel", nine(asset, 22 if asset == "ui_briefing" else 14))
 	p.custom_minimum_size.x = width
 	center.add_child(p)
 	var v := VBoxContainer.new()

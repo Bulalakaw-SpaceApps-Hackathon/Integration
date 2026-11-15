@@ -87,6 +87,9 @@ func goto(name: String, night_id := -1) -> void:
 	if screen:
 		screen.queue_free()
 		screen = null
+	for notice in toast_box.get_children():
+		notice.hide()
+		notice.queue_free()
 	screen_name = name
 	if name == "desk":
 		SimState.tutorial_tonight = tutorial
@@ -196,17 +199,39 @@ func toggle_mute() -> void:
 # ---------------------------------------------------------------- toasts
 ## Small message at the top (icon + shape + text). More than 4 at once are grouped.
 func toast(text: String, kind := "info", seconds := 4.0) -> void:
-	if toast_box.get_child_count() >= 4:
-		toast_box.get_child(0).queue_free()
+	var at_desk := screen_name == "desk" or SimState.running and not flow
+	var limit := 1 if at_desk else 4
+	if toast_box.get_child_count() >= limit:
+		for i in range(toast_box.get_child_count() - limit + 1):
+			var notice := toast_box.get_child(i) as Control
+			notice.hide()
+			notice.queue_free()
+	toast_box.anchor_top = 0.0 if at_desk else 1.0
+	toast_box.anchor_bottom = toast_box.anchor_top
+	toast_box.grow_vertical = Control.GROW_DIRECTION_END if at_desk else Control.GROW_DIRECTION_BEGIN
+	toast_box.offset_left = 322.0 if at_desk else 10.0
+	toast_box.offset_right = toast_box.offset_left
+	toast_box.offset_top = 642.0 if at_desk else -26.0
+	toast_box.offset_bottom = toast_box.offset_top
+	toast_box.custom_minimum_size.x = 726.0 if at_desk else 440.0
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", Ui.nine("ui_popup", 12))
+	var panel := Ui.nine("ui_popup", 12)
+	if at_desk:
+		panel.content_margin_top = 5
+		panel.content_margin_bottom = 5
+	p.add_theme_stylebox_override("panel", panel)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var h := HBoxContainer.new()
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_theme_constant_override("separation", 10)
 	p.add_child(h)
-	h.add_child(Ui.image("alert_" + kind))
-	var l := Ui.body(text, 20, true, Palette.INK, 360)
+	var icon := Ui.image("alert_" + kind)
+	if at_desk:
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(28, 28)
+	h.add_child(icon)
+	var l := Ui.body(text, 20, true, Palette.INK, 646 if at_desk else 360)
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
 	toast_box.add_child(p)

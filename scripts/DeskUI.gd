@@ -249,11 +249,18 @@ func _build_desk() -> void:
 	for i in 2:
 		monitor_sprites.append(_tex("desk_monitor.png", Vector2(229 + i * 470, 258)))
 		var mi := i
-		var sb := _button("SCAN", Rect2(245 + i * 470 + 254, 290, 62, 20), 8, func() -> void: _press_scan(mi))
+		var sb := _button("SCAN", Rect2(471 + i * 470, 259, 76, 26), 13, func() -> void: _press_scan(mi))
+		sb.add_theme_font_override("font", Ui.FONT_BODY_B)
+		var states := {"normal": 0, "hover": 1, "pressed": 1, "disabled": 2}
+		for state in states:
+			sb.add_theme_stylebox_override(state, _btn_sb(8, states[state]))
+		sb.size = Vector2(76, 26)
 		sb.tooltip_text = "Look for a clue here (costs a little battery)"
 		scan_buttons.append(sb)
-		nameplates.append(_label("", Vector2(345 + i * 470, 264), Vector2(120, 17), 8, Palette.HIGHLIGHT, false,
-			HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER))
+		var nameplate := _label("", Vector2(345 + i * 470, 262), Vector2(120, 20), 14, Palette.HIGHLIGHT, true,
+			HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
+		nameplate.add_theme_font_override("font", Ui.FONT_BODY_B)
+		nameplates.append(nameplate)
 
 	_tex("desk_panel_left.png", Vector2(16, 198))
 	_tex("desk_panel_right.png", Vector2(1104, 198))
@@ -326,16 +333,24 @@ func _build_desk() -> void:
 	add_child(stars_strip)
 
 	# meter panel
-	_tex("desk_meter_panel.png", Vector2(16, 576))
+	var meter_frame := Panel.new()
+	meter_frame.position = Vector2(16, 540)
+	meter_frame.size = Vector2(290, 160)
+	meter_frame.add_theme_stylebox_override("panel", Ui.nine("desk_meter_panel", 10))
+	meter_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(meter_frame)
 	meter_panel = MeterPanel.new()
-	meter_panel.position = Vector2(16, 576)
-	meter_panel.size = Vector2(192, 120)
+	meter_panel.position = meter_frame.position
+	meter_panel.size = meter_frame.size
 	meter_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	meter_panel.setup(FONT_R, FONT_B, load(S + "ui_meter_oxygen.png"), load(S + "ui_meter_dose.png"),
+	meter_panel.setup(load(S + "ui_meter_oxygen.png"),
 		load(S + "ui_meter_comms.png"), load(S + "ui_meter_food.png"))
 	add_child(meter_panel)
-	_button("<", Rect2(140, 672, 26, 22), 8, func() -> void: meter_panel.flip(-1)).tooltip_text = "Previous stats page"
-	_button(">", Rect2(170, 672, 26, 22), 8, func() -> void: meter_panel.flip(1)).tooltip_text = "Next stats page"
+	for step in [-1, 1]:
+		var arrow := _button("<" if step < 0 else ">", Rect2(202 if step < 0 else 250, 657, 42, 34),
+			20, func() -> void: meter_panel.flip(step))
+		arrow.add_theme_font_override("font", Ui.FONT_BODY_B)
+		arrow.tooltip_text = "Previous stats page" if step < 0 else "Next stats page"
 
 	# camera buttons (BT-02)
 	for k in 6:
@@ -421,7 +436,7 @@ func _build_desk() -> void:
 	overlay = PanelContainer.new()
 	overlay.position = Vector2(280, 110)
 	overlay.size = Vector2(720, 470)
-	overlay.add_theme_stylebox_override("panel", Ui.nine("ui_debrief", 14))
+	overlay.add_theme_stylebox_override("panel", Ui.nine("ui_panel", 14))
 	add_child(overlay)
 	var margin := MarginContainer.new()
 	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
@@ -437,7 +452,7 @@ func _build_desk() -> void:
 const HELP_SPOTS := {"battery": Vector2(812, 70), "forecast": Vector2(1030, 34), "clock": Vector2(338, 66),
 	"cameras": Vector2(962, 540), "monitors": Vector2(548, 262), "shelter": Vector2(152, 218), "recall": Vector2(152, 316),
 	"comms": Vector2(152, 414), "heater": Vector2(1218, 218), "life": Vector2(1218, 316), "lamp": Vector2(1218, 414),
-	"scroll": Vector2(1232, 170), "meters": Vector2(186, 580)}
+	"scroll": Vector2(1232, 170), "meters": Vector2(274, 546)}
 
 func _build_help_buttons() -> void:
 	for key in HELP_SPOTS:
@@ -682,14 +697,18 @@ func _build_panel_controls() -> void:
 	for k in ["shelter", "recall", "dish", "ask", "send", "heater", "life", "lamp"]:
 		var b: Button = ctl[k]
 		b.add_theme_constant_override("icon_max_width", 24)
+		b.add_theme_font_override("font", Ui.FONT_BODY_B)
+		b.add_theme_font_size_override("font_size", 13 if b.size.x >= 64 else 10)
 		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP      # icon on top, one short word under it
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_refresh_icons(null)
 	var plates := [[lx, 0, "SHELTER DOOR"], [lx, 1, "RECALL CREW"], [lx, 2, "COMMS"],
 		[rx, 0, "HEATER"], [rx, 1, "LIFE SUPPORT"], [rx, 2, "CROP LAMP"]]
 	for p in plates:
-		_label(p[2], Vector2(p[0] + 6, slot_y.call(p[1]) + 70), Vector2(100, 14), 8, Palette.INK, false,
+		var plate := _label(p[2], Vector2(p[0] + 6, slot_y.call(p[1]) + 67), Vector2(100, 18), 13, Palette.INK, true,
 			HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
+		plate.add_theme_font_override("font", Ui.FONT_BODY_B)
+		plate.size = Vector2(100, 18)
 
 
 # ============================================================================
@@ -939,15 +958,21 @@ func _on_night_ended(report: Dictionary) -> void:
 	var cfg := SimState.config
 	# D-08 Debrief (one screen): 3 stars with reasons, the Malfunction answer, the Discovery; MORE for clues
 	var beat := SimState.story_beat(cfg.id)
+	var heading := Ui.row(overlay_body, 10, BoxContainer.ALIGNMENT_BEGIN)
+	var mark := Ui.image("ui_debrief")
+	mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	mark.custom_minimum_size = Vector2(36, 36)
+	heading.add_child(mark)
 	if report.won:
 		Sfx.play("sunrise")
-		_ov_label("SUNRISE! YOU MADE IT", 24, true, Palette.STATUS_OK_SHADE)
+		heading.add_child(Ui.label("SUNRISE! YOU MADE IT", 24, true, Palette.STATUS_OK_SHADE))
 		get_tree().create_timer(0.6).timeout.connect(func() -> void: Sfx.play("star"))
 		get_tree().create_timer(1.1).timeout.connect(func() -> void: Sfx.play("materials"))
 	else:
 		# kind try-again screen: what happened, one tip, two buttons. No stars list, nothing scary.
 		Sfx.play("evacuate")
-		_ov_label(Strings.t("tryagain.title"), 24, true, Palette.SKY_INDIGO)
+		heading.add_child(Ui.label(Strings.t("tryagain.title"), 24, true, Palette.SKY_INDIGO))
 		_ov_label(Strings.t("tryagain.body"), 16, false)
 		_ov_label("WHY: " + Strings.t("lose.%s.why" % report.reason), 8, true, Palette.BASE_PLUM)
 		_ov_label("TIP: " + Strings.t("lose.%s.tip" % report.reason), 16, true, Palette.STATUS_OK_SHADE)
@@ -1551,7 +1576,7 @@ func _process(delta: float) -> void:
 		if sbn.visible:
 			var wait_s := float(s.scan_ready_at.get(cam, 0.0)) - s.clock_sec
 			sbn.disabled = wait_s > 0.0
-			sbn.text = "SCAN" if wait_s <= 0.0 else "SCAN %d" % ceili(wait_s)
+			sbn.text = "Scan" if wait_s <= 0.0 else "Scan %ds" % ceili(wait_s)
 	# a crewmate who walked away can't answer from that camera any more
 	if answer_crew != "" and s.open_request_for(answer_crew).is_empty():
 		_close_answer()
@@ -1628,13 +1653,13 @@ class FeedView extends Control:
 		return "cam_off"
 
 	func _draw() -> void:
-		var font: Font = preload("res://assets/fonts/Silkscreen-Regular.ttf")
+		var font: Font = Ui.FONT_BODY_B
 		var s: OutpostSim = SimState.sim
 		if cam == "" or s == null or s.battery <= 0.0 and int(fmod(t, 4.0)) == 0 and cam != "shelter":
 			# no camera, or the battery is empty: cameras flicker out to NO SIGNAL
 			draw_texture(Assets.frame("cam_off", int(t * 6.0) % Assets.frame_count("cam_off")), Vector2.ZERO)   # rolling static
 			if s != null and s.battery <= 0.0:
-				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_DANGER)
+				draw_string(font, Vector2(118, 172), "NO POWER", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.STATUS_DANGER)
 			return
 		var bg := _bg(s)
 		# the airlock door hisses open when a crewmate walks through, and clunks shut after
@@ -1669,7 +1694,7 @@ class FeedView extends Control:
 				draw_colored_polygon(PackedVector2Array([c0, c0 + side, tip]), Color(0.75, 0.68, 0.78, 0.55))
 			draw_circle(c0, 5.0, Palette.INK)
 			var lbl: String = ["FAN OFF", "FAN LOW", "FAN MID", "FAN HIGH"][s.life_support + 1] if s.battery > 0.0 else "FAN STOPPED"
-			draw_string(font, Vector2(8, 172), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+			draw_string(font, Vector2(8, 172), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 		# shelter door sliding shut (CF-11)
 		if cam == "shelter" and s.door_closing_left > 0.0:
 			var total: float = s.balance.door_close_sec[clampi(int(s.levels.get("shelter", 1)) - 1, 0, 2)]
@@ -1682,7 +1707,7 @@ class FeedView extends Control:
 				var head := Vector2(340.0 - ph * 420.0 + k * 22.0, -10.0 + ph * 150.0 + (k % 3) * 12.0)
 				for seg in 6:
 					draw_rect(Rect2(head + Vector2(seg * 5.0, -seg * 2.0), Vector2(4, 2)), Color(Palette.HIGHLIGHT if seg < 2 else Palette.STATUS_WARN, 1.0 - seg * 0.16))
-			draw_string(font, Vector2(8, 16), "METEOR SHOWER!", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
+			draw_string(font, Vector2(8, 16), "METEOR SHOWER!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.STATUS_WARN)
 		# radar blip for a crewmate on EVA (CF-10): "it's just Carlo!"
 		if cam == "sky_radar":
 			var i := 0
@@ -1690,14 +1715,14 @@ class FeedView extends Control:
 				if OUTSIDE.has(c.room):
 					var ang := t * 0.8 + i * 2.1
 					draw_texture(Assets.frame("fx_radar_blip", int(t * 3.0) % 2), Vector2(160, 90) + Vector2(cos(ang), sin(ang)) * 50.0 - Vector2(8, 8))
-					draw_string(font, Vector2(8, 168), "BLIP = " + str(c.id).to_upper() + " OUTSIDE", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+					draw_string(font, Vector2(8, 168), "BLIP = " + str(c.id).to_upper() + " OUTSIDE", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 					i += 1
 		# camera problems (sparks) and tonight's discovery (sparkle): tap them
 		for f in s.faults_on_cam(cam):
 			var fp: Vector2 = f.pos
 			draw_texture(Assets.frame("fx_fault", int(t * 6.0) % 2), fp - Vector2(16, 16))
 			draw_arc(fp, 20.0 + 3.0 * sin(t * 6.0), 0, TAU, 24, Palette.STATUS_DANGER, 2.0)
-			draw_string(font, fp + Vector2(-20, 32), "TAP!", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+			draw_string(font, fp + Vector2(-20, 32), "TAP!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 		if not s.discovery.is_empty() and not s.discovery.found and s.discovery.cam == cam:
 			var dp: Vector2 = s.discovery.pos
 			draw_texture(Assets.frame("fx_discovery", int(t * 4.0) % 2), dp - Vector2(16, 16))
@@ -1706,7 +1731,7 @@ class FeedView extends Control:
 			draw_texture(Assets.frame("fx_clue", int(t * 3.0) % 2), Vector2(144, 40))
 			draw_rect(Rect2(120, 78, 80, 6), Palette.INK)
 			draw_rect(Rect2(120, 78, 80 * clampf(float(k.watch) / OutpostSim.CLUE_WATCH_SEC, 0.0, 1.0), 6), Palette.STATUS_WARN)
-			draw_string(font, Vector2(120, 96), "CLUE!", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
+			draw_string(font, Vector2(120, 96), "CLUE!", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.STATUS_WARN)
 		# crew in view (CH-02..CH-06 sprites; EVA suit outside)
 		crew_rects.clear()
 		var x := 24.0
@@ -1730,12 +1755,13 @@ class FeedView extends Control:
 						cx = lerpf(330.0, x, w.p)
 				var bob := 0.0 if w.mode != "stand" else roundf(sin(t * 2.0 + x) * 0.6)
 				draw_texture_rect(Assets.frame(sheet, f), Rect2(cx, 90 + bob, 48, 72), false)
-				draw_string(font, Vector2(cx, 88), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+				draw_rect(Rect2(cx - 2, 74, 50, 17), Color(Palette.INK, 0.85))
+				draw_string(font, Vector2(cx, 87), str(c.id).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 				crew_rects.append({"id": c.id, "rect": Rect2(cx, 84, 48, 78)})
 				if not s.open_request_for(c.id).is_empty():
 					draw_texture(Assets.frame("fx_request", int(t * 3.0) % 2), Vector2(cx + 34, 66))
 				if c.held and w.mode != "stand":
-					draw_string(font, Vector2(cx - 4, 160), "RECALLED", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.STATUS_WARN)
+					draw_string(font, Vector2(cx - 4, 160), "RECALLED", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.STATUS_WARN)
 				x += 60
 		# dust haze on outside cameras (CF-09)
 		# dust haze on every feed in a dust storm: thick outside, a light film indoors (dust on the lenses)
@@ -1747,8 +1773,8 @@ class FeedView extends Control:
 			draw_texture(Assets.frame("fx_static", int(t * 12.0) % 4), Vector2.ZERO, Color(1, 1, 1, clampf(s.hazard.comms_loss, 0.2, 1.0)))
 		if cam == "shelter":
 			var door := "OPEN" if s.shelter_door_open else ("CLOSING" if s.door_closing_left > 0.0 else "CLOSED")
-			draw_string(font, Vector2(8, 20), "DOOR: " + door, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
-		draw_string(font, Vector2(260, 172), s.clock_string(), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+			draw_string(font, Vector2(8, 20), "DOOR: " + door, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
+		draw_string(font, Vector2(266, 172), s.clock_string(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Palette.HIGHLIGHT)
 
 
 # ============================================================================
@@ -1756,19 +1782,12 @@ class FeedView extends Control:
 # ============================================================================
 class MeterPanel extends Control:
 	## DK-09 stats panel with pages. < > buttons flip through every stat.
-	var fr: Font
-	var fb: Font
 	var icons: Dictionary = {}
 	var page := 0
-	const PAGES := ["AIR", "CREW DOSE", "CREW WHERE", "RADIO", "FOOD"]
-	const CREW_COL := {"lani": Palette.CREW_LANI, "maya": Palette.CREW_MAYA, "mateo": Palette.CREW_MATEO, "carlo": Palette.CREW_CARLO}
-	const ROOM_SHORT := {"solar_field": "SOLAR FIELD", "outside": "OUTSIDE", "comms_dish": "COMMS DISH", "airlock": "AIRLOCK",
-		"shelter": "SHELTER", "life_support": "LIFE SUPPORT", "greenhouse": "GREENHOUSE", "galley": "GALLEY"}
+	const PAGES := ["Air", "Crew dose", "Crew location", "Radio", "Food"]
 
-	func setup(r: Font, b: Font, oxy: Texture2D, dose: Texture2D, comms: Texture2D, food: Texture2D) -> void:
-		fr = r
-		fb = b
-		icons = {"oxygen": oxy, "dose": dose, "comms": comms, "food": food}
+	func setup(oxy: Texture2D, comms: Texture2D, food: Texture2D) -> void:
+		icons = {"oxygen": oxy, "comms": comms, "food": food}
 
 	## Start each night on the page that matters tonight.
 	func reset_page(cfg: NightConfig) -> void:
@@ -1791,57 +1810,56 @@ class MeterPanel extends Control:
 		if frac > 0.0:
 			draw_rect(Rect2(x + 2, y + 2, (w - 4) * clampf(frac, 0.0, 1.0), h - 4), col)
 
+	func _text(at: Vector2, text: String, font_size: int, bold := false) -> void:
+		draw_string(Ui.FONT_BODY_B if bold else Ui.FONT_BODY, at, text,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Palette.HIGHLIGHT)
+
 	func _draw() -> void:
 		var s: OutpostSim = SimState.sim
 		if s == null:
 			return
-		var blue := Palette.SKY_HAZE
-		match PAGES[page]:
-			"AIR":
-				draw_texture(icons.oxygen, Vector2(12, 10))
-				draw_string(fr, Vector2(68, 16), "OXYGEN", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
-				_bar(68, 20, 112, 14, s.oxygen / 100.0, Palette.SKY_HAZE)
-				draw_string(fr, Vector2(68, 54), "%d%%" % int(s.oxygen), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
+		_text(Vector2(14, 27), PAGES[page], 20, true)
+		match page:
+			0:
+				draw_texture(icons.oxygen, Vector2(14, 41))
+				_text(Vector2(69, 57), "%d%% oxygen" % int(s.oxygen), 20, true)
+				_bar(69, 65, 200, 14, s.oxygen / 100.0, Palette.SKY_HAZE)
 				var rate := s.oxygen_per_sec()
-				draw_string(fr, Vector2(12, 80), ("RISING" if rate >= 0.0 else "FALLING") + " %.2f%%/S" % absf(rate), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
-			"CREW DOSE":
-				draw_texture(icons.dose, Vector2(12, 4))
-				draw_string(fr, Vector2(68, 14), "MAX %.1f / %d X-RAYS" % [s.max_dose(), int(s.balance.dose_limit_xrays)], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
-				var i := 0
-				for c in s.crew:
-					var x := 68 + (i % 2) * 60
-					var y := 22 + (i / 2) * 22
-					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(x, y, 18, 18), false)
-					_bar(x + 20, y + 5, 36, 8, c.dose / s.balance.dose_limit_xrays, Palette.STATUS_WARN)
-					i += 1
-				draw_string(fr, Vector2(12, 80), "LIMIT %d PER CREWMATE" % int(s.balance.dose_limit_xrays), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
-			"CREW WHERE":
-				var j := 0
-				for c in s.crew:
-					var y := 8 + j * 20
-					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(12, y, 16, 16), false)
-					var where: String = ROOM_SHORT.get(c.room, str(c.room).to_upper())
-					if c.walk_left > 0.0:
-						where = "> " + ROOM_SHORT.get(c.target, str(c.target).to_upper())
-					draw_string(fr, Vector2(32, y + 12), "%s %s" % [str(c.id).to_upper(), where], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
-					j += 1
-			"RADIO":
-				draw_texture(icons.comms, Vector2(12, 10))
-				draw_string(fr, Vector2(68, 16), "LINK TO EARTH", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+				_text(Vector2(69, 103), ("%+.2f%% per second" % rate), 16)
+			1:
+				var limit: float = s.balance.dose_limit_xrays
+				_text(Vector2(126, 26), "Limit %s X-rays" % String.num(limit, 1), 15)
+				for i in s.crew.size():
+					var c: Dictionary = s.crew[i]
+					var y := 36 + i * 20
+					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(14, y, 18, 18), false)
+					_text(Vector2(39, y + 14), str(c.id).capitalize(), 16, true)
+					_bar(106, y + 4, 126, 11, c.dose / limit, Palette.STATUS_WARN)
+					_text(Vector2(242, y + 14), "%.1f" % c.dose, 16)
+			2:
+				for i in s.crew.size():
+					var c: Dictionary = s.crew[i]
+					var y := 36 + i * 20
+					draw_texture_rect(Assets.tex("head_" + c.id), Rect2(14, y, 18, 18), false)
+					var room := str(c.target if c.walk_left > 0.0 else c.room).capitalize()
+					_text(Vector2(39, y + 14), str(c.id).capitalize(), 16, true)
+					_text(Vector2(106, y + 14), ("To " if c.walk_left > 0.0 else "") + room, 16)
+			3:
+				draw_texture(icons.comms, Vector2(14, 41))
 				if s.config.comms_delay_real_min <= 0.0:
-					draw_string(fr, Vector2(68, 44), "NO DISH YET", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					_text(Vector2(69, 57), "No dish yet", 20)
 				else:
-					_bar(68, 20, 112, 14, s.comms / 100.0, Palette.SKY_INDIGO)
-					draw_string(fr, Vector2(68, 54), "%d%%" % int(s.comms), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
-			"FOOD":
-				draw_texture(icons.food, Vector2(12, 10))
+					_text(Vector2(69, 57), "%d%% link to Earth" % int(s.comms), 20, true)
+					_bar(69, 65, 200, 14, s.comms / 100.0, Palette.SKY_HAZE)
+			4:
+				draw_texture(icons.food, Vector2(14, 41))
 				if s.config.food_enabled:
-					draw_string(fr, Vector2(68, 32), "FOOD: %d" % s.food, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, blue)
-					draw_string(fr, Vector2(68, 50), "LAMP %d/%d S" % [int(s.crop_lamp_on_sec), int(s.balance.crop_min_sec)], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
+					_text(Vector2(69, 57), "%d meals" % s.food, 20, true)
+					_text(Vector2(69, 85), "Lamp %d/%d sec" % [int(s.crop_lamp_on_sec), int(s.balance.crop_min_sec)], 16)
 				else:
-					draw_string(fr, Vector2(68, 32), "FROM NIGHT 2", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, blue)
-		# footer: page name + number (the < > buttons sit on the right)
-		draw_string(fb, Vector2(12, 112), "%s %d/%d" % [PAGES[page], page + 1, PAGES.size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.HIGHLIGHT)
+					_text(Vector2(69, 57), "From Night 2", 20)
+		draw_line(Vector2(14, 118), Vector2(176, 118), Palette.BASE_MAUVE)
+		_text(Vector2(14, 141), "Page %d of %d" % [page + 1, PAGES.size()], 16)
 
 
 # ============================================================================
