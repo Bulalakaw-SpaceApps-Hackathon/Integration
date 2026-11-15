@@ -26,6 +26,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout cutscene preview branch
+        uses: actions/checkout@v4
+        with:
+          ref: integration/cutscenes-safe
+          path: _preview_cutscenes
+
       - name: Cache Godot and export templates
         id: cache-godot
         uses: actions/cache@v4
@@ -54,6 +60,15 @@ jobs:
         run: |
           mkdir -p build/web
           /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
+
+      - name: Export Cutscene Preview Web build
+        run: |
+          cd _preview_cutscenes
+          mkdir -p build/web
+          /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
+          cd ..
+          mkdir -p build/web/preview-cutscenes
+          cp -r _preview_cutscenes/build/web/* build/web/preview-cutscenes/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
