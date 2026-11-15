@@ -200,59 +200,24 @@ def life_support(slow):
 
 
 def greenhouse(on, frame=0):
-    """CF-06: the team's curved grow lamp over two raised beds and a clear aisle."""
-    im = Image.new("RGBA", (W, H), STEEL_D)
-    d = ImageDraw.Draw(im)
-    d.polygon([(0, 0), (320, 0), (275, 31), (45, 31)], fill=INK)
-    d.polygon([(0, 180), (320, 180), (269, 112), (51, 112)], fill=STEEL)
-    for x in range(52, 271, 36):
-        d.line((x, 112, 160 + (x - 160) * 2, 179), fill=STEEL_D)
-    for y in (127, 149, 176):
-        d.line((0, y, 319, y), fill=STEEL_D)
-    d.rounded_rectangle((54, 20, 271, 115), 18, fill=INK)
-    d.rounded_rectangle((58, 24, 267, 109), 14, fill=MAUVE)
-    d.rounded_rectangle((65, 30, 260, 102), 10, fill=NAVY)
-    d.polygon([(65, 88), (99, 75), (125, 83), (160, 72), (209, 85), (260, 78),
-               (260, 102), (65, 102)], fill=C("914c52"))
-    for x in (105, 161, 216):
-        d.rectangle((x, 30, x + 4, 103), fill=INK)
-        d.line((x + 1, 32, x + 1, 65), fill=PLUM)
-    for x, y in ((73, 42), (121, 52), (152, 36), (194, 58), (241, 38), (251, 62)):
-        d.point((x, y), fill=CREAM)
-
-    d.polygon([(82, 14), (104, 5), (218, 5), (242, 14), (232, 25), (92, 25)],
-              fill=INK, outline=MAUVE)
-    d.rectangle((97, 19, 226, 23), fill=LMAG if on else STEEL)
+    im = Image.new("RGBA", (W, H)); d = ImageDraw.Draw(im); room(d, light=MAG if on else STEEL)
     if on:
-        glow = Image.new("RGBA", (W, H))
-        ImageDraw.Draw(glow).polygon([(97, 23), (226, 23), (268, 120), (68, 120)],
-                                     fill=(*MAG[:3], 65))
-        im.alpha_composite(glow)
-        d = ImageDraw.Draw(im)
-
-    for x, y, width, count in ((108, 86, 117, 5), (87, 126, 165, 6)):
-        for leg in (x + 6, x + width - 10):
-            d.rectangle((leg, y + 7, leg + 5, y + 22), fill=INK)
-            d.line((leg + 2, y + 9, leg + 2, y + 21), fill=MAUVE)
-        d.polygon([(x + 9, y - 7), (x + width - 9, y - 7),
-                   (x + width, y), (x, y)], fill=POT, outline=INK)
-        d.rectangle((x, y, x + width, y + 9), fill=INK)
-        d.rectangle((x + 2, y + 2, x + width - 2, y + 6), fill=MAUVE if on else PLUM)
-        for i in range(count):
-            px = x + (i + 1) * width // (count + 1)
-            py = y - 3
-            sway = (1 if (frame + i) % 2 else -1) if on else 0
-            d.line((px, py, px + sway, py - 19), fill=LEAF, width=2)
-            for dx, dy in ((-9, -14), (8, -17), (-7, -8), (7, -9)):
-                d.polygon([(px, py - 4), (px + dx, py + dy),
-                           (px + dx // 2 + sway, py + dy - 2)], fill=GREEN if on else DGREEN)
-            if i % 3 == 1:
-                d.ellipse((px - 2, py - 14, px + 3, py - 9), fill=GOLD if on else POT)
-
-    d.rounded_rectangle((281, 71, 305, 112), 4, fill=INK)
-    d.rectangle((285, 76, 301, 87), fill=STEEL if not on else MAG)
-    for y in (94, 102):
-        d.line((286, y, 299, y), fill=MAUVE, width=2)
+        mix(d, (60, 40, 260, 150), V3, DMAG, lambda x, y: max(0.0, 0.85 - math.hypot((x - 160) / 110.0, (y - 92) / 60.0)))
+    d.rectangle((90, 18, 230, 26), fill=INK)                                       # grow lamp
+    d.rectangle((92, 20, 228, 24), fill=(LMAG if frame == 0 else MAG) if on else STEEL)
+    for tx0, ty, w in ((96, 84, 128), (80, 118, 160)):                           # planter tables
+        d.rectangle((tx0, ty, tx0 + w, ty + 6), fill=INK); d.rectangle((tx0 + 1, ty + 1, tx0 + w - 1, ty + 4), fill=STEEL)
+        for lx in (tx0 + 4, tx0 + w - 6): d.rectangle((lx, ty + 6, lx + 2, ty + 22), fill=STEEL_D)
+        for px in range(tx0 + 8, tx0 + w - 4, 14):
+            d.rectangle((px - 3, ty - 6, px + 3, ty), fill=POT if on else C("7d2418"))
+            sway = (1 if (frame + px // 14) % 2 else -1) if on else 0
+            leaf = GREEN if on else DGREEN
+            for dx, dy in ((-5, -8), (0, -11), (5, -8), (-3, -6), (3, -6)):
+                d.line((px, ty - 6, px + dx + sway, ty - 6 + dy), fill=leaf)
+            d.point((px + sway, ty - 17), fill=LEAF if on else DGREEN)
+    for x in (40, 280):
+        d.rectangle((x - 10, 140, x + 10, 158), fill=POT if on else C("7d2418"), outline=INK)
+        for dx in (-6, 0, 6): d.line((x, 140, x + dx, 124), fill=GREEN if on else DGREEN)
     return im
 
 

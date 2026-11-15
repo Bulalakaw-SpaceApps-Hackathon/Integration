@@ -5,8 +5,6 @@ A NASA Space Apps Challenge 2026 game by Team Bulalakaw (Polytechnic University 
 - Design, code and art direction: Team Bulalakaw
 
 # Art and sound
-- SC screen and interface artwork: Team Bulalakaw, from the root of the team Assets repository's SC- group. Resized and adapted where needed for the game layout.
-- CF-06 greenhouse camera: pixel-art redraw in tools/paint_rooms.py, based on Team Bulalakaw's greenhouse camera sketches in the team Assets repository.
 - The Commander's outdoor EVA sprite adapts Team Bulalakaw's Carlo EVA walk cycle with cream and blue suit panels.
 - BT-01 through BT-11 (29 button, control and attention PNGs): original Team Bulalakaw art from the team Assets repository, in the matching folders under `BT-/`. The game copies are in `assets/sprites/ui/`.
 - Art by Team Bulalakaw: characters, camera feeds, base map, UI, alerts, sponsor ads and effects (sources in assets/source/).

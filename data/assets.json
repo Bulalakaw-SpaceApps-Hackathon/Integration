@@ -1220,7 +1220,7 @@
 		"path": "res://assets/sprites/screens/night_card_1.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_2": {
@@ -1228,7 +1228,7 @@
 		"path": "res://assets/sprites/screens/night_card_2.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_3": {
@@ -1236,7 +1236,7 @@
 		"path": "res://assets/sprites/screens/night_card_3.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_4": {
@@ -1244,7 +1244,7 @@
 		"path": "res://assets/sprites/screens/night_card_4.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_5": {
@@ -1252,7 +1252,7 @@
 		"path": "res://assets/sprites/screens/night_card_5.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_6": {
@@ -1260,7 +1260,7 @@
 		"path": "res://assets/sprites/screens/night_card_6.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_7": {
@@ -1268,7 +1268,7 @@
 		"path": "res://assets/sprites/screens/night_card_7.png",
 		"w": 240,
 		"h": 160,
-		"frames": 1,
+		"frames": 4,
 		"kind": "image"
 	},
 	"night_card_lock": {
@@ -1962,8 +1962,8 @@
 	"ui_debrief": {
 		"id": "SC-04",
 		"path": "res://assets/sprites/ui/ui_debrief.png",
-		"w": 64,
-		"h": 64,
+		"w": 96,
+		"h": 96,
 		"frames": 1,
 		"kind": "image"
 	},
